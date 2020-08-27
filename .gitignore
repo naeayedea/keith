@@ -3,6 +3,8 @@ Main.java
 
 #Remove intellij 
 *.idea
+Messages
+Messages.db
 
 # Compiled class file
 *.class
