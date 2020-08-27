@@ -1,14 +1,14 @@
-#Ignore main
+#Scrub main from project
 Main.java
+
+#Remove intellij 
+*.idea
 
 # Compiled class file
 *.class
 
 # Log file
 *.log
-
-# BlueJ files
-*.ctxt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
