@@ -15,7 +15,7 @@ public class MessageHandler extends ListenerAdapter {
     public static String prefix = "?";
     private final User[] admin;
     private Database database;
-    private String[] commands = {"ping", "guess", "calc", "love","avatar", "help","setprefix", "all", "choose", "send", "search", "embed", "sneaky","blast"};
+    private String[] commands = {"ping", "guess", "calc", "love","avatar", "help","setprefix", "all", "choose", "send", "search", "embed", "sneaky","blast", "kill", "getdir"};
 
     public MessageHandler(JDA jda, String url){
         this.jda=jda;
@@ -154,9 +154,18 @@ public class MessageHandler extends ListenerAdapter {
                         prefix=message.substring(1);
                         event.getChannel().sendMessage("prefix changed to: "+prefix+". This is case sensitive.").queue();
                         break;
+                    case "kill":
+                        if(isAdmin(event)){
+                            System.exit(0);
+                        }
+                        break;
+                    case "getdir":
+                        if(isAdmin(event)){
+                            event.getChannel().sendMessage(System.getProperty("user.dir")).queue();
+                        }
+                        break;
                     default:
                         event.getChannel().sendMessage("That is not a valid command!").queue();
-
                 }
             }
         }
