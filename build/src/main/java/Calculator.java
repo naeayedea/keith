@@ -15,7 +15,7 @@ public class Calculator {
     String operatorRegex = "[+\\-/*^!]";
     String numberRegex = "\\d+(\\.\\d+)?+([E]\\d+)?";
     ArrayList<String> numbers = new ArrayList<String>();
-    ArrayList<String> operators = new ArrayList<String>();
+    ArrayList<Character> operators = new ArrayList<Character>();
     ArrayList<String> calculations = new ArrayList<String>();
     String[] negativeHandler = {"+-", "--", "*-", "\\-", "^-", "-+", "-*", "-\\", "-^"};
     String[] operatorsArray = {"+", "-", "*", "/", "^", "!"};
@@ -59,21 +59,18 @@ public class Calculator {
         and trims off whitespace in order to isolate only operators.*/
 
         //If a factorial is detected, the following adds a . so the regex will detect it and separate the operator.
-        if (testString.contains("!")){
-            testString = testString.replace("!", "!");
-        }
+//        if (testString.contains("!")){
+//            testString = testString.replace("!", "!");
+//        }
 
         String[] rawOperators =testString.split(numberRegex);
         for (String operator : rawOperators) {
-
             operator = operator.replaceAll("\\s+", "");
             if (!operator.equals("")){
-
                 if(operator.contains("!")){
-                    operators.add("!");
-                    operators.add(operator.substring(1));
+                    operators.add('!');
                 } else
-                    operators.add(operator);
+                    operators.add(operator.charAt(0));
             }
         }
 
@@ -93,14 +90,14 @@ public class Calculator {
         //Deal with factorials first.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("!"))
+            if (operators.get(i).equals('!'))
             {
-
-                if (Double.parseDouble(numbers.get(i))< 0){
+                double number = Double.parseDouble(numbers.get(i));
+                if (number< 0){
                     channel.sendMessage("undefined").queue();
                 }
 
-                numbers.set(numbers.indexOf(numbers.get(i)), processor.calculate(numbers.get(i)+operators.get(i)));
+                numbers.set(numbers.indexOf(numbers.get(i)), processor.calculate(number,operators.get(i),processor.TYPE_FACTORIAL));
                 operators.remove(i);
                 i--;
             }
@@ -109,11 +106,11 @@ public class Calculator {
         //Next deal with powers.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("^"))
+            if (operators.get(i).equals('^'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
-                numbers.set(i, processor.calculate(numberOne+operators.get(i)+numberTwo));
+                numbers.set(i, processor.calculate(numberOne,operators.get(i),numberTwo));
                 numbers.remove(i+1);
                 operators.remove(i);
                 i--;
@@ -123,11 +120,11 @@ public class Calculator {
         //Next deal with multiplication and then addition from left to right.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("*")||operators.get(i).equals("/"))
+            if (operators.get(i).equals('*')||operators.get(i).equals('/'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
-                numbers.set(i, processor.calculate(numberOne+operators.get(i)+numberTwo));
+                numbers.set(i, processor.calculate(numberOne,operators.get(i), numberTwo));
                 numbers.remove(i+1);
                 operators.remove(i);
                 i--;
@@ -137,11 +134,11 @@ public class Calculator {
         //Next deal with adding and subtracting from left to right.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("+")||operators.get(i).equals("-"))
+            if (operators.get(i).equals('+')||operators.get(i).equals('-'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
-                numbers.set(i, processor.calculate(numberOne+operators.get(i)+numberTwo));
+                numbers.set(i, processor.calculate(numberOne,operators.get(i),numberTwo));
                 numbers.remove(i+1);
                 operators.remove(i);
                 i--;
