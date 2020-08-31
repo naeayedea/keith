@@ -10,10 +10,9 @@ public class Processor {
      *
      * v1.0
      */
-
     public static final double TYPE_FACTORIAL = 0;
-    public String calculate(double numberOne, char operator, double numberTwo){
 
+    public String calculate(double numberOne, char operator, double numberTwo){
         switch (operator) {
 
             case '+':

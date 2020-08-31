@@ -59,13 +59,12 @@ public class Calculator {
         and trims off whitespace in order to isolate only operators.*/
 
         //If a factorial is detected, the following adds a . so the regex will detect it and separate the operator.
-        if (testString.contains("!")){
-            testString = testString.replace("!", "!");
-        }
+//        if (testString.contains("!")){
+//            testString = testString.replace("!", "!");
+//        }
 
         String[] rawOperators =testString.split(numberRegex);
         for (String operator : rawOperators) {
-
             operator = operator.replaceAll("\\s+", "");
             if (!operator.equals("")){
                 if(operator.contains("!")){
@@ -91,7 +90,7 @@ public class Calculator {
         //Deal with factorials first.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("!"))
+            if (operators.get(i).equals('!'))
             {
                 double number = Double.parseDouble(numbers.get(i));
                 if (number< 0){
@@ -107,7 +106,7 @@ public class Calculator {
         //Next deal with powers.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("^"))
+            if (operators.get(i).equals('^'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
@@ -121,7 +120,7 @@ public class Calculator {
         //Next deal with multiplication and then addition from left to right.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("*")||operators.get(i).equals("/"))
+            if (operators.get(i).equals('*')||operators.get(i).equals('/'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
@@ -135,7 +134,7 @@ public class Calculator {
         //Next deal with adding and subtracting from left to right.
         for (int i = 0; i < operators.size(); i++){
 
-            if (operators.get(i).equals("+")||operators.get(i).equals("-"))
+            if (operators.get(i).equals('+')||operators.get(i).equals('-'))
             {
                 double numberOne = Double.parseDouble(numbers.get(i));
                 double numberTwo = Double.parseDouble(numbers.get(i+1));
