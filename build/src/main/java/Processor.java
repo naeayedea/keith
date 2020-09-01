@@ -29,7 +29,7 @@ public class Processor {
                 return Double.toString(answer);
             case '!':
                 double factorial = 0;
-
+                if(numberOne>170) return "Infinity";
                 //0 special case
                 if (numberOne == 0) {
 

