@@ -1,21 +1,13 @@
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.AccountType;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
-
-import javax.security.auth.login.LoginException;
-
 public class Bot {
 
-    public Bot(String token, String url) {
-        JDABuilder builder = JDABuilder.createDefault(token);
-        builder.setActivity(Activity.listening("motherfuckers scream"));
-        builder.setLargeThreshold(50);
-        try {
-            JDA jda = builder.build();
-            jda.addEventListener(new MessageHandler(jda, url));
-        } catch (LoginException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Creates a new bot object, should only ever be created once during runtime
+     * @Param   token   your bot token goes here, apply in main class
+     * @Param   url     your database url
+     */
+    public Bot(String token, String url){
+
     }
+
+
 }
