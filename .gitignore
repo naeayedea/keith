@@ -1,10 +1,11 @@
 #Scrub main from project
 Main.java
 
-#Remove intellij 
+#Remove ide and gradele
+
+#Ignore database
 *.idea
-Messages
-Messages.db
+*.db
 
 # Compiled class file
 *.class
