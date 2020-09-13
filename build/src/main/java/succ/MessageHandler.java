@@ -1,9 +1,13 @@
-import Commands.Admin.Admin;
-import Commands.Command;
+package succ;
+
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import succ.commands.admin.Admin;
+import succ.commands.Command;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import succ.logs.util.ConsoleLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,21 +17,23 @@ import java.util.Map;
  */
 public class MessageHandler extends ListenerAdapter {
 
-    //Listener constructor
     JDA jda;
     Map<String, Command> commands;
     String prefix;
-
+    Database database;
+    ConsoleLogger log;
     public MessageHandler(JDA jda, String url){
         this.jda = jda;
+        database = new Database(url);
+        log = new ConsoleLogger();
         initialiseCommands();
-        prefix = "?";
+        prefix = "^";
     }
 
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
     private void initialiseCommands(){
         commands = new HashMap<String, Command>();
-        commands.put("help", new Commands.Help());
+        commands.put("help", new succ.commands.Help());
         commands.put("admin", new Admin());
     }
 
@@ -49,20 +55,25 @@ public class MessageHandler extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
         if(!event.getAuthor().isBot()){     //Filter out bot accounts
-            if(event.getChannel() instanceof TextChannel){
 
+            if(event.getChannel() instanceof TextChannel){
+                publicMessageReceived(event);
+            }
+
+            if(event.getChannel() instanceof PrivateChannel){
+                privateMessageReceived(event);
             }
         }
     }
 
     //Performs tasks relevant to public messages
     private void publicMessageReceived(MessageReceivedEvent event){
-
+        log.printPublicMessage(event.getAuthor().getName()+": "+event.getMessage().getContentDisplay());
     }
 
     //Performs tasks relevant to private messages, stores in private message database.
     private void privateMessageReceived(MessageReceivedEvent event){
-
+        log.printPrivateMessage(event.getAuthor().getName()+": "+event.getMessage().getContentDisplay());
     }
 
     //Executes the specified command in the channel the command was entered.
@@ -70,4 +81,13 @@ public class MessageHandler extends ListenerAdapter {
 
     }
 
+    private void createUser(MessageReceivedEvent event){
+        User user = new User(getUserId(event), database);
+    }
+
+    private int getUserId(MessageReceivedEvent event){
+        String idString = event.getAuthor().getId();
+        int idInt = Integer.parseInt(idString); //should never fail unless discord id's become longer.
+        return idInt;
+    }
 }
