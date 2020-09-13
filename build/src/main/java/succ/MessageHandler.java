@@ -55,7 +55,10 @@ public class MessageHandler extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
         if(!event.getAuthor().isBot()){     //Filter out bot accounts
-
+            User user = createUser(event);
+            if(!user.inDatabase()){
+                log.printSuccess("placeholder");
+            }
             if(event.getChannel() instanceof TextChannel){
                 publicMessageReceived(event);
             }
@@ -81,13 +84,8 @@ public class MessageHandler extends ListenerAdapter {
 
     }
 
-    private void createUser(MessageReceivedEvent event){
-        User user = new User(getUserId(event), database);
+    private User createUser(MessageReceivedEvent event){
+        return new User(event.getAuthor().getId(), database);
     }
 
-    private int getUserId(MessageReceivedEvent event){
-        String idString = event.getAuthor().getId();
-        int idInt = Integer.parseInt(idString); //should never fail unless discord id's become longer.
-        return idInt;
-    }
 }

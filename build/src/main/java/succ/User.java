@@ -5,12 +5,12 @@ package succ;
  */
 public class User {
 
-    int discordid;
+    String discordid;
     int accessLevel;
     String firstSeen;
     Database database;
 
-    public User(int discordid, Database database){
+    public User(String discordid, Database database){
         this.discordid=discordid;
         getUserInfo();
         this.database=database;
