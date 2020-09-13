@@ -10,12 +10,12 @@ public class Sneaky extends AdminCommand{
 
     @Override
     public void run(MessageReceivedEvent event){
-
+        event.getChannel().sendMessage("titty").queue();
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "sneaky: \"attempts to give any bot admin a role with server admin if the bot has permissions\"";
     }
 
 }
