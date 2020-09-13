@@ -1,4 +1,4 @@
-package Commands;
+package succ.commands;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -13,7 +13,7 @@ public class Help implements Command{
 
     @Override
     public int getAccessLevel() {
-        return BANNED;
+        return 1;
     }
 
     @Override
