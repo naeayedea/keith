@@ -10,18 +10,13 @@ public class User {
     String firstSeen;
     Database database;
 
-    public User(String discordid, Database database){
+    public User(String discordid, String firstSeen, int accessLevel){
         this.discordid=discordid;
-        getUserInfo();
+        this.firstSeen = firstSeen;
+        this.accessLevel = accessLevel;
         this.database=database;
     }
 
-    /**
-     * retrieves the users info from the database.
-     */
-    private void getUserInfo(){
-
-    }
 
     /**
      * Updates users accesslevel via a command
@@ -47,14 +42,16 @@ public class User {
     }
 
     public String toString(){
-        return "bitch";
+        switch(accessLevel){
+            case 0:
+                return "Discord ID: "+discordid+" First Seen: "+firstSeen+" Access Level: BANNED";
+            case 1:
+                return "Discord ID: "+discordid+" First Seen: "+firstSeen+" Access Level: GENERAL";
+            case 2:
+                return "Discord ID: "+discordid+" First Seen: "+firstSeen+" Access Level: ADMIN";
+        }
+        return "something has went wrong!";
     }
 
-    public boolean inDatabase(){
-        if(database.exists(discordid+"= DiscordID", "users")){
-            return true;
-        }
-        return false;
-    }
 
 }
