@@ -1,8 +1,7 @@
 package succ.commands.admin;
 
-import succ.Database;
-import succ.UserManager;
-import succ.commands.Command;
+import succ.util.Database;
+import succ.util.UserManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.HashMap;
 import java.util.Map;

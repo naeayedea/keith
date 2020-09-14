@@ -1,9 +1,9 @@
-package succ;
+package succ.util;
 
 import java.sql.*;
 import java.util.ArrayList;
+import succ.util.logs.ConsoleLogger;
 
-import succ.logs.util.ConsoleLogger;
 public class Database {
 
     /**

@@ -1,4 +1,4 @@
-package succ.logs;
+package succ.util.logs;
 
 /**
  * does nothing right now, do later

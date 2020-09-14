@@ -1,10 +1,13 @@
-package succ.logs.util;
+package succ.util.logs;
 
 public class ConsoleLogger {
 
     /**
      * provides functionality for different system messages to be colour coded
      */
+    public ConsoleLogger(){
+
+    }
 
     //Prints a warning message in red
     public void printWarning(String message){

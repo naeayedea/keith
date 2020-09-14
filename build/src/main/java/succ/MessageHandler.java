@@ -8,7 +8,9 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import succ.commands.Help;
-import succ.logs.util.ConsoleLogger;
+import succ.util.Database;
+import succ.util.UserManager;
+import succ.util.logs.ConsoleLogger;
 import java.util.HashMap;
 import java.util.Map;
 

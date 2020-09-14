@@ -1,9 +1,6 @@
-package succ;
+package succ.util;
 
-import succ.logs.util.ConsoleLogger;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import succ.util.logs.ConsoleLogger;
 import java.util.ArrayList;
 
 /**

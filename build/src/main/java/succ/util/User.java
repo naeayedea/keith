@@ -1,4 +1,4 @@
-package succ;
+package succ.util;
 
 /**
  * Allows storage of information and interaction with users.
