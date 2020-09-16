@@ -8,12 +8,14 @@ public class User {
     String discordid;
     int accessLevel;
     String firstSeen;
+    int commandCount;
     Database database;
 
-    public User(String discordid, String firstSeen, int accessLevel){
+    public User(String discordid, String firstSeen, int accessLevel, int commandCount){
         this.discordid=discordid;
         this.firstSeen = firstSeen;
         this.accessLevel = accessLevel;
+        this.commandCount = commandCount;
         this.database=database;
     }
 
@@ -51,6 +53,10 @@ public class User {
                 return "Discord ID: "+discordid+" First Seen: "+firstSeen+" Access Level: ADMIN";
         }
         return "something has went wrong!";
+    }
+
+    public int getCommandCount(){
+        return commandCount;
     }
 
 
