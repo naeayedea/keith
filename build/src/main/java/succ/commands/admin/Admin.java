@@ -14,8 +14,8 @@ public class Admin extends AdminCommand {
     private Map<String, AdminCommand> admin_commands;
     private UserManager userManager;
     public Admin(Database database){
-        initialiseCommands();
         userManager = new UserManager(database);
+        initialiseCommands();
     }
     @Override
     public String getDescription() {
@@ -40,6 +40,9 @@ public class Admin extends AdminCommand {
     private void initialiseCommands(){
         admin_commands = new HashMap<String, AdminCommand>();
         admin_commands.put("sneaky", new Sneaky());
+        admin_commands.put("updatelevel", new UpdateLevel(userManager));
+
+
         admin_commands.put("help", new succ.commands.admin.Help(admin_commands)); //always initialise help last
     }
 

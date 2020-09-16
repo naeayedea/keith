@@ -7,6 +7,6 @@ public abstract class AdminCommand implements Command{
 
         @Override
         public int getAccessLevel(){
-                return 2;
+                return 3;
         }
 }
