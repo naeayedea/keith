@@ -1,5 +1,6 @@
 package succ.commands.admin;
 
+import net.dv8tion.jda.api.JDA;
 import succ.util.Database;
 import succ.util.UserManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,8 +14,10 @@ public class Admin extends AdminCommand {
 
     private Map<String, AdminCommand> admin_commands;
     private UserManager userManager;
-    public Admin(Database database){
+    private JDA jda;
+    public Admin(Database database, JDA jda){
         userManager = new UserManager(database);
+        this.jda = jda;
         initialiseCommands();
     }
     @Override

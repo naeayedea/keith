@@ -37,7 +37,7 @@ public class MessageHandler extends ListenerAdapter {
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
     private void initialiseCommands(){
         commands = new HashMap<String, Command>();
-        commands.put("admin", new Admin(database));
+        commands.put("admin", new Admin(database, jda));
         commands.put("help", new Help(commands)); //Always initialise help last
     }
 
