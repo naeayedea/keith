@@ -56,27 +56,34 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
+        if(event.getChannel().getId().equals("622761218532179968") || event.getChannel().getId().equals("699019273615704067")){
         net.dv8tion.jda.api.entities.User user = event.getAuthor();
-        if(!user.isBot()){     //Filter out bot accounts
-            if(!userManager.inDatabase(user.getId())){      //check if user is in databse, if no send welcome message and add to database
-                addUserToDatabase(user, event);
-            }
-            if(event.getChannel() instanceof TextChannel){
-                publicMessageReceived(event);                   //Log operations
-            }
-            if(event.getChannel() instanceof PrivateChannel){
-                privateMessageReceived(event);                  //Log operations
-            }
-            if(detectPrefix(event)){                            //Search beginning of message for server prefix
-                Command command = findCommand(event);
-                if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform. && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()
-                    command.run(event);
-                }
-                else if(command==null){
-                    event.getChannel().sendMessage("That is not a valid command!").queue();
-                }
-                else{
-                    event.getChannel().sendMessage("You do not have permission to use this command!").queue();
+            if(!user.isBot()){     //Filter out bot accounts
+                if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
+                    if(event.getChannel() instanceof TextChannel){
+                        publicMessageReceived(event);                   //Log operations
+                    }
+                    if(event.getChannel() instanceof PrivateChannel){
+                        privateMessageReceived(event);                  //Log operations
+                    }
+                    if(detectPrefix(event)){                            //Search beginning of message for server prefix
+                        Command command = findCommand(event);
+                        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
+                            if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
+                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
+                                System.out.println("fat cunt");
+                            }
+                            command.run(event);
+                            userManager.incrementCommandCount(user.getId());
+                        }
+                        else if(command==null){
+                            event.getChannel().sendMessage("That is not a valid command!").queue();
+                        }
+                        else{
+                            event.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                            System.out.println("pussy");
+                        }
+                    }
                 }
             }
         }
@@ -99,9 +106,9 @@ public class MessageHandler extends ListenerAdapter {
         return commands.get(commandSplit[0]);
     }
 
-    //adds user to database
-    private void addUserToDatabase(net.dv8tion.jda.api.entities.User user, MessageReceivedEvent event){
-        userManager.createUser(user.getId());
-        event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
-    }
+//    //adds user to database
+//    private void addUserToDatabase(net.dv8tion.jda.api.entities.User user, MessageReceivedEvent event){
+//        userManager.createUser(user.getId());
+//        event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
+//    }
 }
