@@ -26,9 +26,10 @@ public class UserManager {
      * @returns a user object
      */
     public User getUser(String discordid){
-        if(retrieveUser(discordid))
+        if(!retrieveUser(discordid))        //If returns an error, user does not exist => create
+        createUser(discordid);
+        retrieveUser(discordid);
         return currentUser;
-        return null;
     }
 
     /*
@@ -40,7 +41,8 @@ public class UserManager {
         try{ ;
         String firstSeen = rs.get(1);
         int accessLevel = Integer.parseInt(rs.get(2).toString());
-        currentUser = new User(discordid, firstSeen, accessLevel);
+        int commandCount = Integer.parseInt(rs.get(3).toString());
+        currentUser = new User(discordid, firstSeen, accessLevel, commandCount);
         return true;
         }
         catch (IndexOutOfBoundsException e){
@@ -80,6 +82,10 @@ public class UserManager {
      */
     public boolean updateAccessLevel(String discordid, int newLevel){
         return database.update("UserLevel = "+newLevel+" WHERE DiscordID ="+discordid, "users");
+    }
+
+    public void incrementCommandCount(String discordid){
+        database.update("CommandCount = CommandCount + 1 WHERE DiscordID ="+discordid, "users");
     }
 
 }
