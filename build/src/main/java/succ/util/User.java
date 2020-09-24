@@ -9,14 +9,12 @@ public class User {
     int accessLevel;
     String firstSeen;
     int commandCount;
-    Database database;
 
     public User(String discordid, String firstSeen, int accessLevel, int commandCount){
         this.discordid=discordid;
         this.firstSeen = firstSeen;
         this.accessLevel = accessLevel;
         this.commandCount = commandCount;
-        this.database=database;
     }
 
 

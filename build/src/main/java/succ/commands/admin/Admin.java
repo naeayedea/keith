@@ -2,6 +2,7 @@ package succ.commands.admin;
 
 import net.dv8tion.jda.api.JDA;
 import succ.util.Database;
+import succ.util.ServerManager;
 import succ.util.UserManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.HashMap;
@@ -14,9 +15,11 @@ public class Admin extends AdminCommand {
 
     private Map<String, AdminCommand> admin_commands;
     private UserManager userManager;
+    private ServerManager serverManager;
     private JDA jda;
-    public Admin(Database database, JDA jda){
+    public Admin(Database database, JDA jda, ServerManager serverManager){
         userManager = new UserManager(database);
+        this.serverManager = serverManager;
         this.jda = jda;
         initialiseCommands();
     }
@@ -46,7 +49,7 @@ public class Admin extends AdminCommand {
         admin_commands.put("updatelevel", new UpdateLevel(userManager));
 
 
-        admin_commands.put("help", new succ.commands.admin.Help(admin_commands)); //always initialise help last
+        admin_commands.put("help", new succ.commands.admin.Help(admin_commands, serverManager)); //always initialise help last
     }
 
     private AdminCommand findCommand(MessageReceivedEvent event){

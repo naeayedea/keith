@@ -8,8 +8,10 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import succ.commands.Help;
+import succ.commands.generic.SetPrefix;
 import succ.commands.generic.Sleep;
 import succ.util.Database;
+import succ.util.ServerManager;
 import succ.util.UserManager;
 import succ.util.logs.ConsoleLogger;
 
@@ -25,32 +27,33 @@ public class MessageHandler extends ListenerAdapter {
 
     JDA jda;
     Map<String, Command> commands;
-    String prefix;
     Database database;
     ConsoleLogger log;
     UserManager userManager;
+    ServerManager serverManager;
     ExecutorService commandExecutor = Executors.newCachedThreadPool();
     public MessageHandler(JDA jda, String url){
         this.jda = jda;
         database = new Database(url);
         log = new ConsoleLogger();
         userManager = new UserManager(database);
+        serverManager = new ServerManager(database);
         initialiseCommands();
-        prefix = "^";
         commandExecutor = Executors.newCachedThreadPool();
     }
 
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
     private void initialiseCommands(){
         commands = new HashMap<String, Command>();
-        commands.put("admin", new Admin(database, jda));
-        commands.put("help", new Help(commands)); //Always initialise help last
+        commands.put("admin", new Admin(database, jda, serverManager));
         commands.put("sleep", new Sleep());
+        commands.put("setprefix", new SetPrefix(serverManager));
+        commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
 
     //Search the start of the users message for the prefix, whatever that may be.
-    private boolean detectPrefix(MessageReceivedEvent event){
+    private boolean detectPrefix(MessageReceivedEvent event, String prefix){
         try{
             String message = event.getMessage().getContentRaw();
             String prefix_search = message.substring(0,prefix.length());
@@ -63,40 +66,49 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
+        if(event.getAuthor().isBot() || serverManager.getServer(event.getGuild().getId()).isBanned() || userManager.getUser(event.getAuthor().getId()).getAccessLevel()==0)      //Filter out bots, banned users and servers, waste no time on it.
+            return;
         new Thread( () -> {
-        net.dv8tion.jda.api.entities.User user = event.getAuthor();
-        if(!user.isBot()){     //Filter out bot accounts
-            if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
-                if(event.getChannel() instanceof TextChannel){
-                    publicMessageReceived(event);                   //Log operations
-                }
-                if(event.getChannel() instanceof PrivateChannel){
-                    privateMessageReceived(event);                  //Log operations
-                }
-                if(detectPrefix(event)){                            //Search beginning of message for server prefix
-                    Command command = findCommand(event);
-                    if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
-                        if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
-                            event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
-                        }
-                        try {
-                            Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
-                            commandExecutor.submit(execution).get(10, TimeUnit.SECONDS);
-                        } catch (InterruptedException | ExecutionException e) {
-                            event.getChannel().sendMessage("Something went wrong :(").queue();
-                        } catch (TimeoutException e){
-                            event.getChannel().sendMessage("Command took to long to execute!").queue();
-                        }
+            String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
+
+            if(event.getMessage().getMentionedUsers().contains(jda.getUserById("754072310507503736"))){
+                event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
+                return;
+            }
+
+            net.dv8tion.jda.api.entities.User user = event.getAuthor();
+            if(!user.isBot()){     //Filter out bot accounts
+                if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
+                    if(event.getChannel() instanceof TextChannel){
+                        publicMessageReceived(event);                   //Log operations
                     }
-                    else if(command==null){
-                        event.getChannel().sendMessage("That is not a valid command!").queue();
+                    if(event.getChannel() instanceof PrivateChannel){
+                        privateMessageReceived(event);                  //Log operations
                     }
-                    else{
-                        event.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                    if(detectPrefix(event, prefix)){                            //Search beginning of message for server prefix
+                        Command command = findCommand(event, prefix);
+                        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
+                            if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
+                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
+                            }
+                            try {
+                                Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
+                                commandExecutor.submit(execution).get(10, TimeUnit.SECONDS);
+                            } catch (InterruptedException | ExecutionException e) {
+                                event.getChannel().sendMessage("Something went wrong :(").queue();
+                            } catch (TimeoutException e){
+                                event.getChannel().sendMessage("Command took to long to execute!").queue();
+                            }
+                        }
+                        else if(command==null){
+                            event.getChannel().sendMessage("That is not a valid command!").queue();
+                        }
+                        else{
+                            event.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                        }
                     }
                 }
             }
-        }
         }).start();
     }
 
@@ -110,7 +122,7 @@ public class MessageHandler extends ListenerAdapter {
         log.printPrivateMessage(event.getAuthor().getName()+": "+event.getMessage().getContentDisplay());
     }
 
-    private Command findCommand(MessageReceivedEvent event){
+    private Command findCommand(MessageReceivedEvent event, String prefix){
         String command = event.getMessage().getContentDisplay();
         command = command.substring(prefix.length());
         String[] commandSplit = command.split("\\s+");
