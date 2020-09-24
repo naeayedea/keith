@@ -1,5 +1,5 @@
 # Keith, discordbot
-Second version of keith bot, major quality of life improvements and complete overhaul of the source code.Prefixes are now unique to each server and there is 
+Second version of keith bot, major quality of life improvements and complete overhaul of the source code. Prefixes are now unique to each server and there is 
 now the capability to ban users or servers and also give users more powers via a command.
 
 Commands have also been made abstract, simplifying the messagehandler code. Commands are now threaded which allows the bot to continue even 
