@@ -1,7 +1,7 @@
 #Scrub main from project
 Main.java
 
-#Remove ide and gradele
+#Remove ide and gradle stuff
 
 #Ignore database
 *.idea
