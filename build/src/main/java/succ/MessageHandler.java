@@ -8,11 +8,15 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import succ.commands.Help;
+import succ.commands.generic.Sleep;
 import succ.util.Database;
 import succ.util.UserManager;
 import succ.util.logs.ConsoleLogger;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * Main message handler for keithv2, receives incoming messages and performs tasks depending on message content
@@ -25,6 +29,7 @@ public class MessageHandler extends ListenerAdapter {
     Database database;
     ConsoleLogger log;
     UserManager userManager;
+    ExecutorService commandExecutor = Executors.newCachedThreadPool();
     public MessageHandler(JDA jda, String url){
         this.jda = jda;
         database = new Database(url);
@@ -32,6 +37,7 @@ public class MessageHandler extends ListenerAdapter {
         userManager = new UserManager(database);
         initialiseCommands();
         prefix = "^";
+        commandExecutor = Executors.newCachedThreadPool();
     }
 
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
@@ -39,6 +45,7 @@ public class MessageHandler extends ListenerAdapter {
         commands = new HashMap<String, Command>();
         commands.put("admin", new Admin(database, jda));
         commands.put("help", new Help(commands)); //Always initialise help last
+        commands.put("sleep", new Sleep());
     }
 
 
@@ -56,37 +63,41 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
-        if(event.getChannel().getId().equals("622761218532179968") || event.getChannel().getId().equals("699019273615704067")){
+        new Thread( () -> {
         net.dv8tion.jda.api.entities.User user = event.getAuthor();
-            if(!user.isBot()){     //Filter out bot accounts
-                if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
-                    if(event.getChannel() instanceof TextChannel){
-                        publicMessageReceived(event);                   //Log operations
+        if(!user.isBot()){     //Filter out bot accounts
+            if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
+                if(event.getChannel() instanceof TextChannel){
+                    publicMessageReceived(event);                   //Log operations
+                }
+                if(event.getChannel() instanceof PrivateChannel){
+                    privateMessageReceived(event);                  //Log operations
+                }
+                if(detectPrefix(event)){                            //Search beginning of message for server prefix
+                    Command command = findCommand(event);
+                    if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
+                        if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
+                            event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
+                        }
+                        try {
+                            Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
+                            commandExecutor.submit(execution).get(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException | ExecutionException e) {
+                            event.getChannel().sendMessage("Something went wrong :(").queue();
+                        } catch (TimeoutException e){
+                            event.getChannel().sendMessage("Command took to long to execute!").queue();
+                        }
                     }
-                    if(event.getChannel() instanceof PrivateChannel){
-                        privateMessageReceived(event);                  //Log operations
+                    else if(command==null){
+                        event.getChannel().sendMessage("That is not a valid command!").queue();
                     }
-                    if(detectPrefix(event)){                            //Search beginning of message for server prefix
-                        Command command = findCommand(event);
-                        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
-                            if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
-                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
-                                System.out.println("fat cunt");
-                            }
-                            command.run(event);
-                            userManager.incrementCommandCount(user.getId());
-                        }
-                        else if(command==null){
-                            event.getChannel().sendMessage("That is not a valid command!").queue();
-                        }
-                        else{
-                            event.getChannel().sendMessage("You do not have permission to use this command!").queue();
-                            System.out.println("pussy");
-                        }
+                    else{
+                        event.getChannel().sendMessage("You do not have permission to use this command!").queue();
                     }
                 }
             }
         }
+        }).start();
     }
 
     //Performs tasks relevant to public messages
@@ -105,10 +116,4 @@ public class MessageHandler extends ListenerAdapter {
         String[] commandSplit = command.split("\\s+");
         return commands.get(commandSplit[0]);
     }
-
-//    //adds user to database
-//    private void addUserToDatabase(net.dv8tion.jda.api.entities.User user, MessageReceivedEvent event){
-//        userManager.createUser(user.getId());
-//        event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
-//    }
 }
