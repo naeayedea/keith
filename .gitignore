@@ -1,5 +1,6 @@
-#Scrub main from project
+#Scrub main and manifest from project
 Main.java
+MANIFEST.MF
 
 #Remove ide and gradle stuff
 
