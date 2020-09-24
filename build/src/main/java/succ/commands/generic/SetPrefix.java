@@ -17,7 +17,7 @@ public class SetPrefix extends UserCommand{
 
     @Override
     public String getDescription() {
-        return null;
+        return "setprefix: \"Sets the current prefix of this server to a new value, size limit is 1\"";
     }
 
     @Override
