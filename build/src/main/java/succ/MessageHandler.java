@@ -8,14 +8,13 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import succ.commands.Help;
+import succ.commands.generic.Avatar;
 import succ.commands.generic.SetPrefix;
-import succ.commands.generic.Sleep;
 import succ.util.Database;
 import succ.util.ServerManager;
 import succ.util.UserManager;
 import succ.util.logs.ConsoleLogger;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -46,7 +45,7 @@ public class MessageHandler extends ListenerAdapter {
     private void initialiseCommands(){
         commands = new HashMap<String, Command>();
         commands.put("admin", new Admin(database, jda, serverManager));
-        commands.put("sleep", new Sleep());
+        commands.put("avatar", new Avatar());
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
@@ -71,7 +70,7 @@ public class MessageHandler extends ListenerAdapter {
         new Thread( () -> {
             String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
 
-            if(event.getMessage().getMentionedUsers().contains(jda.getUserById("754072310507503736"))){
+            if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser())){
                 event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
                 return;
             }
