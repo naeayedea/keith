@@ -49,6 +49,7 @@ public class Admin extends AdminCommand {
         admin_commands = new HashMap<String, Command>();
         admin_commands.put("sneaky", new Sneaky());
         admin_commands.put("updatelevel", new UpdateLevel(userManager));
+        admin_commands.put("setstatus", new SetStatus(jda, serverManager));
         admin_commands.put("sleep", new Sleep());
         admin_commands.put("send", new SendMessage(jda));
         admin_commands.put("ban", new Ban(userManager, serverManager));
