@@ -22,7 +22,7 @@ public class MessageBuilder {
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle(title);
             eb.setDescription(message);
-            event.getChannel().sendMessage(eb.build()).queue();
+            channel.sendMessage(eb.build()).queue();
         }
         catch (IllegalArgumentException e){
             event.getChannel().sendMessage("Message send error").queue();
