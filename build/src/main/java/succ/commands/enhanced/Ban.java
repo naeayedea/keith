@@ -30,7 +30,6 @@ public class Ban extends EnhancedCommand{
         String commandRaw = event.getMessage().getContentDisplay().toLowerCase().trim();
         String[] commandSplit = commandRaw.split("\\s+");
         try{
-            System.out.println(Arrays.toString(commandSplit));
             String type = commandSplit[2];
             List<User> mentionedUsers = event.getMessage().getMentionedUsers();
             String id;
