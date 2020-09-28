@@ -1,6 +1,8 @@
 package succ;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 import succ.commands.admin.Admin;
 import succ.commands.Command;
 import net.dv8tion.jda.api.JDA;
@@ -9,6 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import succ.commands.Help;
 import succ.commands.generic.Avatar;
+import succ.commands.generic.Feedback;
 import succ.commands.generic.SetPrefix;
 import succ.util.Database;
 import succ.util.ServerManager;
@@ -47,6 +50,7 @@ public class MessageHandler extends ListenerAdapter {
         commands.put("admin", new Admin(database, jda, serverManager));
         commands.put("avatar", new Avatar());
         commands.put("setprefix", new SetPrefix(serverManager));
+        commands.put("feedback", new Feedback(userManager, jda));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
@@ -65,17 +69,24 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
-        if(event.getAuthor().isBot() || serverManager.getServer(event.getGuild().getId()).isBanned() || userManager.getUser(event.getAuthor().getId()).getAccessLevel()==0)      //Filter out bots, banned users and servers, waste no time on it.
+        if(event.getAuthor().isBot() ||  userManager.getUser(event.getAuthor().getId()).getAccessLevel()==0)      //Filter out bots, banned users and servers, waste no time on it.
             return;
+        if(!(event.getChannel() instanceof PrivateChannel) && serverManager.getServer(event.getGuild().getId()).isBanned()){
+            return;
+        }
         new Thread( () -> {
-            String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
+            String prefix;
+            if(!(event.getChannel() instanceof PrivateChannel))
+                prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
+            else
+                prefix = "?";
 
             if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser())){
                 event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
                 return;
             }
 
-            net.dv8tion.jda.api.entities.User user = event.getAuthor();
+            User user = event.getAuthor();
             if(!user.isBot()){     //Filter out bot accounts
                 if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
                     if(event.getChannel() instanceof TextChannel){
@@ -100,7 +111,6 @@ public class MessageHandler extends ListenerAdapter {
                             }
                         }
                         else if(command==null){
-                            event.getChannel().sendMessage("That is not a valid command!").queue();
                         }
                         else{
                             event.getChannel().sendMessage("You do not have permission to use this command!").queue();
