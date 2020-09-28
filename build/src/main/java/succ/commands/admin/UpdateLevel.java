@@ -23,7 +23,9 @@ public class UpdateLevel extends AdminCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event){String[] messageSplit = event.getMessage().getContentDisplay().split("\\s+");
+    public void run(MessageReceivedEvent event){
+
+        String[] messageSplit = event.getMessage().getContentDisplay().split("\\s+");
         int newLevel;
         try{        //Parse the integer from the final argument, return error if not integer
             newLevel = Integer.parseInt(messageSplit[messageSplit.length-1]);

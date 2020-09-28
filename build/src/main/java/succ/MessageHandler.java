@@ -100,7 +100,6 @@ public class MessageHandler extends ListenerAdapter {
                             }
                         }
                         else if(command==null){
-                            event.getChannel().sendMessage("That is not a valid command!").queue();
                         }
                         else{
                             event.getChannel().sendMessage("You do not have permission to use this command!").queue();
