@@ -21,7 +21,6 @@ public class SendMessage extends AdminCommand{
 
     @Override
     public void run(MessageReceivedEvent event) {
-        System.out.println("here0");
         MessageChannel channel = event.getChannel();
         String commandRaw = event.getMessage().getContentRaw().trim();
         String[] args = commandRaw.split("\\s+");
@@ -29,13 +28,11 @@ public class SendMessage extends AdminCommand{
         try{
             String type = args[2];
             if(type.equals("message")){
-                System.out.println("here1");
                 String channelId = args[3];
                 String message = commandRaw.substring(commandRaw.indexOf(args[4]));
                 builder.sendMessage(channelId, message, event);
             }
             else if(type.equals("embed")){
-                System.out.println("here2");
                 String channelId = args[3];
                 String title = args[4];
                 String message = commandRaw.substring(commandRaw.indexOf(args[5]));
@@ -43,7 +40,6 @@ public class SendMessage extends AdminCommand{
             }
         } catch (IndexOutOfBoundsException e){
             channel.sendMessage("Insufficient arguments, see help").queue();
-            System.out.println("fuck");
             return;
         }
     }
