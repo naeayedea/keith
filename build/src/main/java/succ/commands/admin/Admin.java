@@ -15,14 +15,16 @@ import java.util.Map;
  */
 public class Admin extends AdminCommand {
 
-    private Map<String, Command> admin_commands;
+    private Map<String, Command> adminCommands;
     private UserManager userManager;
     private ServerManager serverManager;
+    private Database database;
     private JDA jda;
     public Admin(Database database, JDA jda, ServerManager serverManager){
         userManager = new UserManager(database);
         this.serverManager = serverManager;
         this.jda = jda;
+        this.database = database;
         initialiseCommands();
     }
     @Override
@@ -46,14 +48,15 @@ public class Admin extends AdminCommand {
     }
 
     private void initialiseCommands(){
-        admin_commands = new HashMap<String, Command>();
-        admin_commands.put("sneaky", new Sneaky());
-        admin_commands.put("updatelevel", new UpdateLevel(userManager));
-        admin_commands.put("setstatus", new SetStatus(jda, serverManager));
-        admin_commands.put("sleep", new Sleep());
-        admin_commands.put("send", new SendMessage(jda));
-        admin_commands.put("ban", new Ban(userManager, serverManager));
-        admin_commands.put("help", new succ.commands.admin.Help(admin_commands, serverManager)); //always initialise help last
+        adminCommands = new HashMap<String, Command>();
+        adminCommands.put("sneaky", new Sneaky());
+        adminCommands.put("updatelevel", new UpdateLevel(userManager));
+        adminCommands.put("setstatus", new SetStatus(jda, serverManager));
+        adminCommands.put("sleep", new Sleep());
+        adminCommands.put("send", new SendMessage(jda));
+        adminCommands.put("ban", new Ban(userManager, serverManager));
+        adminCommands.put("stats", new Stats(database, jda));
+        adminCommands.put("help", new succ.commands.admin.Help(adminCommands, serverManager)); //always initialise help last
     }
 
     private Command findCommand(MessageReceivedEvent event){
@@ -62,7 +65,7 @@ public class Admin extends AdminCommand {
         command = command.substring(commandSplit[0].length()).trim();          //Remove initial [index]admin
         commandSplit = command.split("\\s+");                     //Split subcommand into individual arguments
         String subCommand = commandSplit[0];
-        return admin_commands.get(subCommand);
+        return adminCommands.get(subCommand);
     }
 
 }

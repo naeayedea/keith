@@ -105,6 +105,7 @@ public class MessageHandler extends ListenerAdapter {
                                 Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
                                 commandExecutor.submit(execution).get(10, TimeUnit.SECONDS);
                             } catch (InterruptedException | ExecutionException e) {
+                                e.printStackTrace();
                                 event.getChannel().sendMessage("Something went wrong :(").queue();
                             } catch (TimeoutException e){
                                 event.getChannel().sendMessage("Command took to long to execute!").queue();
