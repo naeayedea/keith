@@ -25,6 +25,7 @@ public class Stats extends AdminCommand{
 
     @Override
     public void run(MessageReceivedEvent event) {
+        jda.getGuilds();
         MessageChannel channel = event.getChannel();
         String commandRaw = event.getMessage().getContentDisplay();
         String[] commandSplit = commandRaw.split("\\s+");
@@ -52,7 +53,7 @@ public class Stats extends AdminCommand{
                     Guild server = jda.getGuildById(serverId);
                     serverList+= server.getName()+"("+server.getId()+") First Seen: "+firstSeen+"\n";
                 }
-                channel.sendMessage("Admin Users:\n"+serverList+"```").queue();
+                channel.sendMessage("Servers:\n"+serverList+"```").queue();
                 break;
             case "users":
                 channel.sendMessage("User count: "+returnUserCount()).queue();
