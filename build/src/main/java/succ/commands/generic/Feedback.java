@@ -38,7 +38,7 @@ public class Feedback extends UserCommand{
                     if(matcher.find()){
                         MessageChannel respondChannel =  jda.getTextChannelById(matcher.group(1));
                         try{
-                        respondChannel.sendMessage("Response from "+message.getAuthor()+": "+response).queue();
+                        respondChannel.sendMessage("Response from "+message.getAuthor()+": ```"+response+"```").queue();
                         }
                         catch(Exception e){
                             Pattern userPattern = Pattern.compile("U:.*\\((\\d+?)\\)\\s");
@@ -48,7 +48,7 @@ public class Feedback extends UserCommand{
                                 userId=userMatcher.group(1);
                             }
                             User user = jda.getUserById(userId);
-                            user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessage("Response from "+message.getAuthor()+": "+response)).queue();
+                            user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessage("Response from "+message.getAuthor()+": ```"+response+"```")).queue();
                             feedbackChannel.sendMessage("responded to feedback privately").queue();
                             return;
                         }
@@ -64,11 +64,12 @@ public class Feedback extends UserCommand{
                 return;
         }
             if(channel instanceof PrivateChannel){
-                feedbackChannel.sendMessage("Feedback from "+message.getAuthor()+" privately, "+message.getChannel()+": "+commandRaw.substring(commandRaw.indexOf(commandSplit[1]))).queue();
+                feedbackChannel.sendMessage("Feedback from "+message.getAuthor()+" privately, "+message.getChannel()+": ```"+commandRaw.substring(commandRaw.indexOf(commandSplit[1]))+"```").queue();
+                event.getChannel().sendMessage("Feedback sent!").queue();
                 return;
             }
-            feedbackChannel.sendMessage("Feedback from "+message.getAuthor()+" in server "+message.getGuild()+", channel "+message.getChannel()+": "+commandRaw.substring(commandRaw.indexOf(commandSplit[1]))).queue();
-
+            feedbackChannel.sendMessage("Feedback from "+message.getAuthor()+" in server "+message.getGuild()+", channel "+message.getChannel()+": ```"+commandRaw.substring(commandRaw.indexOf(commandSplit[1]))+"```").queue();
+            event.getChannel().sendMessage("Feedback sent!").queue();
         }
         catch (Exception e){
             e.printStackTrace();
