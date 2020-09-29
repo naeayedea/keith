@@ -22,6 +22,6 @@ public class SetStatus extends AdminCommand{
         String messageRaw = event.getMessage().getContentDisplay().trim();
         String[] args = messageRaw.split("\\s+");
         String newActivity = messageRaw.substring(messageRaw.indexOf(args[2]));
-        jda.getPresence().setActivity(Activity.listening(newActivity));
+        jda.getPresence().setActivity(Activity.playing(newActivity));
     }
 }
