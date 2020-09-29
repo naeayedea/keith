@@ -119,4 +119,42 @@ public class Database {
             return false;
         }
     }
+
+
+    //Warning - never allow the user to input a searchterm directly into this method as it gives unfiltered access
+    //to the database.
+    public ArrayList<String> query(String searchTerm){
+        Connection connection = connect();
+        try
+        {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(searchTerm);
+
+            int columnCount = rs.getMetaData().getColumnCount();
+            ArrayList<String> results = new ArrayList<String>();
+            //Loop through results
+            while(rs.next()){
+                //While next row
+                String queryResult="";
+                for(int i = 1; i<=columnCount; i++){
+                    //Fill out each column
+                    Object object = rs.getObject(i);
+                    if(object!=null){
+                        queryResult+=object.toString()+"    ";
+                    }
+                }
+                results.add(queryResult);
+            }
+            closeConnection(connection);
+            return results;
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            closeConnection(connection);
+            ArrayList<String> error = new ArrayList<String>();
+            error.add(null);
+            return error;
+        }
+    }
 }

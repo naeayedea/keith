@@ -24,7 +24,7 @@ public class Bot {
         //Create jda builder object
         JDABuilder builder = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_BANS, GatewayIntent.GUILD_EMOJIS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES,
                 GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS);
-        builder.setActivity(Activity.listening("?help for commands"));  //Default discord status
+        builder.setActivity(Activity.playing("?help for commands"));  //Default discord status
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.setLargeThreshold(50);
         try {
