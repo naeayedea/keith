@@ -24,11 +24,11 @@ public class Bot {
         //Create jda builder object
         JDABuilder builder = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_BANS, GatewayIntent.GUILD_EMOJIS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES,
                 GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS);
-        builder.setActivity(Activity.playing("?help for commands"));  //Default discord status
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.setLargeThreshold(50);
         try {
             JDA jda = builder.build();
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ "servers"));  //Default discord status
             jda.addEventListener(new MessageHandler(jda, url));
         } catch (LoginException e) {
             e.printStackTrace();
