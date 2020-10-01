@@ -46,7 +46,7 @@ public class MessageHandler extends ListenerAdapter {
         commands.put("avatar", new Avatar());
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("feedback", new Feedback(userManager));
-        commands.put("guess", new Guess(serverManager));
+        commands.put("guess", new Guess(serverManager, 40));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 

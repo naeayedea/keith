@@ -14,10 +14,12 @@ public class Guess extends UserCommand{
     private ArrayList<GuessDriver> games;
     private ServerManager serverManager;
     ExecutorService runner;
-    public Guess(ServerManager serverManager){
+    private int timeout;
+    public Guess(ServerManager serverManager, int timeout){
         this.serverManager = serverManager;
         games = new ArrayList<>();
         runner = Executors.newCachedThreadPool();
+        this.timeout = timeout;
     }
     @Override
     public String getDescription(MessageReceivedEvent event) {
@@ -89,7 +91,7 @@ public class Guess extends UserCommand{
             Runnable newGame = () -> {
                 GuessDriver game = new GuessDriver(number, channel);
                 games.add(game);
-                channel.sendMessage("You have 100 seconds to guess the number between 0 and "+number+"!").queue();
+                channel.sendMessage("You have "+timeout+" seconds to guess the number between 0 and "+number+"!").queue();
                 while(!game.completed){
                     try {
                         Thread.currentThread().sleep(20);
@@ -101,7 +103,7 @@ public class Guess extends UserCommand{
                 endGame(event);
             };
             try{
-                runner.submit(newGame).get(20, TimeUnit.SECONDS); //run command operations, kill after max time reached
+                runner.submit(newGame).get(timeout, TimeUnit.SECONDS); //run command operations, kill after max time reached
             }
             catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
