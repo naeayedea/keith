@@ -1,6 +1,5 @@
 package succ;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import succ.commands.admin.Admin;
@@ -9,15 +8,11 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import succ.commands.Help;
-import succ.commands.generic.Avatar;
-import succ.commands.generic.Feedback;
-import succ.commands.generic.SetPrefix;
+import succ.commands.generic.*;
 import succ.util.Database;
 import succ.util.ServerManager;
 import succ.util.UserManager;
 import succ.util.logs.ConsoleLogger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -50,7 +45,8 @@ public class MessageHandler extends ListenerAdapter {
         commands.put("admin", new Admin(database, jda, serverManager));
         commands.put("avatar", new Avatar());
         commands.put("setprefix", new SetPrefix(serverManager));
-        commands.put("feedback", new Feedback(userManager, jda));
+        commands.put("feedback", new Feedback(userManager));
+        commands.put("guess", new Guess(serverManager));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
@@ -69,18 +65,20 @@ public class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
-        if(event.getAuthor().isBot() ||  userManager.getUser(event.getAuthor().getId()).getAccessLevel()==0)      //Filter out bots, banned users and servers, waste no time on it.
-            return;
-        if(!(event.getChannel() instanceof PrivateChannel) && serverManager.getServer(event.getGuild().getId()).isBanned()){
-            return;
-        }
         new Thread( () -> {
+            if(event.getAuthor().isBot() ||  userManager.getUser(event.getAuthor().getId()).getAccessLevel()==0)      //Filter out bots, banned users and servers, waste no time on it.
+                return;
+            if(!(event.getChannel() instanceof PrivateChannel) && serverManager.getServer(event.getGuild().getId()).isBanned())
+                return;
+
             String prefix;
+            //Retrieve servers prefix, if the message is from a private channel -> default prefix
             if(!(event.getChannel() instanceof PrivateChannel))
                 prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
             else
                 prefix = "?";
 
+            //If someone tags the bot, tell them the prefix
             if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser())){
                 event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
                 return;
@@ -99,16 +97,16 @@ public class MessageHandler extends ListenerAdapter {
                         Command command = findCommand(event, prefix);
                         if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
                             if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
-                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \"" +prefix+"help\" to see a list of commands!").queue();
+                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \""+prefix+"help\" to see a list of commands!").queue();
                             }
                             try {
                                 Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
-                                commandExecutor.submit(execution).get(10, TimeUnit.SECONDS);
+                                commandExecutor.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS); //run command operations, kill after max time reached
                             } catch (InterruptedException | ExecutionException e) {
                                 e.printStackTrace();
                                 event.getChannel().sendMessage("Something went wrong :(").queue();
                             } catch (TimeoutException e){
-                                event.getChannel().sendMessage("Command took to long to execute!").queue();
+//                                event.getChannel().sendMessage("Command took to long to execute!").queue();
                             }
                         }
                         else if(command==null){
