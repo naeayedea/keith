@@ -16,7 +16,7 @@ public class SetPrefix extends UserCommand{
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "setprefix: \"Sets the current prefix of this server to a new value, size limit is 1\"";
     }
 
@@ -40,4 +40,5 @@ public class SetPrefix extends UserCommand{
             event.getChannel().sendMessage("Prefix cannot be empty!").queue();
         }
     }
+
 }

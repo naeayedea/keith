@@ -13,18 +13,18 @@ public class Feedback extends UserCommand{
 
     UserManager userManager;
     JDA jda;
-    public Feedback(UserManager userManager, JDA jda){
+    public Feedback(UserManager userManagera){
         this.userManager = userManager;
-        this.jda=jda;
     }
     @Override
-    public String getDescription() {
-        return "Feedback: \"bugs or ideas for the bot? use this command to voice your opinion\"";
+    public String getDescription(MessageReceivedEvent event) {
+        return "feedback: \"bugs or ideas for the bot? use this command to voice your opinion\"";
     }
 
     @Override
     public void run(MessageReceivedEvent event) {
         try{
+            jda = event.getJDA();
             MessageChannel feedbackChannel= jda.getTextChannelById("760226764529336350");
             MessageChannel channel = event.getChannel();
             Message message = event.getMessage();

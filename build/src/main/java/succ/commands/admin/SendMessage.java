@@ -5,18 +5,22 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.util.MessageBuilder;
+import succ.util.ServerManager;
 
 import java.util.Arrays;
 
 public class SendMessage extends AdminCommand{
 
     MessageBuilder builder;
-    public SendMessage(JDA jda){
+    private ServerManager serverManager;
+
+    public SendMessage(JDA jda, ServerManager serverManager){
         this.builder = new MessageBuilder(jda);
+        this.serverManager = serverManager;
     }
     @Override
-    public String getDescription() {
-        return "send: \"Lets you send a message to another channel - do '[prefix]send message/embed [channelid] [title(embed only] [message]\"";
+    public String getDescription(MessageReceivedEvent event) {
+        return "send: \"Lets you send a message to another channel - do '"+super.getPrefix(event, serverManager)+"send message/embed [channelid] [title(embed only] [message]\"";
     }
 
     @Override

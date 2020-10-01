@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Avatar extends UserCommand {
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "avatar: \"Returns the avatar of the user or a mentioned user\"";
     }
 

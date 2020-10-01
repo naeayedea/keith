@@ -5,7 +5,7 @@ import succ.commands.generic.UserCommand;
 
 public class Sleep extends AdminCommand {
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "sleep: \"simulates a misbehaving command taking to long to test if bot kills it\"";
     }
 

@@ -17,8 +17,9 @@ public class UpdateLevel extends AdminCommand {
     public UpdateLevel(UserManager um){
         this.userManager = um;
     }
+
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "updatelevel: \"updates a users level to the specified value, cannot demote someone above or equal to you.\"";
     }
 

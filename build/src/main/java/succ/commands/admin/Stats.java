@@ -6,25 +6,29 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.util.Database;
+import succ.util.ServerManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Stats extends AdminCommand{
 
-    private JDA jda;
     private Database database;
-    public Stats(Database database, JDA jda){
-        this.jda=jda;
+    private ServerManager serverManager;
+    private JDA jda;
+
+    public Stats(Database database, ServerManager serverManager){
         this.database=database;
+        this.serverManager = serverManager;
     }
                  @Override
-    public String getDescription() {
-        return "stats: \"returns various bot stats do [prefix]admin statis (servers/users/admins)\"";
+    public String getDescription(MessageReceivedEvent event) {
+        return "stats: \"returns various bot stats do '"+super.getPrefix(event, serverManager)+"admin statis (servers/users/admins)'\"";
     }
 
     @Override
     public void run(MessageReceivedEvent event) {
+        jda = event.getJDA();
         jda.getGuilds();
         MessageChannel channel = event.getChannel();
         String commandRaw = event.getMessage().getContentDisplay();

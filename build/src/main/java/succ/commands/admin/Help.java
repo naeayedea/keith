@@ -20,7 +20,7 @@ public class Help extends AdminCommand{
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "help: \"this command, returns admin command list\"";
     }
 
@@ -29,7 +29,7 @@ public class Help extends AdminCommand{
         String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
         String helpString = "```cs\n";
         for(Map.Entry<String, Command> set : commands.entrySet()){
-            helpString+= prefix+set.getValue().getDescription()+"\n";
+            helpString+= prefix+set.getValue().getDescription(event)+"\n";
         }
         helpString+="```";
         event.getChannel().sendMessage(helpString).queue();

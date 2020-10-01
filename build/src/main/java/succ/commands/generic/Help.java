@@ -1,4 +1,4 @@
-package succ.commands;
+package succ.commands.generic;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.commands.Command;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Prints a list of all user commands and their descriptions
  */
-public class Help implements Command {
+public class Help extends UserCommand {
 
     private Map<String, Command> commands;
     private ServerManager serverManager;
@@ -21,13 +21,8 @@ public class Help implements Command {
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "help: \"this command, returns general command list\"";
-    }
-
-    @Override
-    public int getAccessLevel() {
-        return 1;
     }
 
     @Override
@@ -35,7 +30,7 @@ public class Help implements Command {
         String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
         String helpString = "```cs\n";
         for(Map.Entry<String, Command> set : commands.entrySet()){
-            helpString+= prefix+set.getValue().getDescription()+"\n";
+            helpString+= prefix+set.getValue().getDescription(event)+"\n";
         }
         helpString+="```";
         event.getChannel().sendMessage(helpString).queue();

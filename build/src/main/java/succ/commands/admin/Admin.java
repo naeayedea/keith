@@ -28,8 +28,8 @@ public class Admin extends AdminCommand {
         initialiseCommands();
     }
     @Override
-    public String getDescription() {
-        return "admin: \"gateway for all admin commands - do '[prefix]admin [command]'\"";
+    public String getDescription(MessageReceivedEvent event) {
+        return "admin: \"gateway for all admin commands - do '"+super.getPrefix(event, serverManager)+"admin [command]'\"";
     }
 
     @Override
@@ -53,9 +53,9 @@ public class Admin extends AdminCommand {
         adminCommands.put("updatelevel", new UpdateLevel(userManager));
         adminCommands.put("setstatus", new SetStatus(jda, serverManager));
         adminCommands.put("sleep", new Sleep());
-        adminCommands.put("send", new SendMessage(jda));
+        adminCommands.put("send", new SendMessage(jda, serverManager));
         adminCommands.put("ban", new Ban(userManager, serverManager));
-        adminCommands.put("stats", new Stats(database, jda));
+        adminCommands.put("stats", new Stats(database, serverManager));
         adminCommands.put("help", new succ.commands.admin.Help(adminCommands, serverManager)); //always initialise help last
     }
 

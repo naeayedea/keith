@@ -21,8 +21,8 @@ public class Ban extends EnhancedCommand{
         this.serverManager=serverManager;
     }
                @Override
-    public String getDescription() {
-        return "ban: \"Bans the specified user or server - do '[prefix]ban user/server [user or server id]'\"";
+    public String getDescription(MessageReceivedEvent event) {
+        return "ban: \"Bans the specified user or server - do '"+super.getPrefix(event, serverManager)+"ban user/server [user or server id]'\"";
     }
 
     @Override
