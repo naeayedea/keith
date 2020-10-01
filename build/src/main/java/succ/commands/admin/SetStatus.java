@@ -13,7 +13,7 @@ public class SetStatus extends AdminCommand{
         this.jda=jda;
     }
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "setstatus: \"sets the bots status to the specified message\"";
     }
 
@@ -22,6 +22,10 @@ public class SetStatus extends AdminCommand{
         String messageRaw = event.getMessage().getContentDisplay().trim();
         String[] args = messageRaw.split("\\s+");
         String newActivity = messageRaw.substring(messageRaw.indexOf(args[2]));
+        if(newActivity.toLowerCase().equals("default")){
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ "servers"));  //Default discord status
+            return;
+        }
         jda.getPresence().setActivity(Activity.playing(newActivity));
     }
 }

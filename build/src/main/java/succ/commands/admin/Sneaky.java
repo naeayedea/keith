@@ -14,7 +14,7 @@ public class Sneaky extends AdminCommand{
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription(MessageReceivedEvent event) {
         return "sneaky: \"attempts to give any bot admin a role with server admin if the bot has permissions\"";
     }
 
