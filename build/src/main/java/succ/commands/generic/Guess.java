@@ -94,12 +94,11 @@ public class Guess extends UserCommand{
                 channel.sendMessage("You have "+timeout+" seconds to guess the number between 0 and "+number+"!").queue();
                 while(!game.completed){
                     try {
-                        Thread.currentThread().sleep(20);
+                        Thread.currentThread().sleep(35);
                     } catch (InterruptedException e) {
                         //do nothing
                     }
                 }
-                System.out.println("finished");
                 endGame(event);
             };
             try{
@@ -118,6 +117,7 @@ public class Guess extends UserCommand{
         MessageChannel channel = event.getChannel();
         for(GuessDriver game : games){
             if(game.getChannel().getId().equals(channel.getId())){
+                game.finish();
                 games.remove(game);
                 channel.sendMessage("Game ended, the answer was "+game.getAnswer()+"! Use "+super.getPrefix(event, serverManager)+"guess start [number] to start a new game!").queue();
                 return;
