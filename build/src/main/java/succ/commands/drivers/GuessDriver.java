@@ -1,7 +1,6 @@
 package succ.commands.drivers;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
-import succ.commands.generic.Guess;
 
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,7 @@ public class GuessDriver {
         attempts++;
         if(guess==answer){
             channel.sendMessage("Congratulations! You guessed correctly in "+attempts+" guesses! :tada:").queue();
-            completed = true;
+            finish();
         }
         if(guess<answer){
             channel.sendMessage("Number is higher!").queue();
@@ -56,4 +55,7 @@ public class GuessDriver {
         return ""+answer;
     }
 
+    public void finish(){
+        completed = true;
+    }
 }
