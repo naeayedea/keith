@@ -1,6 +1,7 @@
 package succ.commands.drivers;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import succ.commands.generic.Guess;
 
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -12,7 +13,7 @@ public class GuessDriver {
 
     private MessageChannel channel;
     private int maxNum;
-    private static int answer;
+    private int answer;
     private int attempts;
     public boolean completed;
     public GuessDriver(int number, MessageChannel channel){
@@ -31,7 +32,7 @@ public class GuessDriver {
             completed = true;
         }
         if(guess<answer){
-            channel.sendMessage("Number is hiwer!").queue();
+            channel.sendMessage("Number is higher!").queue();
         }
         if(guess>answer){
             channel.sendMessage("Number is lower!").queue();
@@ -47,5 +48,12 @@ public class GuessDriver {
         answer = randomNumber.nextInt(maxNum);
     }
 
+    public int getAnswer(){
+        return answer;
+    }
+
+    public String toString(){
+        return ""+answer;
+    }
 
 }
