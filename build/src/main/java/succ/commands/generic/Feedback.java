@@ -13,7 +13,7 @@ public class Feedback extends UserCommand{
 
     UserManager userManager;
     JDA jda;
-    public Feedback(UserManager userManagera){
+    public Feedback(UserManager userManager){
         this.userManager = userManager;
     }
     @Override

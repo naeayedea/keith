@@ -55,6 +55,7 @@ public class Stats extends AdminCommand{
                     String serverId = args[0].trim();
                     String firstSeen = args[1];
                     Guild server = jda.getGuildById(serverId);
+                    if(server!=null)
                     serverList+= server.getName()+"("+server.getId()+") First Seen: "+firstSeen+"\n";
                 }
                 channel.sendMessage("Servers:\n"+serverList+"```").queue();

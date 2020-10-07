@@ -23,9 +23,16 @@ public class SetStatus extends AdminCommand{
         String[] args = messageRaw.split("\\s+");
         String newActivity = messageRaw.substring(messageRaw.indexOf(args[2]));
         if(newActivity.toLowerCase().equals("default")){
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ "servers"));  //Default discord status
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
             return;
         }
         jda.getPresence().setActivity(Activity.playing(newActivity));
+    }
+
+    //Only does something if current activity is default
+    public void update(){
+        if(jda.getPresence().getActivity().getName().contains("help for commands | ")){
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        }
     }
 }

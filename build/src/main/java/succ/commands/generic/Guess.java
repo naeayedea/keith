@@ -7,6 +7,8 @@ import succ.util.ServerManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.concurrent.*;
 
 public class Guess extends UserCommand{
@@ -42,6 +44,8 @@ public class Guess extends UserCommand{
                 }
                 try{
                 int number = Integer.parseInt(args[2]);
+                if(number<=0)
+                    throw new NumberFormatException();
                 startGame(event, number);
                 }
                 catch (IndexOutOfBoundsException e){
@@ -54,7 +58,8 @@ public class Guess extends UserCommand{
             }
             case "end":
             {
-                endGame(event);
+                if(!endGame(event, 0))
+                    noGameResponse(event);
                 break;
             }
             default: //e.g. a guess
@@ -63,7 +68,7 @@ public class Guess extends UserCommand{
                     if(game.getChannel().getId().equals(channel.getId())){
                         try{
                             int number = Integer.parseInt(args[1]);
-                            game.guess(number);
+                            game.guess(number, event.getAuthor().getAsMention());
                         }
                         catch (NumberFormatException e){
                             channel.sendMessage("Invalid number! Please enter an integer between 1 and 2147483647").queue();
@@ -94,12 +99,12 @@ public class Guess extends UserCommand{
                 channel.sendMessage("You have "+timeout+" seconds to guess the number between 0 and "+number+"!").queue();
                 while(!game.completed){
                     try {
-                        Thread.currentThread().sleep(35);
+                        Thread.currentThread().sleep(1);
                     } catch (InterruptedException e) {
-                        //do nothing
+                        //do nothing, I should learn how to sync this specific thread with the driver
                     }
                 }
-                endGame(event);
+                endGame(event, 1);
             };
             try{
                 runner.submit(newGame).get(timeout, TimeUnit.SECONDS); //run command operations, kill after max time reached
@@ -108,21 +113,24 @@ public class Guess extends UserCommand{
                 e.printStackTrace();
                 channel.sendMessage("Something went wrong :(").queue();
             } catch (TimeoutException e){
-                endGame(event);
+                endGame(event, 0);
             }
         }).start();
     }
 
-    private void endGame(MessageReceivedEvent event){
+    private boolean endGame(MessageReceivedEvent event, int state){
         MessageChannel channel = event.getChannel();
-        for(GuessDriver game : games){
+        for(int i=0; i<games.size(); i++){
+            GuessDriver game = games.get(i);
             if(game.getChannel().getId().equals(channel.getId())){
-                game.finish();
                 games.remove(game);
-                channel.sendMessage("Game ended, the answer was "+game.getAnswer()+"! Use "+super.getPrefix(event, serverManager)+"guess start [number] to start a new game!").queue();
-                return;
+                if(state==0)
+                    channel.sendMessage("Game ended, the answer was "+game.getAnswer()+"! Use "+super.getPrefix(event, serverManager)+"guess start [number] to start a new game!").queue();
+                else
+                    //Success let driver send message
+                return true;
             }
         }
-        noGameResponse(event);
+        return false;
     }
 }
