@@ -2,13 +2,11 @@ package succ;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
-
-import static net.dv8tion.jda.api.requests.GatewayIntent.GUILD_MEMBERS;
 
 /**
  * Initialises bot and logs into discord.
@@ -25,11 +23,18 @@ public class Bot {
         JDABuilder builder = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_BANS, GatewayIntent.GUILD_EMOJIS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES,
                 GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
+        builder.setChunkingFilter(ChunkingFilter.ALL);
         builder.setLargeThreshold(50);
         try {
             JDA jda = builder.build();
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ "servers"));  //Default discord status
-            jda.addEventListener(new MessageHandler(jda, url));
+
+            try{
+                //Sleep thread so bot waits a second before coming online - e.g. let bot log in
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                //Dont matter
+            }
+            jda.addEventListener(new EventHandler(jda, url));
         } catch (LoginException e) {
             e.printStackTrace();
         }
