@@ -24,10 +24,10 @@ public class GuessDriver {
         System.out.println("starting new guess game, answer is "+answer);
     }
 
-    public void guess(int guess){
+    public void guess(int guess, String userMention){
         attempts++;
         if(guess==answer){
-            channel.sendMessage("Congratulations! You guessed correctly in "+attempts+" guesses! :tada:").queue();
+            channel.sendMessage("Congratulations! "+userMention+" You guessed correctly in "+attempts+" guesses! :tada:").queue();
             finish();
         }
         if(guess<answer){
