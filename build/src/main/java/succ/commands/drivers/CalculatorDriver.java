@@ -13,10 +13,12 @@ public class CalculatorDriver {
         ArrayList<Character> operators = new ArrayList<>();
         ArrayList<Double> numbers = new ArrayList<>();
         String calculation=calc;
+
         //Remove whitespace
         calculation=calculation.replaceAll("\\s+","");
+
         /*
-         * Handle combined negative/positives
+         * Handle combined negative/positives and eliminate trailing positive
          */
 
         //Combine multiple negatives
@@ -42,6 +44,9 @@ public class CalculatorDriver {
             String match = matcher.group();
             calculation = calculation.replace(match, "-");
         }
+
+        calculation=calculation.charAt(0)=='+' ? calculation.substring(1) : calculation;
+
         /*
          * Split string into numbers/operators
          */
@@ -52,11 +57,7 @@ public class CalculatorDriver {
             String match = matcher.group();
             double number = Double.parseDouble(match);
             numbers.add(number);
-//            System.out.println("calculation: "+calculation);
-//            System.out.println("match: "+match);
-//            System.out.println("number: "+number);
-//            System.out.println("index: "+calculation.indexOf(match));
-            if(number>=0 || calculation.indexOf(match)==0)
+            if(number>=0 ||( calculation.indexOf(match)==0 && numbers.size()==1))
                 calculation = calculation.replaceFirst(match, "");
             else {
                 calculation = calculation.replaceFirst(match,"+");
