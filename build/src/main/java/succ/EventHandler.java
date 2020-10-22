@@ -54,6 +54,7 @@ public class EventHandler extends ListenerAdapter {
         commands = new HashMap<String, Command>();
         commands.put("admin", new Admin(database, jda, serverManager));
         commands.put("avatar", new Avatar());
+        commands.put("calc", new Calculator());
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("feedback", new Feedback(userManager));
         commands.put("guess", new Guess(serverManager, 40));
