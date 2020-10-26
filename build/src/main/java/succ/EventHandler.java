@@ -90,9 +90,8 @@ public class EventHandler extends ListenerAdapter {
                 prefix = "?";
 
             //If someone tags the bot, tell them the prefix
-            if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser())){
+            if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser()) && (event.getMessage().getContentRaw().contains("prefix") || event.getMessage().getContentRaw().contains("help"))){
                 event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
-                return;
             }
 
             User user = event.getAuthor();
