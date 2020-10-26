@@ -33,7 +33,7 @@ public class BotUtils extends AdminCommand{
 
     @Override
     public String getDescription(MessageReceivedEvent event) {
-        return "util: \"secret stuff\"";
+        return "utils: \"secret stuff\"";
     }
 
     @Override
@@ -79,11 +79,22 @@ public class BotUtils extends AdminCommand{
 
     private String getUptime(){
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-        return String.format("%02d days, %02d hours, %02d minutes, %02d seconds",
-                TimeUnit.MILLISECONDS.toDays(uptime),
-                TimeUnit.MILLISECONDS.toHours(uptime) % TimeUnit.DAYS.toHours(1),
-                TimeUnit.MILLISECONDS.toMinutes(uptime) % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.MILLISECONDS.toSeconds(uptime) % TimeUnit.MINUTES.toSeconds(1));
+        long days = TimeUnit.MILLISECONDS.toDays(uptime);
+        long hours = TimeUnit.MILLISECONDS.toHours(uptime) % TimeUnit.DAYS.toHours(1);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(uptime) % TimeUnit.HOURS.toMinutes(1);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(uptime) % TimeUnit.MINUTES.toSeconds(1);
+        //Format response, only include larger measurement if relevant.
+        String response = "";
+        if(days>0)
+            response+=(days==1) ? days+" day, " : days+" days, ";
+        if(hours>0)
+            response+=(hours==1) ? hours+" hour, " : hours+" hours, ";
+        if(minutes>0)
+            response+=(minutes==1) ? minutes+" minute, " : minutes+" minutes, ";
+        if(seconds>0)
+            response+=(seconds==1) ? seconds+" second" : seconds+" seconds";
+
+        return response;
     }
 
     private String query(String searchTerm){
