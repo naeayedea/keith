@@ -20,7 +20,7 @@ public class SendMessage extends AdminCommand{
     }
     @Override
     public String getDescription(MessageReceivedEvent event) {
-        return "send: \"Lets you send a message to another channel - do '"+super.getPrefix(event, serverManager)+"send message/embed [channelid] [title(embed only] [message]\"";
+        return "send: \"lets you send a message to another channel - do '"+super.getPrefix(event, serverManager)+"send message/embed [channelid] [title(embed only] [message]\"";
     }
 
     @Override
@@ -41,6 +41,13 @@ public class SendMessage extends AdminCommand{
                 String title = args[4];
                 String message = commandRaw.substring(commandRaw.indexOf(args[5]));
                 builder.sendEmbed(channelId, title, message, event);
+            }
+            else if(type.equals("blast")){
+                //?admin send blast [message];
+                String message = commandRaw.substring(commandRaw.indexOf(args[3]));
+                for(MessageChannel messageChannel : event.getGuild().getTextChannels()){
+                    messageChannel.sendMessage(message).queue();
+                }
             }
         } catch (IndexOutOfBoundsException e){
             channel.sendMessage("Insufficient arguments, see help").queue();

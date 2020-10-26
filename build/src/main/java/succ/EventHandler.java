@@ -54,6 +54,7 @@ public class EventHandler extends ListenerAdapter {
         commands = new HashMap<String, Command>();
         commands.put("admin", new Admin(database, jda, serverManager));
         commands.put("avatar", new Avatar());
+        commands.put("calc", new Calculator());
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("feedback", new Feedback(userManager));
         commands.put("guess", new Guess(serverManager, 40));
@@ -89,9 +90,8 @@ public class EventHandler extends ListenerAdapter {
                 prefix = "?";
 
             //If someone tags the bot, tell them the prefix
-            if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser())){
+            if(event.getMessage().getMentionedUsers().contains(jda.getSelfUser()) && (event.getMessage().getContentRaw().contains("prefix") || event.getMessage().getContentRaw().contains("help"))){
                 event.getChannel().sendMessage("The current prefix is: "+prefix).queue();
-                return;
             }
 
             User user = event.getAuthor();

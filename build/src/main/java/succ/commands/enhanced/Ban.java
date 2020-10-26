@@ -22,7 +22,7 @@ public class Ban extends EnhancedCommand{
     }
                @Override
     public String getDescription(MessageReceivedEvent event) {
-        return "ban: \"Bans the specified user or server - do '"+super.getPrefix(event, serverManager)+"ban user/server [user or server id]'\"";
+        return "ban: \"bans the specified user or server - do '"+super.getPrefix(event, serverManager)+"ban user/server [user or server id]'\"";
     }
 
     @Override

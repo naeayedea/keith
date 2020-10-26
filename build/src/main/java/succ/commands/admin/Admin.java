@@ -40,7 +40,6 @@ public class Admin extends AdminCommand {
             command.run(event);
         }
         else if(command==null){
-            event.getChannel().sendMessage("That is not a valid command!").queue();
         }
         else{
             event.getChannel().sendMessage("You do not have permission to use this command!").queue();
@@ -56,6 +55,7 @@ public class Admin extends AdminCommand {
         adminCommands.put("send", new SendMessage(jda, serverManager));
         adminCommands.put("ban", new Ban(userManager, serverManager));
         adminCommands.put("stats", new Stats(database, serverManager));
+        adminCommands.put("utils", new BotUtils(userManager, serverManager, database));
         adminCommands.put("help", new succ.commands.admin.Help(adminCommands, serverManager)); //always initialise help last
     }
 

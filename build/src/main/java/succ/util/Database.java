@@ -2,6 +2,8 @@ package succ.util;
 
 import java.sql.*;
 import java.util.ArrayList;
+
+import org.sqlite.SQLiteException;
 import succ.util.logs.ConsoleLogger;
 
 public class Database {
@@ -133,14 +135,20 @@ public class Database {
             int columnCount = rs.getMetaData().getColumnCount();
             ArrayList<String> results = new ArrayList<String>();
             //Loop through results
+            String queryResult="";
+            for(int i = 1; i<=columnCount; i++){
+                queryResult+=rs.getMetaData().getColumnName(i)+"\t";
+
+            }
+            results.add(queryResult);
             while(rs.next()){
+                queryResult="";
                 //While next row
-                String queryResult="";
                 for(int i = 1; i<=columnCount; i++){
                     //Fill out each column
                     Object object = rs.getObject(i);
                     if(object!=null){
-                        queryResult+=object.toString()+"    ";
+                        queryResult+=object.toString()+"\t";
                     }
                 }
                 results.add(queryResult);
@@ -150,10 +158,9 @@ public class Database {
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
             closeConnection(connection);
             ArrayList<String> error = new ArrayList<String>();
-            error.add(null);
+            error.add(e.getMessage());
             return error;
         }
     }
