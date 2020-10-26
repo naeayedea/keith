@@ -39,7 +39,8 @@ public class Stats extends AdminCommand{
             case "admins":
                 results = returnAdmins();
                 String adminList = "```";
-                    for(String discordid : results){
+                    for(int i=1;i<results.size();i++){
+                        String discordid = results.get(i);
                         System.out.println(discordid.trim());
                         User user = jda.getUserById(discordid.trim());
                         adminList+=user.getName()+"("+user.getId()+")\n";
@@ -49,7 +50,8 @@ public class Stats extends AdminCommand{
             case "servers":
                 results = returnServers();
                 String serverList = "```";
-                for(String resultSet : results){
+                for(int i=1;i<results.size();i++){
+                    String resultSet=results.get(i);
                     String[] args = resultSet.split("\\s+");
                     System.out.println(Arrays.toString(args));
                     String serverId = args[0].trim();
