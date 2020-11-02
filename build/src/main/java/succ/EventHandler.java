@@ -3,6 +3,7 @@ package succ;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.ResumedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;

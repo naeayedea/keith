@@ -30,7 +30,7 @@ public class Bot {
 
             try{
                 //Sleep thread so bot waits a second before coming online - e.g. let bot log in
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 //Dont matter
             }
