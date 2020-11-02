@@ -231,6 +231,7 @@ public class Remind extends UserCommand{
                                 +"' AND date="+date
                                 +" AND text='"+text
                                 +"')");
+        
     }
 
     private Date parseDate(String dateString){

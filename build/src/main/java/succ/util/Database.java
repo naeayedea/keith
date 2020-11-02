@@ -164,4 +164,28 @@ public class Database {
             return error;
         }
     }
+
+    public boolean setReminder(String guildid, String channelid, String userid, long date, String text){
+        Connection connection = connect();
+        String setReminderString = "INSERT INTO reminders (guildid,channelid,userid, date, text) VALUES (?, ?, ?, ?, ?)";
+        try{
+            PreparedStatement addReminder = connection.prepareStatement(setReminderString);
+            connection.setAutoCommit(false);
+            addReminder.setString(1, guildid);
+            addReminder.setString(2, channelid);
+            addReminder.setString(3,userid);
+            addReminder.setLong(4, date);
+            addReminder.setString(5,text);
+            addReminder.executeUpdate();
+            connection.commit();
+            closeConnection(connection);
+            return true;
+        }
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+            closeConnection(connection);
+            return false;
+        }
+    }
+
 }
