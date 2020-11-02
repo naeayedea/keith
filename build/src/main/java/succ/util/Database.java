@@ -188,4 +188,25 @@ public class Database {
         }
     }
 
+    public boolean removeReminder(String guildid, String channelid, String userid, long date, String text){
+        Connection connection = connect();
+        String setReminderString = "DELETE FROM reminders WHERE (guildid=? AND channelid=? AND userid=? AND date=?)";
+        try{
+            PreparedStatement addReminder = connection.prepareStatement(setReminderString);
+            connection.setAutoCommit(false);
+            addReminder.setString(1, guildid);
+            addReminder.setString(2, channelid);
+            addReminder.setString(3,userid);
+            addReminder.setLong(4, date);
+            addReminder.executeUpdate();
+            connection.commit();
+            closeConnection(connection);
+            return true;
+        }
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+            closeConnection(connection);
+            return false;
+        }
+    }
 }

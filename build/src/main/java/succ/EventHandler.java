@@ -50,6 +50,7 @@ public class EventHandler extends ListenerAdapter {
         initialiseCommands();
         commandExecutor = Executors.newCachedThreadPool();
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        ((Remind) commands.get("remind")).loadReminders();
     }
 
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
