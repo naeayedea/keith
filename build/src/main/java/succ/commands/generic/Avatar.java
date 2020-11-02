@@ -1,6 +1,9 @@
 package succ.commands.generic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -16,18 +19,28 @@ public class Avatar extends UserCommand {
     @Override
     public void run(MessageReceivedEvent event) {
         List<User> mentionedUsers = event.getMessage().getMentionedUsers();
-        EmbedBuilder embed = new EmbedBuilder().setColor(new Color(155,0,155));
+        EmbedBuilder embed = new EmbedBuilder();
         if(mentionedUsers.size()>0){
             User user = mentionedUsers.get(0);
+            embed.setColor(getColour(event,user));
             embed.setTitle(user.getName()+"'s Avatar");
             embed.setImage(user.getAvatarUrl());
         }
         else {
             User user = event.getAuthor();
+            embed.setColor(getColour(event,user));
             embed.setTitle(user.getName()+"'s Avatar");
             embed.setImage(user.getAvatarUrl());
         }
 
         event.getChannel().sendMessage(embed.build()).queue();
+    }
+
+    private Color getColour(MessageReceivedEvent event, User user){
+        Member member = event.getGuild().getMemberById(user.getId());
+        List<Role> roles = member.getRoles();
+        if(roles.size()>0)
+            return roles.get(0).getColor();
+        return new Color(44,47,51);
     }
 }
