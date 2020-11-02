@@ -23,11 +23,13 @@ public class BotUtils extends AdminCommand{
     private UserManager userManager;
     private ServerManager serverManager;
     private Database database;
+    private long lastReconnect;
 
     public BotUtils(UserManager userManager, ServerManager serverManager, Database database){
         this.userManager = userManager;
         this.serverManager = serverManager;
         this.database = database;
+        lastReconnect = 0;
     }
 
 
@@ -78,7 +80,7 @@ public class BotUtils extends AdminCommand{
     }
 
     private String getUptime(){
-        long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+        long uptime = ManagementFactory.getRuntimeMXBean().getUptime()-lastReconnect;
         long days = TimeUnit.MILLISECONDS.toDays(uptime);
         long hours = TimeUnit.MILLISECONDS.toHours(uptime) % TimeUnit.DAYS.toHours(1);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(uptime) % TimeUnit.HOURS.toMinutes(1);
@@ -95,6 +97,10 @@ public class BotUtils extends AdminCommand{
             response+=(seconds==1) ? seconds+" second" : seconds+" seconds";
 
         return response;
+    }
+
+    public void updateUptime(){
+        lastReconnect=ManagementFactory.getRuntimeMXBean().getUptime();
     }
 
     private String query(String searchTerm){

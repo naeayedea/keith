@@ -2,6 +2,9 @@ package succ;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
+import net.dv8tion.jda.api.events.ResumedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import succ.commands.admin.Admin;
@@ -58,6 +61,7 @@ public class EventHandler extends ListenerAdapter {
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("feedback", new Feedback(userManager));
         commands.put("guess", new Guess(serverManager, 40));
+        commands.put("remind", new Remind(database, jda));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
@@ -95,35 +99,31 @@ public class EventHandler extends ListenerAdapter {
             }
 
             User user = event.getAuthor();
-            if(!user.isBot()){     //Filter out bot accounts
-                if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
-                    if(event.getChannel() instanceof TextChannel){
-                        publicMessageReceived(event);                   //Log operations
-                    }
-                    if(event.getChannel() instanceof PrivateChannel){
-                        privateMessageReceived(event);                  //Log operations
-                    }
-                    if(detectPrefix(event, prefix)){                            //Search beginning of message for server prefix
-                        Command command = findCommand(event, prefix);
-                        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
-                            if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
-                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \""+prefix+"help\" to see a list of commands!").queue();
-                            }
-                            try {
-                                Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
-                                commandExecutor.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS); //run command operations, kill after max time reached
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
-                                event.getChannel().sendMessage("Something went wrong :(").queue();
-                            } catch (TimeoutException e){
+            if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
+                if(event.getChannel() instanceof TextChannel){
+                    publicMessageReceived(event);                   //Log operations
+                }
+                if(event.getChannel() instanceof PrivateChannel){
+                    privateMessageReceived(event);                  //Log operations
+                }
+                if(detectPrefix(event, prefix)){                            //Search beginning of message for server prefix
+                    Command command = findCommand(event, prefix);
+                    if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
+                        if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
+                            event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \""+prefix+"help\" to see a list of commands!").queue();
+                        }
+                        try {
+                            Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
+                            commandExecutor.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS); //run command operations, kill after max time reached
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                            event.getChannel().sendMessage("Something went wrong :(").queue();
+                        } catch (TimeoutException e){
 //                                event.getChannel().sendMessage("Command took to long to execute!").queue();
-                            }
                         }
-                        else if(command==null){
-                        }
-                        else{
-                            event.getChannel().sendMessage("You do not have permission to use this command!").queue();
-                        }
+                    }
+                    else if(command!=null){
+                        event.getChannel().sendMessage("You do not have permission to use this command!").queue();
                     }
                 }
             }
@@ -145,6 +145,18 @@ public class EventHandler extends ListenerAdapter {
                 .build()).queue();
         log.printSuccess("New Server "+guild+" has added the bot!");
         new SetStatus(jda, serverManager).update();
+    }
+
+    @Override
+    public void onReconnect(ReconnectedEvent event){
+        Command admin = commands.get("admin");
+        ((Admin) admin).updateUptime();
+    }
+
+    @Override
+    public void onResume(ResumedEvent event){
+        Command admin = commands.get("admin");
+        ((Admin) admin).updateUptime();
     }
 
     @Override
