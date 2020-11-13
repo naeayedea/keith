@@ -10,7 +10,6 @@ public class Database {
 
     /**
      * Database class provides methods to interact with a given database via sql commands
-     * input is automatically santiized to prevent sql injection via the sanitizeInput method.
      * @param   url     the url of the database you wish to interact with.
      */
     String url;
@@ -76,7 +75,10 @@ public class Database {
                 for(int i = 1; i<=columnCount; i++){
                     //Fill out each column
                     Object object = rs.getObject(i);
+                    if(object!=null)
                     results.add(object.toString());
+                    else
+                        results.add("");
                 }
             }
             closeConnection(connection);
@@ -204,6 +206,82 @@ public class Database {
             return true;
         }
         catch(SQLException e){
+            System.out.println(e.getMessage());
+            closeConnection(connection);
+            return false;
+        }
+    }
+
+    public ArrayList<String> getEmojis(){
+        Connection connection = connect();
+        String getEmojiString = "SELECT guildid, source_guildid, roleid, emoji, unicode FROM emoji_roles";
+        try{
+            PreparedStatement getEmoji = connection.prepareStatement(getEmojiString);
+            connection.setAutoCommit(false);
+            ResultSet rs = getEmoji.executeQuery();
+            int columnCount = rs.getMetaData().getColumnCount();
+            System.out.println("columns: "+columnCount);
+            ArrayList<String> results = new ArrayList<String>();
+            //Loop through results
+            String queryResult="";;
+            while(rs.next()){
+                queryResult="";
+                //While next row
+                for(int i = 1; i<=columnCount; i++){
+                    //Fill out each column
+                    Object object = rs.getObject(i);
+                    if(object!=null){
+                        queryResult+=object.toString()+"\t";
+                    }
+                }
+                results.add(queryResult);
+            }
+            connection.commit();
+            closeConnection(connection);
+            return results;
+        } catch(SQLException e){
+            closeConnection(connection);
+            ArrayList<String> error = new ArrayList<String>();
+            error.add(e.getMessage());
+            return error;
+        }
+    }
+
+    public boolean addEmoji(String guildid, String sourceGuildid, String roleid, String emoji, boolean unicode){
+        Connection connection = connect();
+        String addEmojiString = "INSERT INTO emoji_roles (guildid, source_guildid, roleid, emoji, unicode) VALUES (?, ?, ?, ?, ?)";
+        try{
+            PreparedStatement addEmoji = connection.prepareStatement(addEmojiString);
+            connection.setAutoCommit(false);
+            addEmoji.setString(1, guildid);
+            addEmoji.setString(2, sourceGuildid);
+            addEmoji.setString(3, roleid);
+            addEmoji.setString(4, emoji);
+            addEmoji.setBoolean(5, unicode);
+            addEmoji.executeUpdate();
+            connection.commit();
+            closeConnection(connection);
+            return true;
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+            closeConnection(connection);
+            return false;
+        }
+    }
+
+    public boolean removeEmoji(String guildid, String emoji){
+        Connection connection = connect();
+        String removeEmojiString = "DELETE FROM emoji_roles WHERE (guildid=? AND emoji=?)";
+        try{
+            PreparedStatement removeEmoji = connection.prepareStatement(removeEmojiString);
+            connection.setAutoCommit(false);
+            removeEmoji.setString(1, guildid);
+            removeEmoji.setString(2, emoji);
+            removeEmoji.executeUpdate();
+            connection.commit();
+            closeConnection(connection);
+            return true;
+        } catch(SQLException e){
             System.out.println(e.getMessage());
             closeConnection(connection);
             return false;
