@@ -175,6 +175,10 @@ public class Remind extends UserCommand{
                 +TimeUnit.DAYS.toMillis(quantifiers[2])
                 +TimeUnit.DAYS.toMillis(quantifiers[1]*7)
                 +TimeUnit.DAYS.toMillis(quantifiers[0]*29);
+        if(time<0){
+            event.getChannel().sendMessage("That is a long way away! Ask me to closer to the time").queue();
+            return false;
+        }
         String text;
         if(commandRaw.length()>inString.length()+1)
             text = commandRaw.substring(inString.length()+1);
@@ -209,7 +213,7 @@ public class Remind extends UserCommand{
         };
         executor.schedule(remind,time-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         database.setReminder(guildid, channelid,userid,time,text);
-        event.getChannel().sendMessage("Reminding you in "+inString+": ```"+text+"```").queue();
+        event.getChannel().sendMessage("Reminding you "+inString+": ```"+text+"```").queue();
         return true;
     }
     private boolean handleOn(MessageReceivedEvent event, String commandRaw){
@@ -222,6 +226,10 @@ public class Remind extends UserCommand{
                 return false;
             }
             long time = date.getTime();
+            if(time<0){
+                event.getChannel().sendMessage("That is a long way away! Ask me to closer to the time").queue();
+                return false;
+            }
             String text;
             if(commandRaw.length()>(commandRaw.indexOf(onString)+onString.length()+1))
                 text = commandRaw.substring(commandRaw.indexOf(onString)+onString.length()+1);
@@ -256,7 +264,7 @@ public class Remind extends UserCommand{
             };
             executor.schedule(remind,time-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             database.setReminder(guildid, channelid,userid,time,text);
-            event.getChannel().sendMessage("Reminding you on "+onString+": ```"+text+"```").queue();
+            event.getChannel().sendMessage("Reminding you "+onString+": ```"+text+"```").queue();
             return true;
         }
         return false;
