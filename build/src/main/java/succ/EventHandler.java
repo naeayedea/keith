@@ -2,8 +2,13 @@ package succ;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
+import net.dv8tion.jda.api.events.ResumedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import succ.commands.admin.Admin;
 import succ.commands.Command;
 import net.dv8tion.jda.api.JDA;
@@ -16,12 +21,10 @@ import succ.util.Server;
 import succ.util.ServerManager;
 import succ.util.UserManager;
 import succ.util.logs.ConsoleLogger;
+import succ.util.Emoji;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -33,20 +36,26 @@ public class EventHandler extends ListenerAdapter {
 
     JDA jda;
     Map<String, Command> commands;
+
     Database database;
     ConsoleLogger log;
     UserManager userManager;
     ServerManager serverManager;
-    ExecutorService commandExecutor = Executors.newCachedThreadPool();
+    ExecutorService commandExecutor;
     public EventHandler(JDA jda, String url){
         this.jda = jda;
         database = new Database(url);
         log = new ConsoleLogger();
         userManager = new UserManager(database);
         serverManager = new ServerManager(database);
+        initialise();
+    }
+
+    private void initialise(){
         initialiseCommands();
         commandExecutor = Executors.newCachedThreadPool();
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        ((Remind) commands.get("remind")).loadReminders();
     }
 
     //Populate hashmap with all available commands, when key is entered the relevant command is returned which can be ran.
@@ -58,6 +67,8 @@ public class EventHandler extends ListenerAdapter {
         commands.put("setprefix", new SetPrefix(serverManager));
         commands.put("feedback", new Feedback(userManager));
         commands.put("guess", new Guess(serverManager, 40));
+        commands.put("remind", new Remind(database, jda));
+        commands.put("emoji", new EmojiRole(database,serverManager, jda));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
@@ -95,35 +106,31 @@ public class EventHandler extends ListenerAdapter {
             }
 
             User user = event.getAuthor();
-            if(!user.isBot()){     //Filter out bot accounts
-                if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
-                    if(event.getChannel() instanceof TextChannel){
-                        publicMessageReceived(event);                   //Log operations
+            if(!(userManager.getUser(user.getId()).getAccessLevel()==0)){
+                if(event.getChannel() instanceof TextChannel){
+                    publicMessageReceived(event);                   //Log operations
+                }
+                if(event.getChannel() instanceof PrivateChannel){
+                    privateMessageReceived(event);                  //Log operations
+                }
+                if(detectPrefix(event, prefix)){                            //Search beginning of message for server prefix
+                    Command command = findCommand(event, prefix);
+                    if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
+                        if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
+                            event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \""+prefix+"help\" to see a list of commands!").queue();
+                        }
+                        try {
+                            Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
+                            commandExecutor.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS); //run command operations, kill after max time reached
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                            event.getChannel().sendMessage("Something went wrong :(").queue();
+                        } catch (TimeoutException e){
+                                event.getChannel().sendMessage("Command took to long to execute!").queue();
+                        }
                     }
-                    if(event.getChannel() instanceof PrivateChannel){
-                        privateMessageReceived(event);                  //Log operations
-                    }
-                    if(detectPrefix(event, prefix)){                            //Search beginning of message for server prefix
-                        Command command = findCommand(event, prefix);
-                        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
-                            if(!(userManager.getUser(user.getId()).getCommandCount() > 0)){      //check if user has used bot before, if no send welcome message
-                                event.getChannel().sendMessage("Hi "+user.getAsMention()+", thank you for using keith! Type \""+prefix+"help\" to see a list of commands!").queue();
-                            }
-                            try {
-                                Runnable execution = () -> {command.run(event); userManager.incrementCommandCount(user.getId());};
-                                commandExecutor.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS); //run command operations, kill after max time reached
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
-                                event.getChannel().sendMessage("Something went wrong :(").queue();
-                            } catch (TimeoutException e){
-//                                event.getChannel().sendMessage("Command took to long to execute!").queue();
-                            }
-                        }
-                        else if(command==null){
-                        }
-                        else{
-                            event.getChannel().sendMessage("You do not have permission to use this command!").queue();
-                        }
+                    else if(command!=null){
+                        event.getChannel().sendMessage("You do not have permission to use this command!").queue();
                     }
                 }
             }
@@ -145,6 +152,83 @@ public class EventHandler extends ListenerAdapter {
                 .build()).queue();
         log.printSuccess("New Server "+guild+" has added the bot!");
         new SetStatus(jda, serverManager).update();
+    }
+
+
+    @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event){
+        new Thread(() -> {
+            EmojiRole driver = (EmojiRole) commands.get("emoji");
+            Map<String, Boolean> activeEmojis = driver.getActiveEmojis();
+            ArrayList<Emoji> emojiRoles = driver.getEmojis();
+            //Filter out banned users and private channels
+            if(event.getUser().isBot() || event.getChannel() instanceof PrivateChannel ||  userManager.getUser(event.getUser().getId()).getAccessLevel()==0)
+                return;
+            if(serverManager.getServer(event.getGuild().getId()).isBanned())
+                return;
+            //Determine if guild has a role message channel and if the current channel is that channel
+            Message roleMessage = serverManager.getRoleMessage(event.getGuild());
+            if(roleMessage==null || !(event.getReaction().getMessageId().equals(roleMessage.getId())))
+                return;
+            MessageReaction.ReactionEmote emote = event.getReactionEmote();
+            String emojiString;
+            // Check if emote is a unicode emote
+            if(emote.isEmoji()){
+                Boolean active = activeEmojis.get(emote.getEmoji());
+                if(active==null || !active)
+                    return;
+                emojiString = emote.getEmoji();
+                event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
+                    //Identified unicode emoji, do stuff
+                    for(Emoji emoji : emojiRoles){
+                        if(emoji.getEmoji().equals(emojiString) && emoji.getServerId()==event.getGuild().getIdLong()){
+                            Guild guild = event.getGuild();
+                            Role role = guild.getRoleById(emoji.getRoleId());
+                            System.out.println(role);
+                            guild.addRoleToMember(guild.getMember(event.getUser()), role).queue();
+                            return;
+                        }
+                    }
+                });
+            }
+            else {
+                Boolean active = activeEmojis.get(emote.getId());
+                if(active==null || !active){
+                    System.out.println("not active");
+                    return;
+                }
+                emojiString = emote.getId();
+                event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
+                    for(Emoji emoji : emojiRoles){
+                        if(emoji.getEmoji().equals(emojiString)){
+                            Guild server = jda.getGuildById(emoji.getSourceId());
+                            Emote roleEmote = server.getEmoteById(emoji.getEmoji());
+                            if(roleEmote!=null){
+                                //Identified custom emoji, do stuff
+                                Guild guild = event.getGuild();
+                                Role role = guild.getRoleById(emoji.getRoleId());
+                                try{
+                                guild.addRoleToMember(guild.getMember(event.getUser()), role).queue();
+                                    return;
+                                }
+                                catch(PermissionException e){
+                                    //Dont have permissions, cant do
+                                    return;
+                                }
+                            }
+                            System.out.println(":(");
+                        }
+                    }
+
+                });
+            }
+        }).start();
+    }
+
+    @Override
+    public void onReconnect(ReconnectedEvent event){
+        Command admin = commands.get("admin");
+        ((Admin) admin).updateUptime();
     }
 
     @Override

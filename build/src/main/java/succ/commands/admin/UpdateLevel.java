@@ -40,8 +40,12 @@ public class UpdateLevel extends AdminCommand {
             return;
         }
         List<User> users = event.getMessage().getMentionedUsers();  //users contains any users mentioned within the command
+        if(users.size()==0){
+            event.getChannel().sendMessage("No users mentioned").queue();
+        }
         if(users.size()>1){
             event.getChannel().sendMessage("Please only update one user at a time!").queue();
+            return;
         }
         if(userManager.getUser(event.getAuthor().getId()).getAccessLevel() > userManager.getUser((users.get(0)).getId()).getAccessLevel()){     //If the targetted user has a higher or same rank as author then return error.
             userManager.updateAccessLevel(users.get(0).getId(), newLevel);

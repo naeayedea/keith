@@ -7,6 +7,8 @@ import succ.util.Database;
 import succ.util.ServerManager;
 import succ.util.UserManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +38,7 @@ public class Admin extends AdminCommand {
     public void run(MessageReceivedEvent event) {
         net.dv8tion.jda.api.entities.User user = event.getAuthor();
         Command command = findCommand(event);
-        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform. && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()
+        if(command!=null && userManager.getUser(user.getId()).getAccessLevel()>=command.getAccessLevel()){                              //If command found, perform.
             command.run(event);
         }
         else if(command==null){
@@ -67,5 +69,10 @@ public class Admin extends AdminCommand {
         String subCommand = commandSplit[0];
         return adminCommands.get(subCommand);
     }
+
+    public void updateUptime(){
+        ((BotUtils) adminCommands.get("utils")).updateUptime();
+    }
+
 
 }
