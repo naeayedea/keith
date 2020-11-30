@@ -151,16 +151,13 @@ public class EmojiRole extends UserCommand {
         ArrayList<String> emojis = database.getEmojis();
         int n = 0;
         for(String result : emojis){
+            try{
             String[] args = result.split("\\s+");
             Emoji emoji;
             if(args[4].equals("1"))
                 args[4]="true";
-            try{
                 emoji = new Emoji(Long.parseLong(args[0]), Long.parseLong(args[1]), args[2], args[3], Boolean.parseBoolean(args[4]));
-            }
-            catch(Exception e){
-                continue;
-            }
+
             Guild server = jda.getGuildById(emoji.getServerId());
             Role role = server.getRoleById(emoji.getRoleId());
             if(server==null || role==null)
@@ -168,6 +165,10 @@ public class EmojiRole extends UserCommand {
             emojiRoles.add(emoji);
             activeEmojis.put(emoji.getEmoji(), true);
             n++;
+            }
+            catch(Exception e){
+                continue;
+            }
         }
         log.printSuccess("Reloaded "+n+" emojis");
     }

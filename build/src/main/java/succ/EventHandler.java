@@ -41,17 +41,17 @@ public class EventHandler extends ListenerAdapter {
     ConsoleLogger log;
     UserManager userManager;
     ServerManager serverManager;
-    ExecutorService commandExecutor = Executors.newCachedThreadPool();
+    ExecutorService commandExecutor;
     public EventHandler(JDA jda, String url){
         this.jda = jda;
         database = new Database(url);
         log = new ConsoleLogger();
         userManager = new UserManager(database);
         serverManager = new ServerManager(database);
-        init();
+        initialise();
     }
 
-    private void init(){
+    private void initialise(){
         initialiseCommands();
         commandExecutor = Executors.newCachedThreadPool();
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
@@ -126,7 +126,7 @@ public class EventHandler extends ListenerAdapter {
                             e.printStackTrace();
                             event.getChannel().sendMessage("Something went wrong :(").queue();
                         } catch (TimeoutException e){
-//                                event.getChannel().sendMessage("Command took to long to execute!").queue();
+                                event.getChannel().sendMessage("Command took to long to execute!").queue();
                         }
                     }
                     else if(command!=null){
@@ -227,12 +227,6 @@ public class EventHandler extends ListenerAdapter {
 
     @Override
     public void onReconnect(ReconnectedEvent event){
-        Command admin = commands.get("admin");
-        ((Admin) admin).updateUptime();
-    }
-
-    @Override
-    public void onResume(ResumedEvent event){
         Command admin = commands.get("admin");
         ((Admin) admin).updateUptime();
     }
