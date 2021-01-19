@@ -72,7 +72,7 @@ public class Remind extends UserCommand{
 
     //Loads reminders for next 10 days
     public void loadReminders(){
-        executor.schedule(()->{loadReminders();logger.printSuccess("loading more reminders");},9, TimeUnit.DAYS);
+        executor.schedule(()->{loadReminders();logger.printSuccess("loading more reminders");},10, TimeUnit.DAYS);
         long tenDaysLater=System.currentTimeMillis()+TimeUnit.DAYS.toMillis(10);
         ArrayList<String> results = database.query("SELECT guildid, channelid, userid, date, text FROM reminders WHERE date < "+tenDaysLater);
         int n=0;
