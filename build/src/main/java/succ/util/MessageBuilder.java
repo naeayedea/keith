@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.awt.*;
+
 /**
  * Utility class for creating and sending messages to text channels the bot can see.
  */
@@ -22,6 +24,7 @@ public class MessageBuilder {
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle(title);
             eb.setDescription(message);
+            eb.setColor(new Color(155,0,155));
             channel.sendMessage(eb.build()).queue();
         }
         catch (IllegalArgumentException e){
