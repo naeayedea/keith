@@ -35,8 +35,12 @@ public class Avatar extends UserCommand {
     private Color getColour(MessageReceivedEvent event, User user){
         Member member = event.getGuild().getMemberById(user.getId());
         List<Role> roles = member.getRoles();
-        if(roles.size()>0)
-            return roles.get(0).getColor();
+        for (Role role : roles) {
+            Color color = role.getColor();
+            if(color != null) {
+                return color;
+            }
+        }
         return new Color(44,47,51);
     }
 }
