@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import succ.util.MessageBuilder;
 import succ.util.ServerManager;
 
@@ -44,10 +45,17 @@ public class SendMessage extends AdminCommand{
             }
             else if(type.equals("blast")){
                 //?admin send blast [message];
+
                 String message = commandRaw.substring(commandRaw.indexOf(args[3]));
                 for(MessageChannel messageChannel : event.getGuild().getTextChannels()){
+                    try{
                     messageChannel.sendMessage(message).queue();
+                    }
+                    catch(PermissionException e){
+                        continue;
+                    }
                 }
+
             }
         } catch (IndexOutOfBoundsException e){
             channel.sendMessage("Insufficient arguments, see help").queue();
