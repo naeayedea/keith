@@ -8,7 +8,6 @@ public class CalculatorDriver {
 
     String operatorRegex = "[+\\-/*^!]";
     String numberRegex = "((?<=[+\\-/*!])?(-))?+\\d+(\\.\\d+)?+([E]\\d+)?";
-
     public String calculate(String calc){
         ArrayList<Character> operators = new ArrayList<>();
         ArrayList<Double> numbers = new ArrayList<>();
