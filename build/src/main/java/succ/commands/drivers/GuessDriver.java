@@ -43,7 +43,7 @@ public class GuessDriver {
     }
 
     private void drawNumber(){
-        Random randomNumber = new Random();
+        Random randomNumber = new Random(System.currentTimeMillis());
         answer = randomNumber.nextInt(maxNum);
     }
 
