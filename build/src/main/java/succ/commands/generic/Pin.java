@@ -43,8 +43,7 @@ public class Pin extends UserCommand {
             } else {
                 MessageChannel channel = guild.getTextChannelById(serverManager.getPinChannelID(guild.getId()));
                 if(channel != null) {
-                    sendEmbed(author, user, originalMessage, channel, guild);
-                    event.getChannel().sendMessage("Message pinned!").queue();
+                    sendEmbed(author, user, originalMessage, channel, event.getChannel(), guild);
                 } else {
                     event.getChannel().sendMessage("Could not find pin channel - please add with "+prefix+"pin add [channelid]").queue();
                 }
@@ -66,8 +65,7 @@ public class Pin extends UserCommand {
                     } else {
                         MessageChannel channel = guild.getTextChannelById(serverManager.getPinChannelID(guild.getId()));
                         if(channel != null) {
-                            sendEmbed(originalMessage[0].getAuthor(), user, originalMessage[0], channel, guild);
-                            event.getChannel().sendMessage("Message pinned!").queue();
+                            sendEmbed(originalMessage[0].getAuthor(), user, originalMessage[0], channel, event.getChannel(), guild);
                         } else {
                             event.getChannel().sendMessage("Could not find pin channel - please add with "+prefix+"pin add [channelid]").queue();
                         }
@@ -84,7 +82,7 @@ public class Pin extends UserCommand {
         }
     }
 
-    private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel channel, Guild guild){
+    private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Message From " + author.getName());
         eb.setDescription(originalMessage.getContentDisplay() + "\n\n[Message Link]("+originalMessage.getJumpUrl()+")");
@@ -92,7 +90,13 @@ public class Pin extends UserCommand {
         eb.setThumbnail(author.getAvatarUrl());
         eb.setFooter("Message Pinned By " + pinner.getName());
         eb.setTimestamp(new Date().toInstant());
-        channel.sendMessage(eb.build()).queue();
+        pinChannel.sendMessage(eb.build()).queue((message) -> {
+                EmbedBuilder reply = new EmbedBuilder();
+                reply.setTitle(":pushpin: Message Pinned!");
+                reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
+                reply.setColor(new Color(155,0,155));
+                commandChannel.sendMessage(reply.build()).queue();
+        });
     }
 
     private Color getColour(Guild guild, User user){
