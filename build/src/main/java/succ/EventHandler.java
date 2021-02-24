@@ -69,6 +69,7 @@ public class EventHandler extends ListenerAdapter {
         commands.put("guess", new Guess(serverManager, 40));
         commands.put("remind", new Remind(database, jda));
         commands.put("emoji", new EmojiRole(database,serverManager, jda));
+        commands.put("pin", new Pin(serverManager));
         commands.put("help", new Help(commands, serverManager)); //Always initialise help last
     }
 
