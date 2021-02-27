@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.util.ServerManager;
 import java.awt.*;
+import java.io.File;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
@@ -83,21 +84,35 @@ public class Pin extends UserCommand {
     }
 
     private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild){
+        List<Message.Attachment> attachments = originalMessage.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Message From " + author.getName());
-        eb.setDescription(originalMessage.getContentDisplay() + "\n\n[Message Link]("+originalMessage.getJumpUrl()+")");
+        eb.setDescription(originalMessage.getContentDisplay() + "\n");
         eb.setColor(getColour(guild, author));
         eb.setThumbnail(author.getAvatarUrl());
         eb.setFooter("Message Pinned By " + pinner.getName());
         eb.setTimestamp(new Date().toInstant());
+        //Do embed stuff
+        if(attachments.size() > 0) {
+            Message.Attachment attachment = attachments.get(0);
+            if(attachment.isImage()) {
+                eb.setImage(attachment.getUrl());
+
+            } else {
+                eb.appendDescription("[Attached Video]("+attachment.getUrl()+")\n\n");
+            }
+            eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
+        }
         pinChannel.sendMessage(eb.build()).queue((message) -> {
-                EmbedBuilder reply = new EmbedBuilder();
-                reply.setTitle(":pushpin: Message Pinned!");
-                reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
-                reply.setColor(new Color(155,0,155));
-                commandChannel.sendMessage(reply.build()).queue();
+            EmbedBuilder reply = new EmbedBuilder();
+            reply.setTitle(":pushpin: Message Pinned!");
+            reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
+            reply.setColor(new Color(155,0,155));
+            commandChannel.sendMessage(reply.build()).queue();
         });
     }
+
+
 
     private Color getColour(Guild guild, User user){
         Member member = guild.getMemberById(user.getId());
