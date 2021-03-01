@@ -19,6 +19,7 @@ import java.util.List;
 public class Pin extends UserCommand {
 
     ServerManager serverManager;
+    enum Type{IMAGE, REGULAR};
 
     public Pin(ServerManager serverManager){
             this.serverManager = serverManager;
@@ -44,12 +45,20 @@ public class Pin extends UserCommand {
             } else {
                 MessageChannel channel = guild.getTextChannelById(serverManager.getPinChannelID(guild.getId()));
                 if(channel != null) {
-                    sendEmbed(author, user, originalMessage, channel, event.getChannel(), guild);
+                    sendEmbed(author, user, originalMessage, channel, event.getChannel(), guild, Type.REGULAR);
                 } else {
                     event.getChannel().sendMessage("Could not find pin channel - please add with "+prefix+"pin add [channelid]").queue();
                 }
             }
-        } else {
+        } else if (message.getAttachments().size() > 0) {
+            //User is trying to pin an image
+            MessageChannel channel = guild.getTextChannelById(serverManager.getPinChannelID(guild.getId()));
+            if(channel != null) {
+                sendEmbed(user, user, message, channel, event.getChannel(), guild, Type.IMAGE);
+            } else {
+                event.getChannel().sendMessage("Could not find pin channel - please add with "+prefix+"pin add [channelid]").queue();
+            }
+        } else  {
             String command = event.getMessage().getContentRaw();
             String[] commandSplit = command.split("\\s+");
             if(commandSplit.length == 2) {
@@ -66,7 +75,7 @@ public class Pin extends UserCommand {
                     } else {
                         MessageChannel channel = guild.getTextChannelById(serverManager.getPinChannelID(guild.getId()));
                         if(channel != null) {
-                            sendEmbed(originalMessage[0].getAuthor(), user, originalMessage[0], channel, event.getChannel(), guild);
+                            sendEmbed(originalMessage[0].getAuthor(), user, originalMessage[0], channel, event.getChannel(), guild, Type.REGULAR);
                         } else {
                             event.getChannel().sendMessage("Could not find pin channel - please add with "+prefix+"pin add [channelid]").queue();
                         }
@@ -83,11 +92,14 @@ public class Pin extends UserCommand {
         }
     }
 
-    private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild){
+    private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, Type type){
         List<Message.Attachment> attachments = originalMessage.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Message From " + author.getName());
-        eb.setDescription(originalMessage.getContentDisplay() + "\n");
+        if(type == Type.REGULAR)
+            eb.setDescription(originalMessage.getContentDisplay() + "\n");
+        else
+            eb.setDescription((originalMessage.getContentDisplay()).substring(4) + "\n");
         eb.setColor(getColour(guild, author));
         eb.setThumbnail(author.getAvatarUrl());
         eb.setFooter("Message Pinned By " + pinner.getName());
