@@ -11,12 +11,14 @@ public class Server {
     private String firstJoined;
     private String prefix;
     private boolean banned;
+    private long pinChannel;
 
-    public Server(String guildID, String firstSeen, String prefix, boolean banned){
+    public Server(String guildID, String firstSeen, String prefix, boolean banned, long pinChannel){
         this.serverID = guildID;
         this.firstJoined  = firstSeen;
         this.prefix = prefix;
         this.banned = banned;
+        this.pinChannel = pinChannel;
     }
 
     public String getId(){
@@ -33,6 +35,10 @@ public class Server {
 
     public boolean isBanned(){
         return banned;
+    }
+
+    public long getPinChannel() {
+        return pinChannel;
     }
 
     public String toString(){

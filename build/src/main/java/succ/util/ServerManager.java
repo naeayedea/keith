@@ -46,7 +46,13 @@ public class ServerManager {
             String firstSeen = rs.get(1);
             String prefix = rs.get(2);
             boolean banned = Boolean.parseBoolean(rs.get(3));
-            currentServer = new Server(guildID, firstSeen, prefix, banned);
+            long pinChannel;
+            try {
+                pinChannel = Long.parseLong(rs.get(6));
+            } catch (NumberFormatException e) {
+                pinChannel =  pinChannel = 0L;
+            }
+            currentServer = new Server(guildID, firstSeen, prefix, banned, pinChannel);
             return true;
         }
         catch (IndexOutOfBoundsException e){
@@ -92,7 +98,7 @@ public class ServerManager {
                 final Message[] roleMessage = new Message[1];
                 MessageChannel channel = guild.getTextChannelById(channelId);
                 channel.retrieveMessageById(messageId).queue((message)->{
-                    roleMessage[0] =message;
+                    roleMessage[0] = message;
                 }, (failure) -> {});
                 Thread.sleep(500);
                 return roleMessage[0];
@@ -106,8 +112,17 @@ public class ServerManager {
         }
     }
 
+    public long getPinChannelID(String guildID) {
+        Server server = getServer(guildID);
+        if(server != null) {
+            return server.getPinChannel();
+        }
+        return 0L;
+    }
+
     public boolean setRoleMessage(Guild guild, Message roleMessage){
         database.update("emoji_message_id = '"+roleMessage.getId()+"' WHERE ServerID = "+guild.getId(), "servers");
         return database.update("emoji_message_channel = '"+roleMessage.getChannel().getId()+"' WHERE ServerID = "+guild.getId(), "servers");
     }
+
 }
