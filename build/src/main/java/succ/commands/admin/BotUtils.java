@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.util.Database;
 import succ.util.ServerManager;
 import succ.util.UserManager;
+
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
@@ -50,6 +52,13 @@ public class BotUtils extends AdminCommand{
                 case "kill":
                     System.exit(0);
                     break;
+                case "restart":
+                    Process p = Runtime.getRuntime().exec("screen -d -m nohup java -jar build-V2-all.jar");
+                    new SetStatus(event.getJDA(), serverManager).set("restarting...");
+                    channel.sendMessage("Restarting now").queue();
+                    Thread.sleep(1000);
+                    System.exit(0);
+                    break;
                 case "find":
                     if(args[3].equals("server")){
                         Guild server =event.getJDA().getGuildById(args[4]);
@@ -71,6 +80,10 @@ public class BotUtils extends AdminCommand{
             }
         } catch(IndexOutOfBoundsException e){
                channel.sendMessage("Insufficient arguments, try again").queue();
+        } catch(IOException e) {
+            channel.sendMessage("Could not restart, come do it manually :)").queue();
+        } catch(InterruptedException e){
+            //do nothing
         }
     }
 

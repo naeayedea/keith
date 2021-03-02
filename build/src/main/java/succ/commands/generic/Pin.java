@@ -113,8 +113,8 @@ public class Pin extends UserCommand {
             } else {
                 eb.appendDescription("[Attached Video]("+attachment.getUrl()+")\n\n");
             }
-            eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
         }
+        eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
         pinChannel.sendMessage(eb.build()).queue((message) -> {
             EmbedBuilder reply = new EmbedBuilder();
             reply.setTitle(":pushpin: Message Pinned!");

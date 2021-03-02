@@ -35,4 +35,8 @@ public class SetStatus extends AdminCommand{
             jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
         }
     }
+
+    public void set(String newMessage) {
+        jda.getPresence().setActivity(Activity.playing(newMessage));
+    }
 }
