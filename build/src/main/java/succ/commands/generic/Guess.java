@@ -32,7 +32,14 @@ public class Guess extends UserCommand{
     public void run(MessageReceivedEvent event) {
         MessageChannel channel = event.getChannel();
         String[] args = event.getMessage().getContentRaw().trim().split("\\s+");
-        String guess = args[1];
+        String prefix = getPrefix(event, serverManager);
+        String guess;
+        if(args.length > 0) {
+            guess = args[1];
+        } else {
+            channel.sendMessage("Invalid usage, do "+prefix+"guess start [number] or "+prefix+"guess [number] to guess").queue();
+            return;
+        }
         switch(guess){
             case "start":
             {

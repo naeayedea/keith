@@ -27,7 +27,7 @@ public class Help extends UserCommand {
 
     @Override
     public void run(MessageReceivedEvent event) {
-        String prefix = serverManager.getServer(event.getGuild().getId()).getPrefix();
+        String prefix = getPrefix(event, serverManager);
         String helpString = "```cs\n";
         for(Map.Entry<String, Command> set : commands.entrySet()){
             helpString+= prefix+set.getValue().getDescription(event)+"\n";

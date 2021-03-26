@@ -46,7 +46,13 @@ public class BotUtils extends AdminCommand{
         MessageChannel channel = event.getChannel();
         String raw = message.getContentRaw().trim().toLowerCase();
         String[] args = raw.split("\\s+");
-        String command = args[2];
+        String command;
+        if(args.length > 2) {
+            command = args[2];
+        } else {
+            channel.sendMessage("Insufficient Arguments!").queue();
+            return;
+        }
         try{
             switch(command){
                 case "kill":

@@ -1,5 +1,7 @@
 package succ.commands.generic;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import succ.util.ServerManager;
 
@@ -22,22 +24,26 @@ public class SetPrefix extends UserCommand{
 
     @Override
     public void run(MessageReceivedEvent event) {
-        try{
-        String newPrefix = event.getMessage().getContentDisplay().trim().split("\\s+")[1];
-        if(newPrefix.length()>1){
-            event.getChannel().sendMessage("Prefix has a max length of 1 and cannot contain spaces!").queue();
+        MessageChannel channel = event.getChannel();
+        if(channel instanceof PrivateChannel) {
+            channel.sendMessage("Cannot set prefix in private channel! Use '?'!").queue();
             return;
         }
-        if(serverManager.setPrefix(event.getGuild().getId(), newPrefix)){
-        event.getChannel().sendMessage("Prefix successfully updated to '"+newPrefix+"' tag the bot to see the prefix again").queue();
-        return;
-        }
-        else {
-            event.getChannel().sendMessage("Prefix change unsuccessful, please try another prefix").queue();
-        }
-        }
-        catch(IndexOutOfBoundsException e){
-            event.getChannel().sendMessage("Prefix cannot be empty!").queue();
+        try{
+            String newPrefix = event.getMessage().getContentDisplay().trim().split("\\s+")[1];
+            if(newPrefix.length()>1){
+                channel.sendMessage("Prefix has a max length of 1 and cannot contain spaces!").queue();
+                return;
+            }
+            if(serverManager.setPrefix(event.getGuild().getId(), newPrefix)){
+                channel.sendMessage("Prefix successfully updated to '"+newPrefix+"' tag the bot to see the prefix again").queue();
+                return;
+            }
+            else {
+                channel.sendMessage("Prefix change unsuccessful, please try another prefix").queue();
+            }
+        } catch(IndexOutOfBoundsException e) {
+            channel.sendMessage("Prefix cannot be empty!").queue();
         }
     }
 

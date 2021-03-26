@@ -1,10 +1,7 @@
 package succ.commands.generic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.awt.Color;
 import java.util.List;
@@ -33,6 +30,9 @@ public class Avatar extends UserCommand {
     }
 
     private Color getColour(MessageReceivedEvent event, User user){
+        if(event.getChannel() instanceof PrivateChannel) {
+            return new Color(155, 0, 155);
+        }
         Member member = event.getGuild().getMemberById(user.getId());
         List<Role> roles = member.getRoles();
         for (Role role : roles) {

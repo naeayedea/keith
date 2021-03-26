@@ -38,6 +38,10 @@ public class EmojiRole extends UserCommand {
 
     @Override
     public void run(MessageReceivedEvent event) {
+        if(event.getChannel() instanceof PrivateChannel) {
+            event.getChannel().sendMessage("Command not supported in private channel!").queue();
+            return;
+        }
         Message message = event.getMessage();
         String messageRaw = message.getContentDisplay().trim();
         messageRaw = messageRaw.substring(6).trim();

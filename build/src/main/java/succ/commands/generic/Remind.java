@@ -1,6 +1,8 @@
 package succ.commands.generic;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -40,6 +42,11 @@ public class Remind extends UserCommand{
     //?remind [in days]/[on date] [text]
     @Override
     public void run(MessageReceivedEvent event) {
+        MessageChannel channel = event.getChannel();
+        if(channel instanceof PrivateChannel) {
+            channel.sendMessage("Reminders not supported in private channels yet!").queue();
+            return;
+        }
         String commandRaw = event.getMessage().getContentRaw().trim();
         String args[]=commandRaw.split("\\s+");
         if(args.length<4){

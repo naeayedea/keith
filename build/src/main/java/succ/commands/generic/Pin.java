@@ -32,6 +32,10 @@ public class Pin extends UserCommand {
 
     @Override
     public void run(MessageReceivedEvent event) {
+        if(event.getChannel() instanceof PrivateChannel) {
+            event.getChannel().sendMessage("Can't use this command in private channels!\n").queue();
+            return;
+        }
         Message message = event.getMessage();
         User user = event.getAuthor();
         Guild guild = event.getGuild();

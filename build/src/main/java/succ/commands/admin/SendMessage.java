@@ -2,6 +2,7 @@ package succ.commands.admin;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -44,8 +45,10 @@ public class SendMessage extends AdminCommand{
                 builder.sendEmbed(channelId, title, message, event);
             }
             else if(type.equals("blast")){
-                //?admin send blast [message];
-
+                if(channel instanceof PrivateChannel){
+                    channel.sendMessage("can't use blast in private message").queue();
+                    return;
+                }
                 String message = commandRaw.substring(commandRaw.indexOf(args[3]));
                 for(MessageChannel messageChannel : event.getGuild().getTextChannels()){
                     try{
