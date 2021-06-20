@@ -1,5 +1,6 @@
 package keith.managers;
 
+import keith.commands.AccessLevel;
 import keith.util.Database;
 
 import java.sql.PreparedStatement;
@@ -10,28 +11,6 @@ public class UserManager {
 
     private static UserManager instance;
 
-    public enum AccessLevel {
-        BANNED (0),
-        USER (1),
-        ADMIN (2),
-        OWNER (3);
-
-        AccessLevel(int num){}
-
-        public static AccessLevel getLevel(String num){
-            switch (num) {
-                case "0":
-                    return BANNED;
-                case "2":
-                    return ADMIN;
-                case "3":
-                    return OWNER;
-                default:
-                    return USER;
-            }
-        }
-
-    }
 
     public static class User {
         private final String discordID;
@@ -59,7 +38,7 @@ public class UserManager {
         }
 
         public boolean isBanned() {
-            return accessLevel == UserManager.AccessLevel.BANNED;
+            return accessLevel == AccessLevel.ALL;
         }
 
         public void setAccessLevel(AccessLevel accessLevel) {
