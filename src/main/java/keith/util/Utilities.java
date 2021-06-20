@@ -1,5 +1,6 @@
 package keith.util;
 
+import keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -49,7 +50,7 @@ public class Utilities {
         if (event.getChannel() instanceof PrivateChannel) {
             return "?";
         }
-        return "!";
+        return ServerManager.getInstance().getServer(event.getGuild().getId()).getPrefix();
     }
 
     public static String stringListToString(List<String> list) {
