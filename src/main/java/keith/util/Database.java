@@ -2,7 +2,6 @@ package keith.util;
 
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -10,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Database {
 
@@ -45,7 +43,7 @@ public class Database {
         }
     }
 
-    public static ArrayList<String> getResultAsString(PreparedStatement statement, Object ... args) {
+    public static ArrayList<String> getStringResult(PreparedStatement statement, Object ... args) {
         try (Connection connection = statement.getConnection()) {
             return getStrings(executeStatement(statement, connection, args));
         } catch (SQLException e) {
@@ -56,7 +54,7 @@ public class Database {
         }
     }
 
-    public static EmbedBuilder getResultAsEmbed(PreparedStatement statement, Object ... args) {
+    public static EmbedBuilder getEmbedResult(PreparedStatement statement, Object ... args) {
         try (Connection connection = statement.getConnection()) {
             return getEmbed(executeStatement(statement, connection, args));
         } catch (SQLException e) {
@@ -68,36 +66,40 @@ public class Database {
         }
     }
 
-    public static void executeStatementNoResult(PreparedStatement statement, Object ... args) {
+    private static void fillStatement(PreparedStatement statement, Object ... args) throws SQLException {
+        int count = 0;
+        for (Object object : args) {
+            count++;
+            //Determine type of object
+            if (object instanceof String) {
+                statement.setString(count, (String) object);
+            } else if (object instanceof Integer) {
+                statement.setInt(count, (Integer) object);
+            } else if (object instanceof Long) {
+                statement.setLong(count, (Long) object);
+            } else if (object instanceof Boolean) {
+                statement.setBoolean(count, (Boolean) object);
+            } else if (object instanceof Double) {
+                statement.setDouble(count, (Double) object);
+            } else {
+                //warn me
+                Logger.printWarning("Warning, class type "+object.getClass()+" not supported");
+            }
+        }
+    }
+
+    public static void executeUpdate(PreparedStatement statement, Object ... args) {
         try (Connection connection = statement.getConnection()) {
-            executeStatement(statement, connection, args);
+            fillStatement(statement, args);
+            statement.executeUpdate();
         } catch (SQLException e) {
-           Logger.printWarning("fuck");
+           Logger.printWarning(e.getMessage());
         }
     }
 
     //executes a premade prepared statement and takes in any parameters required
     private static ResultSet executeStatement(PreparedStatement statement, Connection connection, Object ... args) throws SQLException{
-        int count = 0;
-
-            for (Object object : args) {
-                count++;
-                //Determine type of object
-                if (object instanceof String) {
-                    statement.setString(count, (String) object);
-                } else if (object instanceof Integer) {
-                    statement.setInt(count, (Integer) object);
-                } else if (object instanceof Long) {
-                    statement.setLong(count, (Long) object);
-                } else if (object instanceof Boolean) {
-                    statement.setBoolean(count, (Boolean) object);
-                } else if (object instanceof Double) {
-                    statement.setDouble(count, (Double) object);
-                } else {
-                    //warn me
-                    Logger.printWarning("Warning, class type "+object.getClass()+" not supported");
-                }
-            }
+        fillStatement(statement, args);
         return statement.executeQuery();
     }
 
