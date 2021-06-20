@@ -10,7 +10,7 @@ public class ServerManager {
     private static ServerManager instance;
     private final PreparedStatement prefixStatement;
     private final PreparedStatement createServerStatement;
-
+    
     private ServerManager(){
         prefixStatement = Database.prepareStatement("SELECT prefix FROM servers WHERE ServerID = ?");
         createServerStatement = Database.prepareStatement("INSERT (ServerID) VALUES (?) INTO servers");
@@ -24,11 +24,11 @@ public class ServerManager {
     }
 
     public void addServer(Guild guild) {
-        Database.executeStatementNoResult(createServerStatement, guild.getId());
+        Database.executeUpdate(createServerStatement, guild.getId());
     }
 
     public String getPrefix(Guild guild) {
-        return Database.getResultAsString(prefixStatement, guild.getId()).get(0);
+        return Database.getStringResult(prefixStatement, guild.getId()).get(0);
     }
 
     public void setPrefix(Guild guild, String newPrefix) {
