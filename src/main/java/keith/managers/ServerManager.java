@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ServerManager {
 
@@ -52,7 +53,7 @@ public class ServerManager {
         }
 
         public void setPrefix(String newPrefix) {
-            Database.executeUpdate(prefixStatement(), newPrefix, this.prefix);
+            Database.executeUpdate(prefixStatement(), newPrefix, this.serverID);
             prefix = newPrefix;
         }
 
@@ -88,7 +89,7 @@ public class ServerManager {
     public Server getServer(String guildID) {
         ArrayList<String> results = Database.getStringResult(getServer(), guildID);
         if(results.size() > 1) {
-            String[] result = results.get(1).split("\\s+");
+            String[] result = results.get(1).split("\\t");
             return new Server(guildID, result[0], result[1], Boolean.parseBoolean(result[2]), result[3]);
         } else {
             //server doesn't exist yet, create
