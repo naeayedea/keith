@@ -123,6 +123,8 @@ public class Database {
                 Object object = rs.getObject(i);
                 if (object != null) {
                     currentResult.append(object.toString()).append("\t");
+                } else {
+                    currentResult.append("empty").append("\t");
                 }
             }
             results.add(currentResult.toString());
