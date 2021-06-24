@@ -1,8 +1,11 @@
 package keith;
 
 import keith.managers.ServerManager;
+import keith.managers.ServerManager.Server;
 import keith.managers.UserManager;
+import keith.managers.UserManager.User;
 import keith.util.Database;
+import keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -11,8 +14,10 @@ import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +38,7 @@ public class EventHandler extends ListenerAdapter {
         serverManager = ServerManager.getInstance();
         userManager = UserManager.getInstance();
         Database.setSource(database);
+        Utilities.setJDA(jda);
     }
 
     private void initialiseCommands() {
@@ -40,15 +46,15 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         new Thread(() -> {
-            ServerManager.Server server = serverManager.getServer(event.getGuild().getId());
-            UserManager.User user = userManager.getUser(event.getAuthor().getId());
+            Server server = serverManager.getServer(event.getGuild().getId());
+            User user = userManager.getUser(event.getAuthor().getId());
             Message message = event.getMessage();
             //if user or server not banned
             if(!user.isBanned() && !server.isBanned() && !event.getAuthor().isBot()) {
                 //check for prefix
-                if(message.getContentRaw().substring(server.getPrefix().length()).equals(server.getPrefix())) {
+                if(findPrefix(message, server)) {
                     //check for valid command
                         //execute
                     //else check for channel command
@@ -60,6 +66,11 @@ public class EventHandler extends ListenerAdapter {
         }).start();
     }
 
+    private boolean findPrefix(Message message, Server server) {
+        //ensure that message content greater than prefix length then check if prefix is there
+        return message.getContentRaw().length() > server.getPrefix().length() && message.getContentRaw().startsWith(server.getPrefix());
+    }
+
     @Override
     public void onGuildJoin(GuildJoinEvent event){
         Guild guild = event.getGuild();
@@ -67,7 +78,9 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onReconnected(ReconnectedEvent event){
+    public void onReconnected(@NotNull ReconnectedEvent event){
+        Utilities.updateUptime();
+        Utilities.setJDA(event.getJDA());
 
     }
 
