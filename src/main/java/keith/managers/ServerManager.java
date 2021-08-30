@@ -45,7 +45,9 @@ public class ServerManager {
         }
 
         public void setBanned(Boolean banned) {
-            this.banned = banned;
+            if (Database.executeUpdate(setBannedStatement(), banned, this.serverID)) {
+                this.banned = banned;
+            }
         }
 
         public String getPrefix() {
@@ -53,12 +55,17 @@ public class ServerManager {
         }
 
         public void setPrefix(String newPrefix) {
-            Database.executeUpdate(prefixStatement(), newPrefix, this.serverID);
-            prefix = newPrefix;
+            if(Database.executeUpdate(prefixStatement(), newPrefix, this.serverID)) {
+                prefix = newPrefix;
+            }
         }
 
         private PreparedStatement prefixStatement() {
             return Database.prepareStatement("UPDATE servers SET prefix = ? WHERE ServerID = ?");
+        }
+
+        private PreparedStatement setBannedStatement() {
+            return Database.prepareStatement("UPDATE servers SET banned = ? WHERE ServerID = ?");
         }
 
         public String getFirstSeen() {
@@ -94,7 +101,7 @@ public class ServerManager {
         } else {
             //server doesn't exist yet, create
             Database.executeUpdate(addServer(), guildID);
-            return new Server(guildID, Instant.now().toString(),"?", false, null);
+            return new Server(guildID, Instant.now().toString(), "?", false, null);
         }
     }
 

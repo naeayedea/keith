@@ -2,6 +2,8 @@ package keith.managers;
 
 import keith.commands.AccessLevel;
 import keith.util.Database;
+import keith.util.Utilities;
+import net.dv8tion.jda.api.entities.User;
 
 import java.sql.PreparedStatement;
 import java.time.Instant;
@@ -45,14 +47,20 @@ public class UserManager {
             this.accessLevel = accessLevel;
         }
 
-
         public long getCommandCount() {
             return commandCount;
         }
 
         public String toString() {
-            return discordID + " " + accessLevel + ", " + firstSeen + ", " + commandCount;
+            net.dv8tion.jda.api.entities.User user =  Utilities.getJDAInstance().getUserById(this.discordID);
+            String tail = " " + accessLevel + ", " + firstSeen + ", " + commandCount;
+            return user == null ?  "Unknown User, ID: "+ discordID + tail : user.getName()+user.getDiscriminator() + tail;
         }
+
+        private PreparedStatement accessLevelStatement() {
+            return Database.prepareStatement("UPDATE users SET UserLevel = ? WHERE DiscordID = ?");
+        }
+
     }
 
     private UserManager(){
