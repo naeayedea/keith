@@ -1,5 +1,6 @@
 package keith;
 
+import keith.commands.Command;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.managers.UserManager;
@@ -17,13 +18,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class EventHandler extends ListenerAdapter {
 
     ExecutorService commandService;
+    ScheduledExecutorService rateLimitService;
+    Map<String, Integer> rateLimitRecord;
     ServerManager serverManager;
     UserManager userManager;
 
@@ -35,10 +37,15 @@ public class EventHandler extends ListenerAdapter {
         initialiseCommands();
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
         commandService = Executors.newCachedThreadPool();
+        rateLimitService = Executors.newScheduledThreadPool(1);
+        rateLimitRecord = new ConcurrentHashMap<>();
+        Runnable clearHashMap = () -> rateLimitRecord.clear();
+        rateLimitService.scheduleAtFixedRate(clearHashMap, 30, 30, TimeUnit.SECONDS);
         serverManager = ServerManager.getInstance();
         userManager = UserManager.getInstance();
         Database.setSource(database);
         Utilities.setJDA(jda);
+        Utilities.setRateLimitMax(5);
     }
 
     private void initialiseCommands() {
@@ -51,14 +58,21 @@ public class EventHandler extends ListenerAdapter {
             Server server = serverManager.getServer(event.getGuild().getId());
             User user = userManager.getUser(event.getAuthor().getId());
             Message message = event.getMessage();
+            String messageContent = message.getContentRaw().toLowerCase();
             //if user or server not banned
-            if(!user.isBanned() && !server.isBanned() && !event.getAuthor().isBot()) {
+            if (!user.isBanned() && !server.isBanned() && !event.getAuthor().isBot()) {
                 //check for prefix
-                if(findPrefix(message, server)) {
-                    //check for valid command
-                        //execute
+                if (findPrefix(messageContent, server)) {
+                    //trim prefix and trailing spaces from command
+                    Command command = findCommand(messageContent.substring(server.getPrefix().length()).trim());
+                    Integer numRecentCommands = rateLimitRecord.get(user.getDiscordID());
+                    if (command != null && (numRecentCommands != null && numRecentCommands < Utilities.getRateLimitMax())) {
+                        //execute command
+
+
+                    }
                     //else check for channel command
-                        //process
+
                     //else ignore
                 }
             }
@@ -66,10 +80,15 @@ public class EventHandler extends ListenerAdapter {
         }).start();
     }
 
-    private boolean findPrefix(Message message, Server server) {
+    private boolean findPrefix(String message, Server server) {
         //ensure that message content greater than prefix length then check if prefix is there
-        return message.getContentRaw().length() > server.getPrefix().length() && message.getContentRaw().startsWith(server.getPrefix());
+        return message.length() > server.getPrefix().length() && message.startsWith(server.getPrefix());
     }
+
+    private Command findCommand(String message) {
+        return null;
+    }
+
 
     @Override
     public void onGuildJoin(GuildJoinEvent event){

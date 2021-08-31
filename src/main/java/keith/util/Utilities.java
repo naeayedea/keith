@@ -17,6 +17,9 @@ public class Utilities {
     private static long lastReconnect;
     private static JDA jda;
 
+    /*stores the maximum total "cost" of commands a user can do within 30 seconds, the cost of each command is defined
+     * individually depending on the amount of time it takes to complete on average */
+    private static int rateLimitMax;
 
     /*
      * Setter methods for static variables and various features of bot
@@ -35,6 +38,10 @@ public class Utilities {
         jda.getPresence().setActivity(Activity.playing(newStatus));
     }
 
+    public static void setRateLimitMax(int newMax) {
+        rateLimitMax = newMax;
+    }
+
     public static void updateDefaultStatus() {
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
     }
@@ -44,13 +51,16 @@ public class Utilities {
      * Getter methods for static variables
      */
 
-
     public static long getUptimeMillis() {
         return ManagementFactory.getRuntimeMXBean().getUptime() - lastReconnect;
     }
 
     public static JDA getJDAInstance() {
         return Utilities.jda;
+    }
+
+    public static int getRateLimitMax() {
+        return rateLimitMax;
     }
 
     /*
