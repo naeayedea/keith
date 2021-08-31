@@ -27,15 +27,14 @@ public class Database {
 
     //attempt to close an active connection
     private static void closeConnection(Connection connection) throws SQLException {
-        if(connection != null) {
-                connection.close();
+        if (connection != null) {
+            connection.close();
         }
     }
 
     //returns a prepared statement if the input string is valid
     public static PreparedStatement prepareStatement(String string) {
-        try {
-            Connection connection = connect();
+        try (Connection connection = connect()) {
             return connection.prepareStatement(string);
         } catch (SQLException | NullPointerException e) {
             Logger.printWarning(e.getMessage());
@@ -46,7 +45,7 @@ public class Database {
     public static ArrayList<String> getStringResult(PreparedStatement statement, Object ... args) {
         try (Connection connection = statement.getConnection()) {
             return getStrings(executeStatement(statement, connection, args));
-        } catch (SQLException e) {
+        } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
             ArrayList<String> error = new ArrayList<>();
             error.add("Error");
@@ -57,7 +56,7 @@ public class Database {
     public static EmbedBuilder getEmbedResult(PreparedStatement statement, Object ... args) {
         try (Connection connection = statement.getConnection()) {
             return getEmbed(executeStatement(statement, connection, args));
-        } catch (SQLException e) {
+        } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
             EmbedBuilder error = new EmbedBuilder();
             error.setTitle("SQLException");
@@ -66,7 +65,7 @@ public class Database {
         }
     }
 
-    private static void fillStatement(PreparedStatement statement, Object ... args) throws SQLException {
+    private static void fillStatement(PreparedStatement statement, Object ... args) throws SQLException, NullPointerException{
         int count = 0;
         for (Object object : args) {
             count++;
@@ -88,17 +87,19 @@ public class Database {
         }
     }
 
-    public static void executeUpdate(PreparedStatement statement, Object ... args) {
-        try (Connection connection = statement.getConnection()) {
+    public static boolean executeUpdate(PreparedStatement statement, Object ... args) {
+        try (Connection ignored = statement.getConnection()) {
             fillStatement(statement, args);
             statement.executeUpdate();
-        } catch (SQLException e) {
+            return true;
+        } catch (SQLException | NullPointerException e) {
            Logger.printWarning(e.getMessage());
+           return false;
         }
     }
 
     //executes a premade prepared statement and takes in any parameters required
-    private static ResultSet executeStatement(PreparedStatement statement, Connection connection, Object ... args) throws SQLException{
+    private static ResultSet executeStatement(PreparedStatement statement, Object ... args) throws SQLException, NullPointerException{
         fillStatement(statement, args);
         return statement.executeQuery();
     }
@@ -122,14 +123,14 @@ public class Database {
                 //Fill out each column
                 Object object = rs.getObject(i);
                 if (object != null) {
-                    currentResult.append(object.toString()).append("\t");
+                    currentResult.append(object).append("\t");
                 } else {
                     currentResult.append("empty").append("\t");
                 }
             }
             results.add(currentResult.toString());
         }
-
+        rs.close();
         return results;
     }
 
@@ -154,7 +155,7 @@ public class Database {
             for(int i = 1; i <= columnCount; i++) {
                 Object object = rs.getObject(i);
                 if(object != null) {
-                    columnContent.get(i-1).append(object.toString()).append("\n");
+                    columnContent.get(i-1).append(object).append("\n");
                 }
             }
         }
@@ -167,7 +168,7 @@ public class Database {
             }
             eb.addField(headers[i], columnContent.get(i).toString(), true);
         }
-        
+        rs.close();
         return eb;
     }
 
