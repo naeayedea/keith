@@ -1,11 +1,13 @@
 package keith;
 
 import keith.commands.Command;
+import keith.commands.info.Help;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.managers.UserManager;
 import keith.managers.UserManager.User;
 import keith.util.Database;
+import keith.util.MultiMap;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
@@ -18,6 +20,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -26,6 +31,7 @@ public class EventHandler extends ListenerAdapter {
     ExecutorService commandService;
     ScheduledExecutorService rateLimitService;
     Map<String, Integer> rateLimitRecord;
+    MultiMap<String, Command> commands;
     ServerManager serverManager;
     UserManager userManager;
 
@@ -49,34 +55,42 @@ public class EventHandler extends ListenerAdapter {
     }
 
     private void initialiseCommands() {
-
+        commands = new MultiMap<>();
+        commands.putAll(Arrays.asList("help", "test", "what", "5"), new Help());
+        commands.put("settings", commands.get("help"));
+        commands.remove("test");
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         new Thread(() -> {
+            if (!event.getAuthor().isBot()) {
             Server server = serverManager.getServer(event.getGuild().getId());
             User user = userManager.getUser(event.getAuthor().getId());
             Message message = event.getMessage();
             String messageContent = message.getContentRaw().toLowerCase();
             //if user or server not banned
-            if (!user.isBanned() && !server.isBanned() && !event.getAuthor().isBot()) {
+            if (!user.isBanned() && !server.isBanned()) {
                 //check for prefix
                 if (findPrefix(messageContent, server)) {
                     //trim prefix and trailing spaces from command
-                    Command command = findCommand(messageContent.substring(server.getPrefix().length()).trim());
+                    messageContent = messageContent.substring(server.getPrefix().length()).trim();
+                    //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+                    List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+                    Command command = findCommand(tokens);
                     Integer numRecentCommands = rateLimitRecord.get(user.getDiscordID());
-                    if (command != null && (numRecentCommands != null && numRecentCommands < Utilities.getRateLimitMax())) {
+
+                    //Check if command was found and that user isn't rate limited
+                    if (command != null && (numRecentCommands == null || numRecentCommands < Utilities.getRateLimitMax())) {
                         //execute command
-
-
+                        commandService.execute(()-> command.run(event));
                     }
                     //else check for channel command
 
                     //else ignore
                 }
             }
-
+            }
         }).start();
     }
 
@@ -85,8 +99,9 @@ public class EventHandler extends ListenerAdapter {
         return message.length() > server.getPrefix().length() && message.startsWith(server.getPrefix());
     }
 
-    private Command findCommand(String message) {
-        return null;
+    private Command findCommand(List<String> list) {
+        String commandString = list.remove(0);
+        return commands.get(commandString);
     }
 
 
