@@ -54,7 +54,7 @@ public class UserManager {
         public String toString() {
             net.dv8tion.jda.api.entities.User user =  Utilities.getJDAInstance().getUserById(this.discordID);
             String tail = " " + accessLevel + ", " + firstSeen + ", " + commandCount;
-            return user == null ?  "Unknown User, ID: "+ discordID + tail : user.getName()+user.getDiscriminator() + tail;
+            return user == null ?  "Unknown User, ID: "+ discordID + tail : user.getName()+"#"+user.getDiscriminator() + tail;
         }
 
         private PreparedStatement accessLevelStatement() {
