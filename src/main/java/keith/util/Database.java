@@ -2,6 +2,7 @@ package keith.util;
 
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.sqlite.jdbc4.JDBC4Connection;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Database {
 
@@ -34,8 +36,8 @@ public class Database {
 
     //returns a prepared statement if the input string is valid
     public static PreparedStatement prepareStatement(String string) {
-        try (Connection connection = connect()) {
-            return connection.prepareStatement(string);
+        try {
+            return connect().prepareStatement(string);
         } catch (SQLException | NullPointerException e) {
             Logger.printWarning(e.getMessage());
             return null;
@@ -43,8 +45,8 @@ public class Database {
     }
 
     public static ArrayList<String> getStringResult(PreparedStatement statement, Object ... args) {
-        try (Connection connection = statement.getConnection()) {
-            return getStrings(executeStatement(statement, connection, args));
+        try (Connection ignored = statement.getConnection()) {
+            return getStrings(executeStatement(statement, args));
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
             ArrayList<String> error = new ArrayList<>();
@@ -54,8 +56,8 @@ public class Database {
     }
 
     public static EmbedBuilder getEmbedResult(PreparedStatement statement, Object ... args) {
-        try (Connection connection = statement.getConnection()) {
-            return getEmbed(executeStatement(statement, connection, args));
+        try (Connection ignored = statement.getConnection()) {
+            return getEmbed(executeStatement(statement, args));
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
             EmbedBuilder error = new EmbedBuilder();
@@ -70,20 +72,20 @@ public class Database {
         for (Object object : args) {
             count++;
             //Determine type of object
-            if (object instanceof String) {
-                statement.setString(count, (String) object);
-            } else if (object instanceof Integer) {
-                statement.setInt(count, (Integer) object);
-            } else if (object instanceof Long) {
-                statement.setLong(count, (Long) object);
-            } else if (object instanceof Boolean) {
-                statement.setBoolean(count, (Boolean) object);
-            } else if (object instanceof Double) {
-                statement.setDouble(count, (Double) object);
-            } else {
-                //warn me
-                Logger.printWarning("Warning, class type "+object.getClass()+" not supported");
-            }
+                if (object instanceof String) {
+                    statement.setString(count, (String) object);
+                } else if (object instanceof Integer) {
+                    statement.setInt(count, (Integer) object);
+                } else if (object instanceof Long) {
+                    statement.setLong(count, (Long) object);
+                } else if (object instanceof Boolean) {
+                    statement.setBoolean(count, (Boolean) object);
+                } else if (object instanceof Double) {
+                    statement.setDouble(count, (Double) object);
+                } else {
+                    //warn me
+                    Logger.printWarning("Warning, class type "+object.getClass()+" not supported, details: "+object);
+                }
         }
     }
 
