@@ -1,18 +1,43 @@
 package keith.util;
 
 import keith.managers.ServerManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Utilities {
+
+
+    public static class Messages {
+
+        public static void sendError(MessageChannel channel, String header, String message) {
+            channel.sendMessage(MessageTemplate.errorMessage(header, message).build()).queue();
+        }
+
+        public static class MessageTemplate {
+            /*
+             * Various message templates for ease of use when sending user a message such as error messages, information etc.
+             * Add various message types as required
+             */
+
+            public static EmbedBuilder errorMessage(String header, String text) {
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.setTitle("ERROR");
+                eb.setDescription(header);
+                eb.addField("error", text, false);
+                return eb;
+            }
+
+        }
+    }
 
     private static long lastReconnect;
     private static JDA jda;
@@ -105,7 +130,7 @@ public class Utilities {
     }
 
     public static void restart(MessageReceivedEvent event) throws IOException  {
-        Process p = Runtime.getRuntime().exec("screen -d -m nohup java -jar /home/succ/keith/v3/build/libs/keithv3-V3.00-all.jar");
+        Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-V3.00-all.jar");
         setStatus("Restarting...");
         boolean status = p.isAlive();
         if(status) {
