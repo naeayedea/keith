@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.awt.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.List;
@@ -32,7 +33,7 @@ public class Utilities {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("ERROR");
                 eb.setDescription(header);
-                eb.addField("error", text, false);
+                eb.addField("Information", text, false);
                 return eb;
             }
 
@@ -117,6 +118,10 @@ public class Utilities {
             return "?";
         }
         return ServerManager.getInstance().getServer(event.getGuild().getId()).getPrefix();
+    }
+
+    public static Color getDefaultColor() {
+        return new Color(155,0,155);
     }
 
     public static String stringListToString(List<String> list) {
