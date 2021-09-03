@@ -13,9 +13,12 @@ public enum AccessLevel {
     //Commands with ALL access level can be used by anyone, even banned users
     ALL (0);
 
-    AccessLevel(int num){}
+    public final int num;
+    AccessLevel(int num){
+        this.num = num;
+    }
 
-    public static AccessLevel getLevel(String num){
+    public static AccessLevel getLevel(String num) {
         switch (num) {
             case "0":
                 return ALL;

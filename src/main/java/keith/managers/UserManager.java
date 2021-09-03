@@ -18,7 +18,7 @@ public class UserManager {
         private final String discordID;
         private AccessLevel accessLevel;
         private final String firstSeen;
-        private final long commandCount;
+        private long commandCount;
 
         public User(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
             this.discordID = discordID;
@@ -44,11 +44,19 @@ public class UserManager {
         }
 
         public void setAccessLevel(AccessLevel accessLevel) {
-            this.accessLevel = accessLevel;
+            if (Database.executeUpdate(accessLevelStatement(), accessLevel.num, this.discordID)) {
+                this.accessLevel = accessLevel;
+            }
         }
 
         public long getCommandCount() {
             return commandCount;
+        }
+
+        public void incrementCommandCount() {
+            if (Database.executeUpdate(incrementCommandCountStatement(), this.discordID)) {
+                this.commandCount++;
+            }
         }
 
         public String toString() {
@@ -59,6 +67,10 @@ public class UserManager {
 
         private PreparedStatement accessLevelStatement() {
             return Database.prepareStatement("UPDATE users SET UserLevel = ? WHERE DiscordID = ?");
+        }
+
+        private PreparedStatement incrementCommandCountStatement() {
+            return Database.prepareStatement("UPDATE users SET CommandCount = CommandCount + 1 WHERE DiscordID = ?");
         }
 
     }
