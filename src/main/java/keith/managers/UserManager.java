@@ -59,6 +59,10 @@ public class UserManager {
             }
         }
 
+        public boolean hasPermission(AccessLevel commandLevel) {
+            return this.accessLevel.num >= commandLevel.num;
+        }
+
         public String toString() {
             net.dv8tion.jda.api.entities.User user =  Utilities.getJDAInstance().getUserById(this.discordID);
             String tail = " " + accessLevel + ", " + firstSeen + ", " + commandCount;

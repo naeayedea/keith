@@ -10,12 +10,11 @@ import keith.util.Database;
 import keith.util.MultiMap;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,38 +64,61 @@ public class EventHandler extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         new Thread(() -> {
             if (!event.getAuthor().isBot()) {
-            Server server = serverManager.getServer(event.getGuild().getId());
-            User user = userManager.getUser(event.getAuthor().getId());
-            Message message = event.getMessage();
-            String messageContent = message.getContentRaw().toLowerCase();
-            //if user or server not banned
-            if (!user.isBanned() && !server.isBanned()) {
-                //check for prefix
-                if (findPrefix(messageContent, server)) {
-                    //trim prefix and trailing spaces from command
-                    messageContent = messageContent.substring(server.getPrefix().length()).trim();
-                    //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
-                    List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
-                    Command command = findCommand(tokens);
-                    Integer numRecentCommands = rateLimitRecord.get(user.getDiscordID());
-
-                    //Check if command was found and that user isn't rate limited
-                    if (command != null && (numRecentCommands == null || numRecentCommands < Utilities.getRateLimitMax())) {
-                        //execute command
-                        commandService.execute(()-> command.run(event));
-                    }
-                    //else check for channel command
-
-                    //else ignore
+                MessageChannel channel = event.getChannel();
+                Message message = event.getMessage();
+                String messageContent = message.getContentRaw().toLowerCase();
+                User user = userManager.getUser(event.getAuthor().getId());
+                String prefix;
+                Server server = null;
+                boolean isPrivateMessage = channel instanceof PrivateChannel;
+                if (isPrivateMessage) {
+                    prefix = "?";
+                } else {
+                    server = serverManager.getServer(event.getGuild().getId());
+                    prefix = server.getPrefix();
                 }
-            }
+
+                //check first if user is banned, if not check for server ban or private message
+                if (!user.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                    //check for prefix
+                    if (findPrefix(messageContent, prefix)) {
+                        //trim prefix and trailing spaces from command
+                        messageContent = messageContent.substring(prefix.length()).trim();
+                        //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+                        List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+                        Command command = findCommand(tokens);
+                        Integer numRecentCommands = rateLimitRecord.get(user.getDiscordID());
+
+                        //Check if command was found and that user isn't rate limited
+                        if (command != null && (numRecentCommands == null || numRecentCommands < Utilities.getRateLimitMax())) {
+                            //execute command
+                            if (user.hasPermission(command.getAccessLevel())) {
+                                try {
+                                    Runnable execution = () -> {command.run(event, tokens); user.incrementCommandCount();};
+                                    commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+                                } catch (PermissionException e) {
+                                    Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
+                                } catch (IllegalArgumentException e) {
+                                    Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
+                                } catch (Exception e) {
+                                    Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                }
+                            } else {
+                                    sendMessage(channel, "You do not have access to this command");
+                            }
+                        }
+                        //else check for channel command
+
+                        //else ignore
+                    }
+                }
             }
         }).start();
     }
 
-    private boolean findPrefix(String message, Server server) {
+    private boolean findPrefix(String message, String prefix) {
         //ensure that message content greater than prefix length then check if prefix is there
-        return message.length() > server.getPrefix().length() && message.startsWith(server.getPrefix());
+        return message.length() > prefix.length() && message.startsWith(prefix);
     }
 
     private Command findCommand(List<String> list) {
@@ -104,6 +126,14 @@ public class EventHandler extends ListenerAdapter {
         return commands.get(commandString);
     }
 
+    //wrapper for channel.sendMesssage(content).queue() so dont have to write it in full every time.
+    private void sendMessage(MessageChannel channel, String content) {
+        channel.sendMessage(content).queue();
+    }
+
+    private void sendEmbed(MessageChannel channel, MessageEmbed embed) {
+        channel.sendMessage(embed).queue();
+    }
 
     @Override
     public void onGuildJoin(GuildJoinEvent event){
