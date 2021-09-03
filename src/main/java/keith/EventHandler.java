@@ -55,7 +55,7 @@ public class EventHandler extends ListenerAdapter {
 
     private void initialiseCommands() {
         commands = new MultiMap<>();
-        commands.putAll(Arrays.asList("help", "test", "what", "5"), new Help());
+        commands.putAll(Arrays.asList("help", "test", "what", "5"), new Help(commands, "help"));
         commands.put("settings", commands.get("help"));
         commands.remove("test");
     }
@@ -94,7 +94,12 @@ public class EventHandler extends ListenerAdapter {
                             //execute command
                             if (user.hasPermission(command.getAccessLevel())) {
                                 try {
-                                    Runnable execution = () -> {command.run(event, tokens); user.incrementCommandCount();};
+                                    Runnable execution = () -> {
+                                        channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
+                                        command.run(event, tokens);
+                                        user.incrementCommandCount();
+                                        //TODO: Implement rate limiting by adding "cost" of each command to rate limit map.
+                                    };
                                     commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                 } catch (PermissionException e) {
                                     Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
