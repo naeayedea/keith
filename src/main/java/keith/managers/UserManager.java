@@ -69,6 +69,10 @@ public class UserManager {
             return user == null ?  "Unknown User, ID: "+ discordID + tail : user.getName()+"#"+user.getDiscriminator() + tail;
         }
 
+        public String getAsMention() {
+            return "<@!"+this.discordID+">";
+        }
+
         private PreparedStatement accessLevelStatement() {
             return Database.prepareStatement("UPDATE users SET UserLevel = ? WHERE DiscordID = ?");
         }
