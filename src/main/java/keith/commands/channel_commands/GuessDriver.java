@@ -36,6 +36,7 @@ public class GuessDriver implements ChannelCommand {
         try {
             int guess = Integer.parseInt(args.get(0));
             if (guess == answer) {
+                message.addReaction("U+1F3C6").queue();
                 channel.sendMessage("Congratulations! "+user.getAsMention()+" You guessed correctly in "+attempts+" guesses! :tada:").queue();
                 timerTask.cancel(true);
                 finish();
