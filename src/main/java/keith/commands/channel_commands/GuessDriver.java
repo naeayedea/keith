@@ -36,10 +36,10 @@ public class GuessDriver implements ChannelCommand {
         try {
             int guess = Integer.parseInt(args.get(0));
             if (guess == answer) {
+                finish();
                 message.addReaction("U+1F3C6").queue();
                 channel.sendMessage("Congratulations! "+user.getAsMention()+" You guessed correctly in "+attempts+" guesses! :tada:").queue();
                 timerTask.cancel(true);
-                finish();
             } else if (guess < answer) {
                 message.addReaction("U+2B06").queue();
             } else {
@@ -52,7 +52,7 @@ public class GuessDriver implements ChannelCommand {
 
     private void start() {
         if (manager.gameInProgress(channel.getId())) {
-            channel.sendMessage("There is already a game running in this channel! Use "+server.getPrefix()+"guess [number]").queue();
+            channel.sendMessage("There is already a game running in this channel! Simply type your guess into chat to play!").queue();
         } else {
             int timeout = 30;
             channel.sendMessage("You have "+ timeout +" seconds to guess the number between 1 and "+maxNum+"!").queue();
