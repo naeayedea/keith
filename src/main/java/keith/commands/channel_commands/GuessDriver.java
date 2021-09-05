@@ -55,7 +55,7 @@ public class GuessDriver implements ChannelCommand {
             channel.sendMessage("There is already a game running in this channel! Use "+server.getPrefix()+"guess [number]").queue();
         } else {
             int timeout = 30;
-            channel.sendMessage("You have "+ timeout +" seconds to guess the number between 0 and "+maxNum+"!").queue();
+            channel.sendMessage("You have "+ timeout +" seconds to guess the number between 1 and "+maxNum+"!").queue();
             answer = ThreadLocalRandom.current().nextInt(1, maxNum + 1);
             manager.addGame(channel.getId(), this);
             timerTask = timer.schedule(this::finishNoAnswer, timeout, TimeUnit.SECONDS);
