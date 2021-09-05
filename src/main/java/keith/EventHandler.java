@@ -59,7 +59,7 @@ public class EventHandler extends ListenerAdapter {
         rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
         Utilities.setJDA(jda);
-        Utilities.setRateLimitMax(5);
+        Utilities.setRateLimitMax(10);
     }
 
     private void initialiseCommands() {
@@ -96,14 +96,15 @@ public class EventHandler extends ListenerAdapter {
                         //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
                         tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
                         Command command = findCommand(tokens);
-                        Integer numRecentCommands = rateLimitRecord.get(user.getDiscordID());
+                        Integer numRecentCommandsObj = rateLimitRecord.get(user.getId());
+                        int numRecentCommands = numRecentCommandsObj == null ? 0 : numRecentCommandsObj;
 
                         //Check if command was found and that user isn't rate limited
                         if (command != null ) {
                             /*
                              * command was found, check that user is not rate limited and that they have permission
                              */
-                            if (numRecentCommands == null || numRecentCommands < Utilities.getRateLimitMax()) {
+                            if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
                                     //all checks passed, execute command
                                     try {
@@ -111,7 +112,7 @@ public class EventHandler extends ListenerAdapter {
                                             channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
                                             command.run(event, tokens);
                                             user.incrementCommandCount();
-                                            //TODO: Implement rate limiting by adding "cost" of each command to rate limit map.
+                                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                                         };
                                         commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                     } catch (PermissionException e) {
@@ -124,6 +125,8 @@ public class EventHandler extends ListenerAdapter {
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");
                                 }
+                            } else {
+                                sendMessage(channel, "Too many commands in a short time.. please wait 30 seconds");
                             }
 
                             /*
