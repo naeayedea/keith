@@ -3,9 +3,7 @@ package keith.util;
 import keith.managers.ServerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -120,8 +118,26 @@ public class Utilities {
         return ServerManager.getInstance().getServer(event.getGuild().getId()).getPrefix();
     }
 
-    public static Color getDefaultColor() {
+    public static Color getBotColor() {
         return new Color(155,0,155);
+    }
+
+    public static Color getDefaultColor() {
+        return new Color(44,47,51);
+    }
+
+    public static Color getMemberColor(Guild guild, User user) {
+            Member member = guild.getMember(user);
+            if (member != null) {
+                List<Role> roles = member.getRoles();
+                for (Role role : roles) {
+                    Color color = role.getColor();
+                    if(color != null) {
+                        return color;
+                    }
+                }
+            }
+            return new Color(44,47,51);
     }
 
     public static String stringListToString(List<String> list) {

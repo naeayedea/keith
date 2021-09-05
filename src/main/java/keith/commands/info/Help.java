@@ -1,16 +1,11 @@
 package keith.commands.info;
 
-import keith.commands.AccessLevel;
 import keith.commands.Command;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +49,7 @@ public class Help extends InfoCommand {
     public void sendAllCommandHelp(MessageChannel channel, String prefix) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Help");
-        eb.setColor(Utilities.getDefaultColor());
+        eb.setColor(Utilities.getBotColor());
         eb.setDescription("For information on specific commands do \""+prefix+"help [command\"");
         StringBuilder helpString = new StringBuilder("```cs\n");
         for (Command command : commands.values()) {
@@ -71,7 +66,7 @@ public class Help extends InfoCommand {
 
     public void sendSingleCommandHelp(MessageChannel channel, String commandString) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Utilities.getDefaultColor());
+        eb.setColor(Utilities.getBotColor());
         Command command = commands.get(commandString);
         if (command != null) {
             eb.setTitle("Help");
