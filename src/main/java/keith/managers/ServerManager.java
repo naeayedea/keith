@@ -1,13 +1,12 @@
 package keith.managers;
 
-import keith.commands.AccessLevel;
 import keith.util.Database;
+import keith.util.Utilities;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,24 +22,26 @@ public class ServerManager {
         private final String firstSeen;
         private String prefix;
         private Boolean banned;
-        private String pin_channel;
+        private String pinChannel;
 
-        public Server(String serverID, String firstSeen, String prefix, Boolean banned, String pin_channel) {
+        public Server(String serverID, String firstSeen, String prefix, Boolean banned, String pinChannel) {
 
             this.serverID = serverID;
             this.firstSeen = firstSeen;
             this.prefix = prefix;
             this.banned = banned;
-            this.pin_channel = pin_channel;
+            this.pinChannel = pinChannel;
         }
 
 
-        public String getPin_channel() {
-            return pin_channel;
+        public String getPinChannel() {
+            return pinChannel;
         }
 
-        public void setPin_channel(String pin_channel) {
-            this.pin_channel = pin_channel;
+        public void setPinChannel(String pinChannel) {
+            if (Database.executeUpdate(pinChannelStatement(), pinChannel, this.serverID)) {
+                this.pinChannel = pinChannel;
+            }
         }
 
         public Boolean isBanned() {
@@ -63,6 +64,10 @@ public class ServerManager {
             }
         }
 
+        private PreparedStatement pinChannelStatement() {
+            return Database.prepareStatement("UPDATE servers SET PinChannel = ? WHERE ServerID = ?");
+        }
+
         private PreparedStatement prefixStatement() {
             return Database.prepareStatement("UPDATE servers SET prefix = ? WHERE ServerID = ?");
         }
@@ -77,6 +82,12 @@ public class ServerManager {
 
         public String getServerID() {
             return serverID;
+        }
+
+        public String toString() {
+            Guild guild =  Utilities.getJDAInstance().getGuildById(this.serverID);
+            String tail = "> First Seen: " + firstSeen + ", Prefix: " + prefix +", Pin Channel: " + pinChannel;
+            return guild == null ?  "Unknown Server, ID: "+ serverID + tail : guild.getName()+"<"+guild.getId() + tail;
         }
     }
 
@@ -104,7 +115,7 @@ public class ServerManager {
 
     //String serverID, String firstSeen, String prefix, Boolean banned, String pin_channel
     private PreparedStatement getServer() {
-        return Database.prepareStatement("SELECT FirstSeen, prefix, banned, pin_channel FROM servers where serverID = ?");
+        return Database.prepareStatement("SELECT FirstSeen, prefix, banned, PinChannel FROM servers where serverID = ?");
     }
 
     public Server getServer(String guildID) {
