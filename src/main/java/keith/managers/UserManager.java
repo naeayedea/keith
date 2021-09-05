@@ -8,12 +8,15 @@ import net.dv8tion.jda.api.entities.User;
 import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserManager {
 
-    private static UserManager instance;
 
-
+    /*
+     * Internal class user
+     */
     public static class User {
         private final String discordID;
         private AccessLevel accessLevel;
@@ -83,8 +86,22 @@ public class UserManager {
 
     }
 
-    private UserManager(){
+    /*
+     * UserManager code, above is internal class User
+     */
 
+    private static UserManager instance;
+    private Map<String, User> userCache;
+
+    private UserManager(){
+        userCache = new HashMap<>();
+    }
+
+    public static UserManager getInstance() {
+        if (instance == null) {
+            instance = new UserManager();
+        }
+        return instance;
     }
 
     private PreparedStatement getUser() {
@@ -96,22 +113,25 @@ public class UserManager {
     }
 
     public User getUser(String discordID) {
-        ArrayList<String> results = Database.getStringResult(getUser(), discordID);
-        if (results.size() > 1) {
-            String[] result = results.get(1).split("\\s+");
-            return new User(discordID, AccessLevel.getLevel(result[1]), result[2], Long.parseLong(result[3]));
-        } else {
-            //user doesn't exist, need to create
-            Database.executeUpdate(createUser(), discordID);
-            return new User(discordID, AccessLevel.USER , Instant.now().toString(), 0);
+        User user = userCache.get(discordID);
+        if(user == null) {
+            //user not in cache, attempt to retrieve from database
+            ArrayList<String> results = Database.getStringResult(getUser(), discordID);
+            if (results.size() > 1) {
+                String[] result = results.get(1).split("\\s+");
+                user = new User(discordID, AccessLevel.getLevel(result[1]), result[2], Long.parseLong(result[3]));
+            } else {
+                //user doesn't exist, need to create
+                Database.executeUpdate(createUser(), discordID);
+                user =  new User(discordID, AccessLevel.USER , Instant.now().toString(), 0);
+            }
+            userCache.put(discordID, user);
         }
+        return user;
     }
 
-    public static UserManager getInstance() {
-        if (instance == null) {
-            instance = new UserManager();
-        }
-        return instance;
+    public void clear() {
+        userCache.clear();
     }
 
 }

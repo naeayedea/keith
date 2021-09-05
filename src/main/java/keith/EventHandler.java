@@ -49,10 +49,14 @@ public class EventHandler extends ListenerAdapter {
         channelCommandService = ChannelCommandManager.getInstance();
         rateLimitService = Executors.newScheduledThreadPool(1);
         rateLimitRecord = new ConcurrentHashMap<>();
-        Runnable clearHashMap = () -> rateLimitRecord.clear();
-        rateLimitService.scheduleAtFixedRate(clearHashMap, 30, 30, TimeUnit.SECONDS);
         serverManager = ServerManager.getInstance();
         userManager = UserManager.getInstance();
+        Runnable clearHistory = () -> {
+            rateLimitRecord.clear();
+            serverManager.clear();
+            userManager.clear();
+        };
+        rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
         Utilities.setJDA(jda);
         Utilities.setRateLimitMax(5);

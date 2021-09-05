@@ -8,13 +8,16 @@ import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerManager {
 
-    private static ServerManager instance;
+    /*
+     * Internal class user
+     */
 
     public static class Server {
-
 
         private final String serverID;
         private final String firstSeen;
@@ -77,6 +80,17 @@ public class ServerManager {
         }
     }
 
+    /*
+     * ServerManager code, above is internal class server
+     */
+
+    private static ServerManager instance;
+    private Map<String, Server> serverCache;
+
+    private ServerManager() {
+        serverCache = new HashMap<>();
+    }
+
     public static ServerManager getInstance() {
         if (instance == null) {
             instance = new ServerManager();
@@ -94,15 +108,25 @@ public class ServerManager {
     }
 
     public Server getServer(String guildID) {
-        ArrayList<String> results = Database.getStringResult(getServer(), guildID);
-        if(results.size() > 1) {
-            String[] result = results.get(1).split("\\t");
-            return new Server(guildID, result[0], result[1], Boolean.parseBoolean(result[2]), result[3]);
-        } else {
-            //server doesn't exist yet, create
-            Database.executeUpdate(addServer(), guildID);
-            return new Server(guildID, Instant.now().toString(), "?", false, null);
+        Server server = serverCache.get(guildID);
+        if (server == null ) {
+            //server not in cache, attempt to retrieve from database
+            ArrayList<String> results = Database.getStringResult(getServer(), guildID);
+            if (results.size() > 1) {
+                String[] result = results.get(1).split("\\t");
+                server = new Server(guildID, result[0], result[1], Boolean.parseBoolean(result[2]), result[3]);
+            } else {
+                //server doesn't exist yet, create
+                Database.executeUpdate(addServer(), guildID);
+                server = new Server(guildID, Instant.now().toString(), "?", false, null);
+            }
+            serverCache.put(guildID, server);
         }
+        return server;
+    }
+
+    public void clear() {
+        serverCache.clear();
     }
 
 }
