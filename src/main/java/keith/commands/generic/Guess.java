@@ -17,7 +17,7 @@ public class Guess extends UserCommand{
     @Override
     public String getLongDescription() {
         return "Guess lets you and your friends to guess the number generated between 1-100 or 1-[number] where [number]"
-                +"can be any number between 1-5000! Simply start the game and type your guess in chat to play!";
+                +" can be any number between 1-5000! Simply start the game and type your guess in chat to play!";
     }
 
     @Override
