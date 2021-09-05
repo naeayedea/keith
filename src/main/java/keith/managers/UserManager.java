@@ -34,7 +34,7 @@ public class UserManager {
             return firstSeen;
         }
 
-        public String getDiscordID() {
+        public String getId() {
             return discordID;
         }
 
