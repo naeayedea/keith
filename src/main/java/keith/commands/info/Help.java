@@ -61,7 +61,7 @@ public class Help extends InfoCommand {
         }
         helpString.append("```");
         eb.addField("List of Commands", helpString.toString(), false);
-        channel.sendMessage(eb.build()).queue();
+        channel.sendMessageEmbeds(eb.build()).queue();
     }
 
     public void sendSingleCommandHelp(MessageChannel channel, String commandString) {
@@ -80,7 +80,7 @@ public class Help extends InfoCommand {
             eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
             eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length()-2), false);
             eb.addField("Information", command.getLongDescription(), false);
-            channel.sendMessage(eb.build()).queue();
+            channel.sendMessageEmbeds(eb.build()).queue();
         } else {
             channel.sendMessage("No command found with that name or alias").queue();
         }

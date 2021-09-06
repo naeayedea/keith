@@ -136,12 +136,12 @@ public class Pin extends UserCommand{
             }
         }
         eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
-        pinChannel.sendMessage(eb.build()).queue((message) -> {
+        pinChannel.sendMessageEmbeds(eb.build()).queue((message) -> {
             EmbedBuilder reply = new EmbedBuilder();
             reply.setTitle(":pushpin: Message Pinned!");
             reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
             reply.setColor(new Color(155,0,155));
-            commandChannel.sendMessage(reply.build()).queue();
+            commandChannel.sendMessageEmbeds(reply.build()).queue();
         });
     }
 

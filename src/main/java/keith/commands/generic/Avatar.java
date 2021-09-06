@@ -55,7 +55,7 @@ public class Avatar extends UserCommand {
         //Build embed and send
         embed.setTitle(user.getName()+"'s Avatar");
         embed.setImage(user.getAvatarUrl()+"?size=4096");
-        event.getChannel().sendMessage(embed.build()).queue();
+        event.getChannel().sendMessageEmbeds(embed.build()).queue();
     }
 
 }
