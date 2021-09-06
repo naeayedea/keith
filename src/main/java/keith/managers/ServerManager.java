@@ -48,20 +48,24 @@ public class ServerManager {
             return banned;
         }
 
-        public void setBanned(Boolean banned) {
+        public boolean setBanned(Boolean banned) {
             if (Database.executeUpdate(setBannedStatement(), banned, this.serverID)) {
                 this.banned = banned;
+                return true;
             }
+            return false;
         }
 
         public String getPrefix() {
             return prefix;
         }
 
-        public void setPrefix(String newPrefix) {
+        public boolean setPrefix(String newPrefix) {
             if(Database.executeUpdate(prefixStatement(), newPrefix, this.serverID)) {
                 prefix = newPrefix;
+                return true;
             }
+            return false;
         }
 
         private PreparedStatement pinChannelStatement() {
