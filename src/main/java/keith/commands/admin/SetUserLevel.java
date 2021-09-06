@@ -4,12 +4,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class AdminUtilities extends AdminCommand {
+public class SetUserLevel extends AdminCommand {
 
     String defaultName;
 
-    public AdminUtilities() {
-        defaultName = "utils";
+    public SetUserLevel() {
+        defaultName = "setlevel";
     }
 
     @Override

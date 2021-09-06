@@ -4,12 +4,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class AdminUtilities extends AdminCommand {
+public class Stats extends AdminCommand {
 
     String defaultName;
 
-    public AdminUtilities() {
-        defaultName = "utils";
+    public Stats() {
+        defaultName = "stats";
     }
 
     @Override
@@ -24,7 +24,7 @@ public class AdminUtilities extends AdminCommand {
 
     @Override
     public String getDefaultName() {
-        return defaultName;
+        return null;
     }
 
     @Override

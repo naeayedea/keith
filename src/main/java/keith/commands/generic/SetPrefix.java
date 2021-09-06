@@ -1,25 +1,25 @@
-package keith.commands.admin;
+package keith.commands.generic;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class AdminUtilities extends AdminCommand {
+public class SetPrefix extends UserCommand {
 
     String defaultName;
 
-    public AdminUtilities() {
-        defaultName = "utils";
+    public SetPrefix() {
+        defaultName = "setprefix";
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"\"";
+        return prefix+defaultName+": \"sets the prefix of the bot in your server, new prefix cannot contain spaces!\"";
     }
 
     @Override
     public String getLongDescription() {
-        return null;
+        return "TODO";
     }
 
     @Override
