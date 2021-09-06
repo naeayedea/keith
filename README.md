@@ -1,4 +1,4 @@
-#Keith, Discord Bot
+# Keith, Discord Bot
 
 Third major version of keith, the bot has been rebuilt from the ground up. V3 has the same functionality as V2 and more
 but with significantly tidier codebase, greatly improved database and user/server manager code. A list of improvements
