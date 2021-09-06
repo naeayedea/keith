@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Utilities {
@@ -18,7 +19,7 @@ public class Utilities {
     public static class Messages {
 
         public static void sendError(MessageChannel channel, String header, String message) {
-            channel.sendMessage(MessageTemplate.errorMessage(header, message).build()).queue();
+            channel.sendMessageEmbeds(MessageTemplate.errorMessage(header, message).build()).queue();
         }
 
         public static class MessageTemplate {
@@ -141,14 +142,18 @@ public class Utilities {
             return new Color(44,47,51);
     }
 
+    public static Color getRandomColor() {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        return new Color(random.nextInt(0, 255+1), random.nextInt(0, 255+1), random.nextInt(0, 255+1));
+    }
+
+    //rebuilds a string list into a "sentence" by appending spaces
     public static String stringListToString(List<String> list) {
         StringBuilder result = new StringBuilder();
-
         for (String string : list) {
-            result.append(string).append("\n");
+            result.append(string).append(" ");
         }
-
-        return result.toString();
+        return result.toString().trim();
     }
 
     public static void restart(MessageReceivedEvent event) throws IOException  {
