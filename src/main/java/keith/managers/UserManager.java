@@ -119,7 +119,7 @@ public class UserManager {
             ArrayList<String> results = Database.getStringResult(getUser(), discordID);
             if (results.size() > 1) {
                 String[] result = results.get(1).split("\\s+");
-                user = new User(discordID, AccessLevel.getLevel(result[1]), result[2], Long.parseLong(result[3]));
+                user = new User(discordID, AccessLevel.getLevel(result[2]), result[1], Long.parseLong(result[3]));
             } else {
                 //user doesn't exist, need to create
                 Database.executeUpdate(createUser(), discordID);
