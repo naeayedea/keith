@@ -4,7 +4,56 @@ Third major version of keith, the bot has been rebuilt from the ground up. V3 ha
 but with significantly tidier codebase, greatly improved database and user/server manager code. A list of improvements
 and additions can be found below: 
 
-## Backend Changes
+## User Facing Changes
+
+### Command Aliases
+    commands can now easily be aliased thanks to the new MultiMap class, 
+
+### New Commands
+    echo: bot will repeat anything passed to it via the command - only for users with higher access level
+
+### Improved Commands
+    guess: the number guess game now utilises the brand new channel command interface which means that 
+    users no longer have to type ?guess [guess] to have the bot evaluate their input. Now users can 
+    simply type their guess and keith will automatically evaluate it and respond with a success message
+    or a reaction for higher/lower
+
+    pin: the pin command has been recreated with greater utility such as typing ?pin [text] will pin the
+    text without requiring the message to be sent first, also the originating channel with be noted so 
+    that users do not accidentally go to a channel they do not want to with the hyperlink. 
+
+    the major improvement with pin is that it will automatically create a pin channel if one does not 
+    exist, previously the database would need to be updated by the bot owner personally which was less
+    than ideal, the bot requires manage channel permission for this which will be communicated to users
+    in the event that it does not. 
+
+    remind: reminders now support the long needed feature of "on date at time" e.g. remind on 21/03/2021
+    at 14:40 [text]. The code is significantly cleaner with much less code reuse and the pins now look
+    nicer with a fresh lick of paint on top (e.g. they now use embeds for the reply, no more ugly code 
+    blocks) 
+
+    setprefix: now supports more than one character (see below)
+
+### Improved Prefixes
+    prefixes can now be longer than one character due to security improvements in the database, due to 
+    the way user input is parsed, prefixes cannot themselves contain spaces but the single word can be
+    as long as discord will allow - this is subject to change and an artificial limit me be included to
+    keep prefixes practical such as 10-20 characters. 
+
+### Assorted Changes
+    the bot now sends a typing signal to discord when responding to commands so that the user knows their
+    command is being processed if it happens to take longer than usual. 
+
+    users can now be rate limited from using the bot - separate from discord rate limiting - if their use 
+    exceeds a given value in a short time.
+
+    commands now use embeds where appropriate to provide a much cleaner look to bot responses. 
+
+###Discord Interactions
+
+    TODO
+
+# Backend Changes
 
 ### Command Interface
     The regular command interface operates almost identically with the exception of hidden commands and 
@@ -42,40 +91,14 @@ and additions can be found below:
     implemented as singletons to ensure that the same object is accessed no matter where they are used
     - very important change. 
 
-## User Facing Changes
+    the utilities class has been significantly fleshed out and also made static so that it is much more
+    convenient to use without having to initialise an object all over the place or pass it through.
 
-### Command Aliases
-    commands can now easily be aliases thanks to the new MultiMap class, 
-
-### New Commands
-    echo: bot will repeat anything passed to it via the command - only for users with higher access level
+###Shard Support
     
-### Improved Commands
-    guess: the number guess game now utilises the brand new channel command interface which means that 
-    users no longer have to type ?guess [guess] to have the bot evaluate their input. Now users can 
-    simply type their guess and keith will automatically evaluate it and respond with a success message
-    or a reaction for higher/lower
+    TODO 
 
-    pin: the pin command has been recreated with greater utility such as typing ?pin [text] will pin the
-    text without requiring the message to be sent first, also the originating channel with be noted so 
-    that users do not accidentally go to a channel they do not want to with the hyperlink. 
-
-    the major improvement with pin is that it will automatically create a pin channel if one does not 
-    exist, previously the database would need to be updated by the bot owner personally which was less
-    than ideal, the bot requires manage channel permission for this which will be communicated to users
-    in the event that it does not. 
-
-### Improved Prefixes
-    prefixes can now be longer than one character due to security improvements in the database, due to 
-    the way user input is parsed, prefixes cannot themselves contain spaces but the single word can be
-    as long as discord will allow - this is subject to change and an artificial limit me be included to
-    keep prefixes practical such as 10-20 characters. 
-
-### Assorted Changes
-    the bot now sends a typing signal to discord when responding to commands so that the user knows their
-    command is being processed if it happens to take longer than usual. 
-
-    users can now be rate limited from using the bot - separate from discord rate limiting - if their use 
-    exceeds a given value in a short time.
-
+### Interactions API Integration
     
+    TODO 
+
