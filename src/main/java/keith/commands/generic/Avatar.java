@@ -13,9 +13,15 @@ import java.util.List;
 
 public class Avatar extends UserCommand {
 
+    String defaultName;
+
+    public Avatar() {
+        defaultName = "avatar";
+    }
+
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+"avatar: \"displays avatar of a user\"";
+        return prefix+defaultName+": \"displays avatar of a user\"";
     }
 
     @Override
@@ -26,7 +32,7 @@ public class Avatar extends UserCommand {
 
     @Override
     public String getDefaultName() {
-        return "avatar";
+        return defaultName;
     }
 
     @Override

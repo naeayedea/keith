@@ -9,9 +9,15 @@ import java.util.List;
 
 public class Guess extends UserCommand{
 
+    String defaultName;
+
+    public Guess() {
+        defaultName = "guess";
+    }
+
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+"guess: \"number guessing game: use '"+prefix+"guess' or '"+prefix+"guess [number]' to start a game!\"";
+        return prefix+defaultName+": \"number guessing game: use '"+prefix+"guess' or '"+prefix+"guess [number]' to start a game!\"";
     }
 
     @Override
@@ -22,7 +28,7 @@ public class Guess extends UserCommand{
 
     @Override
     public String getDefaultName() {
-        return "guess";
+        return defaultName;
     }
 
     @Override
