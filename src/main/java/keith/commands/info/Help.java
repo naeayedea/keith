@@ -69,10 +69,15 @@ public class Help extends InfoCommand {
         eb.setColor(Utilities.getBotColor());
         Command command = commands.get(commandString);
         if (command != null) {
-            eb.setTitle("Help");
+            eb.setTitle("Command: "+command.getDefaultName());
             StringBuilder knownAliases = new StringBuilder();
-            commands.forEach((key, val) -> {if(val.equals(command)){knownAliases.append(key).append(", ");}});
-            eb.setDescription("Extended information on "+command.getDefaultName());
+            commands.forEach((key, val) -> {
+                //for every command, if command matches the requested command, add its aliases to the embed
+                //do not add the default name.
+                if(val.equals(command) && !key.equals(val.getDefaultName())) {
+                    knownAliases.append(key).append(", ");}
+            });
+            eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
             eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length()-2), false);
             eb.addField("Information", command.getLongDescription(), false);
             channel.sendMessage(eb.build()).queue();
