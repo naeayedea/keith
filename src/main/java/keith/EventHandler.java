@@ -1,6 +1,7 @@
 package keith;
 
 import keith.commands.Command;
+import keith.commands.admin.Admin;
 import keith.commands.channel_commands.ChannelCommand;
 import keith.commands.generic.*;
 import keith.commands.info.Help;
@@ -64,11 +65,13 @@ public class EventHandler extends ListenerAdapter {
 
     private void initialiseCommands() {
         commands = new MultiMap<>();
-        commands.putAll(Arrays.asList("help", "test", "what", "5"), new Help(commands, "help"));
-        commands.put("settings", commands.get("help"));
-        commands.put("guess", new Guess());
+        commands.putAll(Arrays.asList("help", "hlep"), new Help(commands));
+        commands.putAll(Arrays.asList("guess", "numguess"), new Guess());
         commands.putAll(Arrays.asList("avatar", "picture", "pfp"), new Avatar());
         commands.putAll(Arrays.asList("pin", "sticky"), new Pin());
+        commands.putAll(Arrays.asList("remind", "remindme"), new Remind());
+        commands.put("setprefix", new SetPrefix());
+        commands.put("admin", new Admin());
     }
 
     @Override
