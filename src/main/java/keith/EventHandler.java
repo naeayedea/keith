@@ -44,7 +44,6 @@ public class EventHandler extends ListenerAdapter {
     }
 
     private void initialise(DataSource database, JDA jda) {
-        initialiseCommands();
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
         commandService = Executors.newCachedThreadPool();
         channelCommandService = ChannelCommandManager.getInstance();
@@ -61,6 +60,7 @@ public class EventHandler extends ListenerAdapter {
         Database.setSource(database);
         Utilities.setJDA(jda);
         Utilities.setRateLimitMax(10);
+        initialiseCommands();
     }
 
     private void initialiseCommands() {
@@ -165,7 +165,7 @@ public class EventHandler extends ListenerAdapter {
     }
 
     private void sendEmbed(MessageChannel channel, MessageEmbed embed) {
-        channel.sendMessage(embed).queue();
+        channel.sendMessageEmbeds(embed).queue();
     }
 
     @Override
@@ -178,7 +178,8 @@ public class EventHandler extends ListenerAdapter {
     public void onReconnected(@NotNull ReconnectedEvent event){
         Utilities.updateUptime();
         Utilities.setJDA(event.getJDA());
-
+        UserManager.getInstance().clear();
+        ServerManager.getInstance().clear();
     }
 
 
