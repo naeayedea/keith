@@ -14,15 +14,15 @@ public class Help extends InfoCommand {
     private final Map<String, Command> commands;
     private final String defaultName;
 
-    public Help (Map<String, Command> commandMap, String defaultName) {
+    public Help (Map<String, Command> commandMap) {
         this.commands = commandMap;
-        this.defaultName = defaultName;
+        this.defaultName = "help";
     }
 
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+"help: \"for more information on a command use "+prefix+"help [command]\"";
+        return prefix+defaultName+": \"for more information on a command use "+prefix+"help [command]\"";
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Help extends InfoCommand {
         for (Command command : commands.values()) {
             String description = command.getShortDescription(prefix);
             //only add description if not duplicate (need to look into improving multimap, maybe have two maps?
-            if (helpString.indexOf(description) == -1) {
+            if (helpString.indexOf(description) == -1 && !command.isHidden()) {
                 helpString.append(command.getShortDescription(prefix)).append("\n");
             }
         }
