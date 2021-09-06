@@ -31,6 +31,7 @@ public class Bot {
             try{
                 JDA jda = builder.build();
                 jda.awaitReady();
+                Thread.sleep(500);
                 jda.addEventListener(new EventHandler(database, jda));
             } catch (LoginException e){
                 e.printStackTrace();
