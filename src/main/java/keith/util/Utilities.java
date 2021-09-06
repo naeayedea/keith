@@ -32,6 +32,7 @@ public class Utilities {
                 eb.setTitle("ERROR");
                 eb.setDescription(header);
                 eb.addField("Information", text, false);
+                eb.setColor(new Color (155,0,0));
                 return eb;
             }
 
