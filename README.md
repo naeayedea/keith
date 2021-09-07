@@ -1,4 +1,7 @@
 # Keith, discordbot
+
+NOTE: as of 07/09/2021 this version is now outdated in favour of v3, I have maintained this branch as a record of my programming skills over time. This version was created in September 2020 and was maintained until May 2021.
+
 Second version of keith bot, major quality of life improvements and complete overhaul of the source code. Prefixes are now unique to each server and there is 
 now the capability to ban users or servers and also give users more powers via a command.
 
