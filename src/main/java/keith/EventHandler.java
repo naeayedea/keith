@@ -2,6 +2,7 @@ package keith;
 
 import keith.commands.Command;
 import keith.commands.admin.Admin;
+import keith.commands.admin.SetStatus;
 import keith.commands.channel_commands.ChannelCommand;
 import keith.commands.generic.*;
 import keith.commands.info.Help;
@@ -181,6 +182,7 @@ public class EventHandler extends ListenerAdapter {
         Utilities.setJDA(event.getJDA());
         UserManager.getInstance().clear();
         ServerManager.getInstance().clear();
+        SetStatus.update();
     }
 
 
