@@ -42,7 +42,7 @@ public class Help extends InfoCommand {
         if(tokens.isEmpty()){
             sendAllCommandHelp(event.getChannel(), prefix);
         } else {
-            sendSingleCommandHelp(event.getChannel(), tokens.get(0));
+            sendSingleCommandHelp(event.getChannel(), tokens.get(0).toLowerCase());
         }
     }
 

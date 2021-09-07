@@ -70,6 +70,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("avatar", "picture", "pfp"), new Avatar());
         commands.putAll(Arrays.asList("pin", "sticky"), new Pin());
         commands.putAll(Arrays.asList("remind", "remindme"), new Remind());
+        commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.put("setprefix", new SetPrefix());
         commands.put("admin", new Admin());
     }
@@ -80,7 +81,7 @@ public class EventHandler extends ListenerAdapter {
             if (!event.getAuthor().isBot()) {
                 MessageChannel channel = event.getChannel();
                 Message message = event.getMessage();
-                String messageContent = message.getContentRaw().toLowerCase();
+                String messageContent = message.getContentRaw();
                 User user = userManager.getUser(event.getAuthor().getId());
                 String prefix;
                 Server server = null;
@@ -151,11 +152,11 @@ public class EventHandler extends ListenerAdapter {
 
     private boolean findPrefix(String message, String prefix) {
         //ensure that message content greater than prefix length then check if prefix is there
-        return message.length() > prefix.length() && message.startsWith(prefix);
+        return message.length() > prefix.length() && message.toLowerCase().startsWith(prefix);
     }
 
     private Command findCommand(List<String> list) {
-        String commandString = list.remove(0);
+        String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }
 

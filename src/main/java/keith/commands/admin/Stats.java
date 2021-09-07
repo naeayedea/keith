@@ -46,7 +46,7 @@ public class Stats extends AdminCommand {
         } else  {
             type = tokens.get(0);
             ArrayList<String> results;
-            switch(type){
+            switch(type.toLowerCase()){
                 case "admins":
                     results = Database.getStringResult(returnAdmins());
                     StringBuilder adminList = new StringBuilder();
