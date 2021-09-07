@@ -46,10 +46,14 @@ public class UserManager {
             return accessLevel == AccessLevel.ALL;
         }
 
-        public void setAccessLevel(AccessLevel accessLevel) {
-            if (Database.executeUpdate(accessLevelStatement(), accessLevel.num, this.discordID)) {
-                this.accessLevel = accessLevel;
+        public boolean setAccessLevel(AccessLevel accessLevel) {
+            if (this.accessLevel != AccessLevel.OWNER) {
+                if (Database.executeUpdate(accessLevelStatement(), accessLevel.num, this.discordID)) {
+                    this.accessLevel = accessLevel;
+                    return true;
+                }
             }
+            return false;
         }
 
         public long getCommandCount() {
