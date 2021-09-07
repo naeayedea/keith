@@ -1,11 +1,12 @@
 #Scrub main and manifest from project
 Main.java
+Beta.java
 MANIFEST.MF
 
 #Remove ide and gradle stuff
+*.idea
 
 #Ignore database
-*.idea
 *.db
 
 # Compiled class file
