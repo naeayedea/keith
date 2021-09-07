@@ -76,6 +76,12 @@ public class UserManager {
             return "<@!"+this.discordID+">";
         }
 
+        public String getDescription() {
+            net.dv8tion.jda.api.entities.User user =  Utilities.getJDAInstance().getUserById(this.discordID);
+            String tail = " ID: "+ discordID;
+            return user == null ?  "Unknown User,"+ tail : user.getName()+"#"+user.getDiscriminator() + tail;
+        }
+
         private PreparedStatement accessLevelStatement() {
             return Database.prepareStatement("UPDATE users SET UserLevel = ? WHERE DiscordID = ?");
         }
