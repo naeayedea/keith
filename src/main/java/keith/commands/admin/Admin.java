@@ -20,6 +20,7 @@ public class Admin extends AdminCommand {
     public Admin () {
         serverManager = ServerManager.getInstance();
         userManager = UserManager.getInstance();
+        defaultName = "admin";
         initialiseCommands();
     }
 
