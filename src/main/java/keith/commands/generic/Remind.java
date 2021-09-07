@@ -31,10 +31,9 @@ public class Remind extends UserCommand {
     public static class RemindExecutor extends ScheduledThreadPoolExecutor {
 
         /**
-         * RemindExecutor is an executor where all remaining tasks
+         * RemindExecutor is an executor where all remaining tasks can be easily cancelled, does this by maintaining list
+         * of all scheduledfutures for easy access later. cleanup() should be called occasionally to clear finished futures.
          */
-
-
         List<ScheduledFuture<?>> tasks;
 
         public RemindExecutor(int corePoolSize) {
@@ -82,7 +81,11 @@ public class Remind extends UserCommand {
 
     @Override
     public String getLongDescription() {
-        return "TODO" ;
+        return "Forgetful? Use remind to have the bot tag you in the specified amoutn of time" +
+                "with a message to help you remember! Acceptable uses are:\n" +
+                "\"remind in X months, Y days, Z hours [message]\" etc. you do not need to include all times so \"remind in X hours [message]\" will also work!\n" +
+                "\"remind on [date] at [time] [message]\" - please use format dd/mm/yyyy, dd-mm-yyyy or dd mm yyyy, it is not necessary to specify a time\n\n" +
+                "please note that reminders cannot be empty e.g. you must have something to be reminded of!";
     }
 
     @Override
