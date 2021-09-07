@@ -38,6 +38,37 @@ public class Utilities {
             }
 
         }
+
+        public static void sendEmbed(String channelID, String title, String message, MessageReceivedEvent event){
+            try{
+                TextChannel channel = jda.getTextChannelById(channelID);
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.setTitle(title);
+                eb.setDescription(message);
+                eb.setColor(new Color(155,0,155));
+                if (channel != null) {
+                    channel.sendMessageEmbeds(eb.build()).queue();
+                } else {
+                    event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
+                }
+            }
+            catch (IllegalArgumentException e){
+                event.getChannel().sendMessage("Message send error").queue();
+            }
+        }
+
+        public static void sendMessage(String channelID, String message, MessageReceivedEvent event ){
+            try {
+                TextChannel channel = jda.getTextChannelById(channelID);
+                if (channel != null) {
+                    channel.sendMessage(message).queue();
+                } else {
+                    event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
+                }
+            } catch (IllegalArgumentException e){
+                event.getChannel().sendMessage("Message send error").queue();
+            }
+        }
     }
 
     private static long lastReconnect;
