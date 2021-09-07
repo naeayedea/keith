@@ -66,7 +66,7 @@ public class Admin extends AdminCommand {
     }
 
     private Command findCommand(List<String> list) {
-        String commandString = list.remove(0);
+        String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }
 
