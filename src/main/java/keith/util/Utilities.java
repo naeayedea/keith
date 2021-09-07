@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.awt.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -171,6 +173,23 @@ public class Utilities {
                 }
             }
             return new Color(44,47,51);
+    }
+
+    public static Color getColorFromString(String string) {
+        String stringHash;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.update(string.getBytes());
+            stringHash = new String(messageDigest.digest());
+
+        } catch (NoSuchAlgorithmException e) {
+            //if for some reason SHA-256 was to disappear, just revert to regular old string.getHash()
+            stringHash = string;
+        }
+        int pv = 0xFFFFFF & stringHash.hashCode();
+        int R, G, B;
+        R = pv & 255; G = (pv >> 8) & 255; B = (pv >> 16) & 255;
+        return new Color(R,G,B);
     }
 
     public static Color getRandomColor() {

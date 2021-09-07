@@ -278,7 +278,7 @@ public class Remind extends UserCommand {
     public void sendEmbed(MessageChannel channel, String mention, String text) {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Reminder");
-        embed.setColor(Utilities.getRandomColor());
+        embed.setColor(Utilities.getColorFromString(text));
         embed.setDescription(text);
         channel.sendMessage(mention).setEmbeds(embed.build()).queue();
     }
