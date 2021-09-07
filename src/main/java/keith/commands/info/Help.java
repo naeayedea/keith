@@ -78,7 +78,11 @@ public class Help extends InfoCommand {
                     knownAliases.append(key).append(", ");}
             });
             eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
+            if (knownAliases.toString().trim().equals("")) {
+                eb.addField("Known Aliases", "No aliases", false);
+            } else {
             eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length()-2), false);
+            }
             eb.addField("Information", command.getLongDescription(), false);
             channel.sendMessageEmbeds(eb.build()).queue();
         } else {
