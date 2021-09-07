@@ -11,8 +11,13 @@ and additions can be found below:
 
 ### New Commands
     echo: bot will repeat anything passed to it via the command - only for users with higher access level
-
+    
 ### Improved Commands
+
+    help: the help command is now much nicer looking by using embeds in addition to the code block for
+    colour. The most significant change is the ability to request help on specific commands which will
+    give more in depth information such as aliases and use cases for a command e.g. ?help guess. 
+    
     guess: the number guess game now utilises the brand new channel command interface which means that 
     users no longer have to type ?guess [guess] to have the bot evaluate their input. Now users can 
     simply type their guess and keith will automatically evaluate it and respond with a success message
@@ -30,9 +35,13 @@ and additions can be found below:
     remind: reminders now support the long needed feature of "on date at time" e.g. remind on 21/03/2021
     at 14:40 [text]. The code is significantly cleaner with much less code reuse and the pins now look
     nicer with a fresh lick of paint on top (e.g. they now use embeds for the reply, no more ugly code 
-    blocks) 
+    blocks). The embed also uses a random colour every time which gives it a nicer look than the black
+    bar when no colour is set
 
     setprefix: now supports more than one character (see below)
+
+    calculate: calculate now supports brackets, sqrt function and the common trig functions sin,cos and tan. 
+    thank you to [Boann](https://stackoverflow.com/a/26227947)for the nice recursive descent parser
 
 ### Improved Prefixes
     prefixes can now be longer than one character due to security improvements in the database, due to 
@@ -49,8 +58,7 @@ and additions can be found below:
 
     commands now use embeds where appropriate to provide a much cleaner look to bot responses. 
 
-###Discord Interactions
-
+### Discord Interactions
     TODO
 
 # Backend Changes
@@ -94,11 +102,12 @@ and additions can be found below:
     the utilities class has been significantly fleshed out and also made static so that it is much more
     convenient to use without having to initialise an object all over the place or pass it through.
 
-###Shard Support
-    
+    Tokenisation of user input has also been improved and a list of tokens is passed through the command 
+    interface to reduce constant need to call string.split(\\s+) in every command
+
+### Shard Support
     TODO 
 
 ### Interactions API Integration
-    
     TODO 
 
