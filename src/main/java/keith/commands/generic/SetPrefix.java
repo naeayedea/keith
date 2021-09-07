@@ -8,19 +8,20 @@ import java.util.List;
 public class SetPrefix extends UserCommand {
 
     String defaultName;
-
+    int limit;
     public SetPrefix() {
         defaultName = "setprefix";
+        limit = 10;
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"sets the prefix of the bot in your server, new prefix cannot contain spaces!\"";
+        return prefix+defaultName+": \"sets the prefix of the bot in your server, for prefix limits do "+prefix+"help setprefix!\"";
     }
 
     @Override
     public String getLongDescription() {
-        return "TODO";
+        return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than "+limit+" characters";
     }
 
     @Override
@@ -31,9 +32,9 @@ public class SetPrefix extends UserCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         if (tokens.isEmpty()) {
-            event.getChannel().sendMessage("Please enter a prefix, note that it cannot contain spaces!").queue();
-        } else if (tokens.size() > 1 || containsInvalidCharacters(tokens.get(0))) {
-            event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters! Please only have one word").queue();
+            event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
+        } else if (tokens.size() > 1 || containsInvalidCharacters(tokens.get(0)) || tokens.get(0).length() > limit) {
+            event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
         } else {
             ServerManager.Server server = ServerManager.getInstance().getServer(event.getGuild().getId());
             if (server.setPrefix(tokens.get(0))) {
