@@ -50,7 +50,7 @@ public class Help extends InfoCommand {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Help");
         eb.setColor(Utilities.getBotColor());
-        eb.setDescription("For information on specific commands do \""+prefix+"help [command\"");
+        eb.setDescription("For information on specific commands do \""+prefix+"help [command]\"");
         StringBuilder helpString = new StringBuilder("```cs\n");
         for (Command command : commands.values()) {
             String description = command.getShortDescription(prefix);
