@@ -230,4 +230,16 @@ public class Utilities {
         }
 
     }
+
+    public static String truncateString(String string, int length) {
+        if (length > 0) {
+            String format = "%-"+ length+"s";
+            String result = String.format(format, string);
+            if (string.length() > length) {
+                result = result.substring(0, length - 2) + "..";
+            }
+            return result;
+        }
+        return "";
+    }
 }
