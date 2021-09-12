@@ -217,16 +217,19 @@ public class Utilities {
 
     public static void restart(MessageReceivedEvent event) {
         try {
-            Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar");
+            Message message = event.getChannel().sendMessage("Restarting...").complete();
+            Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar " + message.getId() + " " + message.getChannel().getId());
             setStatus("Restarting...");
-            boolean status = p.isAlive();
-            if (status) {
-                event.getChannel().sendMessage("Restarting...").queue(success -> System.exit(0));
-            } else {
-                event.getChannel().sendMessage("Restart failed...").queue();
-            }
+            try {
+                if (p.waitFor(10, TimeUnit.SECONDS)) {
+                    System.exit(0);
+                } else {
+                    event.getChannel().sendMessage("Restart failed...").queue();
+                }
+            } catch (InterruptedException ignored) {}
+
         } catch (IOException e) {
-            event.getChannel().sendMessage("Restart failed...").queue();
+            event.getChannel().sendMessage("Restart failed badly...").queue();
         }
 
     }

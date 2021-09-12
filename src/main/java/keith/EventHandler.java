@@ -40,7 +40,13 @@ public class EventHandler extends ListenerAdapter {
     ServerManager serverManager;
     UserManager userManager;
 
-    public EventHandler(DataSource database, JDA jda) {
+    public EventHandler(DataSource database, JDA jda, String restartMessage, String restartChannel) {
+        if(!restartMessage.equals("")) {
+            TextChannel channel = jda.getTextChannelById(restartChannel);
+            if (channel != null) {
+                channel.retrieveMessageById(restartMessage).queue(message -> message.editMessage("Restarted").queue());
+            }
+        }
         initialise(database, jda);
     }
 
