@@ -12,6 +12,7 @@ import java.lang.management.ManagementFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -101,8 +102,16 @@ public class Utilities {
         rateLimitMax = newMax;
     }
 
-    public static void updateDefaultStatus() {
+    //set status to default by force
+    public static void forceDefaultStatus() {
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+    }
+
+    //update default status if it is already set, otherwise leave current status alone
+    public static void updateDefaultStatus() {
+        if(Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")){
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        }
     }
 
 

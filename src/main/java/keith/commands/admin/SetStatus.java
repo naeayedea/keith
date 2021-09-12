@@ -34,23 +34,10 @@ public class SetStatus extends AdminCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        JDA jda = Utilities.getJDAInstance();
-        if(tokens.size() == 1 && tokens.get(0).equalsIgnoreCase("default")){
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
-            return;
+        if (tokens.size() == 1 && tokens.get(0).equalsIgnoreCase("default")){
+            Utilities.forceDefaultStatus();
+        } else {
+            Utilities.setStatus(Utilities.stringListToString(tokens));
         }
-        jda.getPresence().setActivity(Activity.playing(Utilities.stringListToString(tokens)));
-    }
-
-    //Only does something if current activity is default
-    public static void update(){
-        JDA jda = Utilities.getJDAInstance();
-        if(Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")){
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
-        }
-    }
-
-    public static void set(String newMessage) {
-        Utilities.getJDAInstance().getPresence().setActivity(Activity.playing(newMessage));
     }
 }
