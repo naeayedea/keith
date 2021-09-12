@@ -43,7 +43,9 @@ public class Calculator extends UserCommand {
         }
     }
 
-    //can create own calculator later, right now thank you: https://stackoverflow.com/a/26227947
+    /*adapted calculator code from: https://stackoverflow.com/a/26227947, fixed bug in original and adapted to work well
+     * with the bot and users
+     */
     public static double eval(final String str) {
         return new Object() {
             int pos = -1, ch, prev;
@@ -101,7 +103,10 @@ public class Calculator extends UserCommand {
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
                     x = parseExpression();
-                    eat(')');
+                    if (!eat(')')) {
+                        throw new RuntimeException ("No closing bracket after character "+prev+": '"+str.charAt(prev)+"'");
+                    }
+                    return x;
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));

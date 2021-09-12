@@ -12,6 +12,7 @@ import java.lang.management.ManagementFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -101,8 +102,16 @@ public class Utilities {
         rateLimitMax = newMax;
     }
 
-    public static void updateDefaultStatus() {
+    //set status to default by force
+    public static void forceDefaultStatus() {
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+    }
+
+    //update default status if it is already set, otherwise leave current status alone
+    public static void updateDefaultStatus() {
+        if(Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")){
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        }
     }
 
 
@@ -206,15 +215,31 @@ public class Utilities {
         return result.toString().trim();
     }
 
-    public static void restart(MessageReceivedEvent event) throws IOException  {
-        Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-V3.00-all.jar");
-        setStatus("Restarting...");
-        boolean status = p.isAlive();
-        if(status) {
-            event.getChannel().sendMessage("Restarting...").queue(success -> System.exit(0));
-        } else {
+    public static void restart(MessageReceivedEvent event) {
+        try {
+            Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar");
+            setStatus("Restarting...");
+            boolean status = p.isAlive();
+            if (status) {
+                event.getChannel().sendMessage("Restarting...").queue(success -> System.exit(0));
+            } else {
+                event.getChannel().sendMessage("Restart failed...").queue();
+            }
+        } catch (IOException e) {
             event.getChannel().sendMessage("Restart failed...").queue();
         }
 
+    }
+
+    public static String truncateString(String string, int length) {
+        if (length > 0) {
+            String format = "%-"+ length+"s";
+            String result = String.format(format, string);
+            if (string.length() > length) {
+                result = result.substring(0, length - 2) + "..";
+            }
+            return result;
+        }
+        return "";
     }
 }

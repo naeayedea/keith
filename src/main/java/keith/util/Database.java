@@ -5,10 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.sqlite.jdbc4.JDBC4Connection;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,7 +13,6 @@ public class Database {
 
     static Database instance;
     static DataSource source;
-
 
     public static void setSource(DataSource updatedSource){
         source = updatedSource;
@@ -41,6 +37,64 @@ public class Database {
         } catch (SQLException | NullPointerException e) {
             Logger.printWarning(e.getMessage());
             return null;
+        }
+    }
+
+    /* WARNING: This is very dangerous for the database as it does not use prepared statements so sql injection is
+     * a very real possibility if you give users access to this function, should only be for *extremely* trusted
+     * users.
+     */
+    public static String executeQuery(String query) {
+        try (Connection connection = connect() ) {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            int columnCount = rs.getMetaData().getColumnCount();
+            int length = 140;
+            int minLength = 5;
+            //This guarantees that columns will have a minimum length
+            if ((length / minLength - 2 ) > columnCount) {
+                length = length / columnCount;
+            } else {
+                length = minLength;
+            }
+            ArrayList<String> results = new ArrayList<>();
+            StringBuilder currentResult= new StringBuilder();
+
+            //Get column names
+            for (int i = 1; i <= columnCount; i++) {
+                currentResult.append(Utilities.truncateString(rs.getMetaData().getColumnName(i), length)).append("\t");
+            }
+
+            //get the information from each row separated by a tab
+            results.add(currentResult.toString());
+            while (rs.next()) {
+                currentResult = new StringBuilder();
+                //While next row
+                for (int i = 1; i <= columnCount; i++) {
+                    //Fill out each column
+                    Object object = rs.getObject(i);
+                    if (object != null) {
+                        currentResult.append(Utilities.truncateString(String.valueOf(object), length)).append("\t");
+                    } else {
+                        currentResult.append(Utilities.truncateString("empty", length)).append("\t");
+                    }
+                }
+                results.add(currentResult.toString());
+            }
+            rs.close();
+            int n = 0;
+            StringBuilder result= new StringBuilder("```");
+            for (String resultSet : results) {
+                if (n <= 20) {
+                    result.append(resultSet).append("\n");
+                }
+                n++;
+            }
+            result.append("```");
+            return result.toString();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 
@@ -116,7 +170,7 @@ public class Database {
             currentResult.append(rs.getMetaData().getColumnName(i)).append("\t");
         }
 
-        //get all of the information from each row separated by a tab
+        //get the information from each row separated by a tab
         results.add(currentResult.toString());
         while (rs.next()) {
             currentResult = new StringBuilder();
@@ -157,7 +211,9 @@ public class Database {
             for(int i = 1; i <= columnCount; i++) {
                 Object object = rs.getObject(i);
                 if(object != null) {
-                    columnContent.get(i-1).append(object).append("\n");
+                    if (columnContent.get(i-1).length() + String.valueOf(object).length() <= 1024) {
+                        columnContent.get(i-1).append(object).append("\n");
+                    }
                 }
             }
         }

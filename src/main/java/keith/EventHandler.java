@@ -66,7 +66,7 @@ public class EventHandler extends ListenerAdapter {
 
     private void initialiseCommands() {
         commands = new MultiMap<>();
-        commands.putAll(Arrays.asList("help", "hlep"), new Help(commands));
+        commands.putAll(Arrays.asList("help", "hlep", "commands"), new Help(commands));
         commands.putAll(Arrays.asList("guess", "numguess"), new Guess());
         commands.putAll(Arrays.asList("avatar", "picture", "pfp"), new Avatar());
         commands.putAll(Arrays.asList("pin", "sticky"), new Pin());
@@ -182,7 +182,7 @@ public class EventHandler extends ListenerAdapter {
         Utilities.setJDA(event.getJDA());
         UserManager.getInstance().clear();
         ServerManager.getInstance().clear();
-        SetStatus.update();
+        Utilities.updateDefaultStatus();
     }
 
 
