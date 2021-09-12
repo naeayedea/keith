@@ -60,7 +60,7 @@ public class EventHandler extends ListenerAdapter {
         rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
         Utilities.setJDA(jda);
-        Utilities.setRateLimitMax(10);
+        Utilities.setRateLimitMax(7);
         initialiseCommands();
     }
 
@@ -111,6 +111,7 @@ public class EventHandler extends ListenerAdapter {
                             /*
                              * command was found, check that user is not rate limited and that they have permission
                              */
+                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                             if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
                                     //all checks passed, execute command
@@ -119,7 +120,6 @@ public class EventHandler extends ListenerAdapter {
                                             channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
                                             command.run(event, tokens);
                                             user.incrementCommandCount();
-                                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                                         };
                                         commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                     } catch (PermissionException e) {
@@ -132,7 +132,7 @@ public class EventHandler extends ListenerAdapter {
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");
                                 }
-                            } else {
+                            } else if (numRecentCommands == Utilities.getRateLimitMax()) {
                                 sendMessage(channel, "Too many commands in a short time.. please wait 30 seconds");
                             }
 
