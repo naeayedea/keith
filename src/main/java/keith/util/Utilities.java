@@ -215,13 +215,17 @@ public class Utilities {
         return result.toString().trim();
     }
 
-    public static void restart(MessageReceivedEvent event) throws IOException  {
-        Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-V3.00-all.jar");
-        setStatus("Restarting...");
-        boolean status = p.isAlive();
-        if(status) {
-            event.getChannel().sendMessage("Restarting...").queue(success -> System.exit(0));
-        } else {
+    public static void restart(MessageReceivedEvent event) {
+        try {
+            Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar");
+            setStatus("Restarting...");
+            boolean status = p.isAlive();
+            if (status) {
+                event.getChannel().sendMessage("Restarting...").queue(success -> System.exit(0));
+            } else {
+                event.getChannel().sendMessage("Restart failed...").queue();
+            }
+        } catch (IOException e) {
             event.getChannel().sendMessage("Restart failed...").queue();
         }
 
