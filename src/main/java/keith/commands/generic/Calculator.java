@@ -101,7 +101,10 @@ public class Calculator extends UserCommand {
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
                     x = parseExpression();
-                    eat(')');
+                    if (!eat(')')) {
+                        throw new RuntimeException ("No closing bracket after character "+prev+": '"+str.charAt(prev)+"'");
+                    }
+                    return x;
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
