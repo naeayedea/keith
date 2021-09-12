@@ -60,7 +60,7 @@ public class Admin extends AdminCommand {
         commands.putAll(Arrays.asList("utils", "util", "utilities"), new AdminUtilities());
         commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats());
         commands.putAll(Arrays.asList("setstatus", "newstatus"), new SetStatus());
-        commands.putAll(Arrays.asList("help", "hlep", "dumb"), new Help(commands));
+        commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands));
         commands.put("ban", new Ban());
         commands.put("send", new SendMessage());
     }
