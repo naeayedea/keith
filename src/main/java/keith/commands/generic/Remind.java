@@ -210,9 +210,9 @@ public class Remind extends UserCommand {
                 //shouldn't need to wrap below in try/catch as timeRegex only matches two integers surrounding ':'
                 long offset = TimeUnit.HOURS.toMillis(Integer.parseInt(times[0]))+ TimeUnit.MINUTES.toMillis(Integer.parseInt(times[1]));
                 time += offset;
-                index = commandRaw.indexOf(atString) + atString.length() + 1;
+                index = commandRaw.indexOf(atString) + atString.length();
             } else {
-                index = commandRaw.indexOf(onString) + onString.length() + 1;
+                index = commandRaw.indexOf(onString) + onString.length();
 
             }
             if (commandRaw.length() > index) {
