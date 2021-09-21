@@ -316,6 +316,7 @@ public class Remind extends UserCommand {
         for (String format : dateFormats) {
             try{
                 SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
                 return dateFormat.parse(dateString);
             }
             catch (ParseException ignored) {}
