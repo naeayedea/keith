@@ -15,10 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -204,10 +201,7 @@ public class Remind extends UserCommand {
                 return false;
             }
             long time = date.getTime();
-            if (time < 0) {
-                event.getChannel().sendMessage("That is a long way away! Ask me to closer to the time").queue();
-                return false;
-            }
+
             String text;
             int index;
             if (commandRaw.contains("at") && atMatcher.find()) {
@@ -226,7 +220,11 @@ public class Remind extends UserCommand {
             } else {
                 text= " ";
             }
-            return createReminder(event, commandRaw.substring(0, index), time, text);
+            if (time < 0) {
+                event.getChannel().sendMessage("That is a long way away! Ask me to closer to the time").queue();
+                return false;
+            }
+            return createReminder(event, commandRaw.substring(0, index).trim(), time, text);
         }
         return false;
     }
