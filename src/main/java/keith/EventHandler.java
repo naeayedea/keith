@@ -2,10 +2,10 @@ package keith;
 
 import keith.commands.Command;
 import keith.commands.admin.Admin;
-import keith.commands.admin.SetStatus;
 import keith.commands.channel_commands.ChannelCommand;
 import keith.commands.generic.*;
 import keith.commands.info.Help;
+import keith.commands.info.Invite;
 import keith.managers.ChannelCommandManager;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
@@ -80,6 +80,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.put("setprefix", new SetPrefix());
         commands.put("admin", new Admin());
+        commands.put("invite", new Invite());
     }
 
     @Override
