@@ -44,7 +44,7 @@ public class Calculator extends UserCommand {
     }
 
     /*adapted calculator code from: https://stackoverflow.com/a/26227947, fixed bug in original and adapted to work well
-     * with the bot and users
+     * with the bot and users and made use of brackets with functions make more sense
      */
     public static double eval(final String str) {
         return new Object() {
@@ -96,6 +96,12 @@ public class Calculator extends UserCommand {
             }
 
             double parseFactor() {
+                double x = parseBracket();
+                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+                return x;
+            }
+
+            double parseBracket() {
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return -parseFactor(); // unary minus
 
@@ -106,25 +112,27 @@ public class Calculator extends UserCommand {
                     if (!eat(')')) {
                         throw new RuntimeException ("No closing bracket after character "+prev+": '"+str.charAt(prev)+"'");
                     }
-                    return x;
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
+                    return x;
                 } else if (ch >= 'a' && ch <= 'z') { // functions
                     while (ch >= 'a' && ch <= 'z') nextChar();
                     String func = str.substring(startPos, this.pos);
                     switch (func) {
                         case "sqrt":
-                            x = Math.sqrt(parseFactor());
+                            double y = parseBracket();
+                            if (y < 0) throw new RuntimeException("Cannot take the square root of a negative number!");
+                            x = Math.sqrt(y);
                             break;
                         case "sin":
-                            x = Math.sin(Math.toRadians(parseFactor()));
+                            x = Math.sin(Math.toRadians(parseBracket()));
                             break;
                         case "cos":
-                            x = Math.cos(Math.toRadians(parseFactor()));
+                            x = Math.cos(Math.toRadians(parseBracket()));
                             break;
                         case "tan":
-                            x = Math.tan(Math.toRadians(parseFactor()));
+                            x = Math.tan(Math.toRadians(parseBracket()));
                             break;
                         default:
                             throw new RuntimeException("Unknown Function: " + func);
@@ -135,9 +143,6 @@ public class Calculator extends UserCommand {
                     }
                     throw new RuntimeException("Unexpected Character:" + (char) ch);
                 }
-
-                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
-
                 return x;
             }
         }.parse();
