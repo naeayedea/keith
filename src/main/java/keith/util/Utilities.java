@@ -43,8 +43,11 @@ public class Utilities {
         }
 
         public static void sendEmbed(String channelID, String title, String message, MessageReceivedEvent event){
+            sendEmbed(jda.getTextChannelById(channelID), title, message, event);
+        }
+
+        public static void sendEmbed(MessageChannel channel, String title, String message, MessageReceivedEvent event){
             try{
-                TextChannel channel = jda.getTextChannelById(channelID);
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle(title);
                 eb.setDescription(message);
