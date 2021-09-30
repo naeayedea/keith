@@ -2,10 +2,10 @@ package keith;
 
 import keith.commands.Command;
 import keith.commands.admin.Admin;
-import keith.commands.admin.SetStatus;
 import keith.commands.channel_commands.ChannelCommand;
 import keith.commands.generic.*;
 import keith.commands.info.Help;
+import keith.commands.info.Invite;
 import keith.managers.ChannelCommandManager;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
@@ -40,7 +40,13 @@ public class EventHandler extends ListenerAdapter {
     ServerManager serverManager;
     UserManager userManager;
 
-    public EventHandler(DataSource database, JDA jda) {
+    public EventHandler(DataSource database, JDA jda, String restartMessage, String restartChannel) {
+        if(!restartMessage.equals("")) {
+            TextChannel channel = jda.getTextChannelById(restartChannel);
+            if (channel != null) {
+                channel.retrieveMessageById(restartMessage).queue(message -> message.editMessage("Restarted").queue());
+            }
+        }
         initialise(database, jda);
     }
 
@@ -60,7 +66,7 @@ public class EventHandler extends ListenerAdapter {
         rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
         Utilities.setJDA(jda);
-        Utilities.setRateLimitMax(10);
+        Utilities.setRateLimitMax(7);
         initialiseCommands();
     }
 
@@ -74,6 +80,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.put("setprefix", new SetPrefix());
         commands.put("admin", new Admin());
+        commands.put("invite", new Invite());
     }
 
     @Override
@@ -111,6 +118,7 @@ public class EventHandler extends ListenerAdapter {
                             /*
                              * command was found, check that user is not rate limited and that they have permission
                              */
+                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                             if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
                                     //all checks passed, execute command
@@ -119,7 +127,6 @@ public class EventHandler extends ListenerAdapter {
                                             channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
                                             command.run(event, tokens);
                                             user.incrementCommandCount();
-                                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                                         };
                                         commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                     } catch (PermissionException e) {
@@ -132,7 +139,7 @@ public class EventHandler extends ListenerAdapter {
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");
                                 }
-                            } else {
+                            } else if (numRecentCommands == Utilities.getRateLimitMax()) {
                                 sendMessage(channel, "Too many commands in a short time.. please wait 30 seconds");
                             }
 

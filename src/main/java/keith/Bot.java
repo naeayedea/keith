@@ -13,11 +13,15 @@ import javax.sql.DataSource;
 public class Bot {
 
         String token;
+        String restartMessage;
+        String restartChannel;
         DataSource database;
 
-        public Bot (String token, DataSource database) {
+        public Bot (String token, DataSource database, String restartMessage, String restartChannel) {
             this.token = token;
             this.database = database;
+            this.restartMessage = restartMessage;
+            this.restartChannel = restartChannel;
         }
 
         public void build(){
@@ -32,7 +36,7 @@ public class Bot {
                 JDA jda = builder.build();
                 jda.awaitReady();
                 Thread.sleep(500);
-                jda.addEventListener(new EventHandler(database, jda));
+                jda.addEventListener(new EventHandler(database, jda, restartMessage, restartChannel));
             } catch (LoginException e){
                 e.printStackTrace();
             } catch (InterruptedException e){

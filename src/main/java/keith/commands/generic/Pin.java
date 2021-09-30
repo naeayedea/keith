@@ -4,11 +4,13 @@ import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -61,9 +63,14 @@ public class Pin extends UserCommand{
     private MessageChannel getPinChannel(Server server, Guild guild) {
         String pinChannel = server.getPinChannel();
         final TextChannel channel;
-        if (pinChannel.equals("empty")) {
+        Member selfMember = guild.getMember(Utilities.getJDAInstance().getSelfUser());
+        if ((pinChannel.equals("empty") || guild.getTextChannelById(pinChannel) == null ) && selfMember != null) {
             try {
-            channel = guild.createTextChannel("pins", null).complete();
+                System.out.println("making");
+                channel = guild.createTextChannel("pins", null)
+                    .addPermissionOverride(selfMember, Permission.ALL_TEXT_PERMISSIONS, 0L)
+                    .addPermissionOverride(guild.getPublicRole(), Collections.singleton(Permission.VIEW_CHANNEL), Collections.singleton(Permission.MESSAGE_WRITE))
+                    .complete();
             server.setPinChannel(channel.getId());
             } catch (InsufficientPermissionException e) {
                 return null;
@@ -106,7 +113,11 @@ public class Pin extends UserCommand{
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Message From " + author.getName());
         String content = originalMessage.getContentRaw().trim();
-        if(type  == MessageType.INLINE_REPLY)
+        if (content.equals("")) {
+            Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
+            return;
+        }
+        if (type  == MessageType.INLINE_REPLY)
             eb.setDescription(content + "\n");
         else {
             String description = content.substring(content.indexOf(" ") + 1) + "\n";
