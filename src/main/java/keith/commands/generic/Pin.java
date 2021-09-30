@@ -73,7 +73,6 @@ public class Pin extends UserCommand{
                     .complete();
             server.setPinChannel(channel.getId());
             } catch (InsufficientPermissionException e) {
-                e.printStackTrace();
                 return null;
             }
         } else {
