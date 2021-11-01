@@ -5,10 +5,7 @@ import keith.util.Utilities;
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -109,7 +106,7 @@ public class Remind extends UserCommand {
             channel.sendMessage("Reminders not supported in private channels yet!").queue();
             return;
         }
-        if(tokens.size() < 3){
+        if(tokens.size() < 2){
             event.getChannel().sendMessage("Insufficient Arguments").queue();
             return;
         }
@@ -182,10 +179,23 @@ public class Remind extends UserCommand {
             return false;
         }
         String text;
-        if (commandRaw.length() > inString.length() + 1) {
-            text = commandRaw.substring(inString.length() + 1);
+        Message commandMessage = event.getMessage();
+        if (commandMessage.getType().equals(MessageType.INLINE_REPLY)) {
+            //use the text of the message being replied to
+            Message content = commandMessage.getReferencedMessage();
+            if (content != null) {
+                text = content.getContentRaw().trim();
+            } else {
+                event.getChannel().sendMessage("Couldn't retrieve message").queue();
+                return false;
+            }
         } else {
-            text= " ";
+            //use the text of the command message
+            if (commandRaw.length() > inString.length() + 1) {
+                text = commandRaw.substring(inString.length() + 1);
+            } else {
+                text= " ";
+            }
         }
         return createReminder(event, inString, time, text);
     }
@@ -215,10 +225,22 @@ public class Remind extends UserCommand {
                 index = commandRaw.indexOf(onString) + onString.length();
 
             }
-            if (commandRaw.length() > index) {
-                text = commandRaw.substring(index).trim();
+            Message commandMessage = event.getMessage();
+            if (commandMessage.getType().equals(MessageType.INLINE_REPLY)) {
+                //use the text of the message being replied to
+                Message content = commandMessage.getReferencedMessage();
+                if (content != null) {
+                    text = content.getContentRaw().trim();
+                } else {
+                    event.getChannel().sendMessage("Couldn't retrieve message").queue();
+                    return false;
+                }
             } else {
-                text= " ";
+                if (commandRaw.length() > index) {
+                    text = commandRaw.substring(index).trim();
+                } else {
+                    text= " ";
+                }
             }
             if (time < 0) {
                 event.getChannel().sendMessage("That is a long way away! Ask me to closer to the time").queue();
@@ -228,6 +250,7 @@ public class Remind extends UserCommand {
         }
         return false;
     }
+
 
     private boolean createReminder(MessageReceivedEvent event, String onString, long time, String text) {
         String guildId = event.getGuild().getId();
