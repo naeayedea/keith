@@ -113,7 +113,7 @@ public class Pin extends UserCommand{
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Message From " + author.getName());
         String content = originalMessage.getContentRaw().trim();
-        if (content.equals("")) {
+        if (content.equals("") && attachments.isEmpty()) {
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
             return;
         }
