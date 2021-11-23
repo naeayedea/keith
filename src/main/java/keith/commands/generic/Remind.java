@@ -75,7 +75,7 @@ public class Remind extends UserCommand {
 
     @Override
     public String getLongDescription() {
-        return "Forgetful? Use remind to have the bot tag you in the specified amoutn of time" +
+        return "Forgetful? Use remind to have the bot tag you in the specified amount of time" +
                 "with a message to help you remember! Acceptable uses are:\n" +
                 "\"remind in X months, Y days, Z hours [message]\" etc. you do not need to include all times so \"remind in X hours [message]\" will also work!\n" +
                 "\"remind on [date] at [time] [message]\" - please use format dd/mm/yyyy, dd-mm-yyyy or dd mm yyyy, it is not necessary to specify a time\n\n" +
