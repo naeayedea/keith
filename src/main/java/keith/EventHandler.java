@@ -125,7 +125,9 @@ public class EventHandler extends ListenerAdapter {
                                     //all checks passed, execute command
                                     try {
                                         Runnable execution = () -> {
-                                            channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
+                                            if (command.sendTyping()) {
+                                                channel.sendTyping().queue();
+                                            }
                                             command.run(event, tokens);
                                             user.incrementCommandCount();
                                         };
