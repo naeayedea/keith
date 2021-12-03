@@ -66,10 +66,9 @@ public class Pin extends UserCommand{
         Member selfMember = guild.getMember(Utilities.getJDAInstance().getSelfUser());
         if ((pinChannel.equals("empty") || guild.getTextChannelById(pinChannel) == null ) && selfMember != null) {
             try {
-                System.out.println("making");
                 channel = guild.createTextChannel("pins", null)
                     .addPermissionOverride(selfMember, Permission.ALL_TEXT_PERMISSIONS, 0L)
-                    .addPermissionOverride(guild.getPublicRole(), Collections.singleton(Permission.VIEW_CHANNEL), Collections.singleton(Permission.MESSAGE_WRITE))
+                    .addPermissionOverride(guild.getPublicRole(), Collections.singleton(Permission.VIEW_CHANNEL), Collections.singleton(Permission.MESSAGE_SEND))
                     .complete();
             server.setPinChannel(channel.getId());
             } catch (InsufficientPermissionException e) {
