@@ -7,10 +7,12 @@ and additions can be found below:
 ## User Facing Changes
 
 ### Command Aliases
-    commands can now easily be aliased thanks to the new MultiMap class, 
+    commands can now easily be aliased thanks to the new MultiMap class, not yet usable through commands
 
 ### New Commands
     echo: bot will repeat anything passed to it via the command - only for users with higher access level
+    invite: command to create bot invite now added - don't know why it was left so late
+    servericon: similar to avatar but for servers
     
 ### Improved Commands
 
