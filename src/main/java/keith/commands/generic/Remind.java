@@ -102,10 +102,10 @@ public class Remind extends UserCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
-        if(channel instanceof PrivateChannel) {
-            channel.sendMessage("Reminders not supported in private channels yet!").queue();
-            return;
-        }
+//        if(channel instanceof PrivateChannel) {
+//            channel.sendMessage("Reminders not supported in private channels yet!").queue();
+//            return;
+//        }
         if(tokens.size() < 2){
             event.getChannel().sendMessage("Insufficient Arguments").queue();
             return;
@@ -253,12 +253,17 @@ public class Remind extends UserCommand {
 
 
     private boolean createReminder(MessageReceivedEvent event, String onString, long time, String text) {
-        String guildId = event.getGuild().getId();
+        String guildId;
+        if (event.getChannel() instanceof PrivateChannel) {
+            guildId = "";
+        } else {
+            guildId = event.getGuild().getId();
+        }
         String channelId = event.getChannel().getId();
         String userid = event.getAuthor().getId();
         Runnable remind = () -> {
             JDA jda = Utilities.getJDAInstance();
-            TextChannel channel = jda.getTextChannelById(channelId);
+            MessageChannel channel = Utilities.getMessageChannelById(channelId);
             remind(guildId, channelId, userid, time, text, jda, channel);
         };
         if (text.trim().isEmpty()) {
@@ -271,29 +276,32 @@ public class Remind extends UserCommand {
         return true;
     }
 
-    private void remind(String guildId, String channelId, String userId, long time, String text, JDA jda, TextChannel channel) {
-
+    private void remind(String guildId, String channelId, String userId, long time, String text, JDA jda, MessageChannel channel) {
         User user = jda.getUserById(userId);
+        //Check if the original message channel still exists
         if (channel == null) {
-            channel =  Objects.requireNonNull(jda.getGuildById(guildId)).getDefaultChannel();
-            if (channel == null) {
-                if (user == null) {
-                    Logger.printWarning("couldn't send reminder to user "+userId+" at guild "+guildId);
-                    Database.executeUpdate(removeReminderStatement(), guildId,channelId,userId,time,text);
-                    return;
-                }
-                user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessage(user.getAsMention()+" You asked me to remind you of this: "+text)).queue();
-                Database.executeUpdate(removeReminderStatement(), guildId, channelId, userId, time, text);
+            //if it doesn't, make sure the user still exists, and if they do try and send a private message of the reminder
+            if (user == null) {
+                Logger.printWarning("couldn't send reminder to user "+userId+" at guild "+guildId);
+            } else {
+                user.openPrivateChannel().flatMap(privateChannel -> {
+                    EmbedBuilder embed = new EmbedBuilder();
+                    embed.setTitle("Reminder");
+                    embed.setColor(Utilities.getColorFromString(text));
+                    embed.setDescription(text);
+                    return privateChannel.sendMessage(user.getAsMention()+" You asked me to remind you of this:").setEmbeds(embed.build());
+                }).queue();
+            }
+            Database.executeUpdate(removeReminderStatement(), guildId,channelId,userId,time,text);
+        } else {
+            if (user == null) {
+                Logger.printWarning("couldn't send reminder to user "+userId+" at guild "+guildId);
+                Database.executeUpdate(removeReminderStatement(), guildId,channelId,userId,time,text);
                 return;
             }
+            Database.executeUpdate(removeReminderStatement(), guildId, channelId, userId, time, text);
+            sendEmbed(channel,user.getAsMention()+" You asked me to remind you of this:", text);
         }
-        if (user == null) {
-            Logger.printWarning("couldn't send reminder to user "+userId+" at guild "+guildId);
-            Database.executeUpdate(removeReminderStatement(), guildId,channelId,userId,time,text);
-            return;
-        }
-        Database.executeUpdate(removeReminderStatement(), guildId, channelId, userId, time, text);
-        sendEmbed(channel,user.getAsMention()+" You asked me to remind you of this:", text);
     }
 
     public void sendEmbed(MessageChannel channel, String mention, String text) {
