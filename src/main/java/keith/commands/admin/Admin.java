@@ -53,6 +53,11 @@ public class Admin extends AdminCommand {
         return true;
     }
 
+    @Override
+    public boolean sendTyping() {
+        return false;
+    }
+
     private void initialiseCommands() {
         commands = new MultiMap<>();
         commands.putAll(Arrays.asList("echo", "repeat"), new Echo());

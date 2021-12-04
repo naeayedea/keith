@@ -3,7 +3,6 @@ package keith.managers;
 import keith.commands.AccessLevel;
 import keith.util.Database;
 import keith.util.Utilities;
-import net.dv8tion.jda.api.entities.User;
 
 import java.sql.PreparedStatement;
 import java.time.Instant;
@@ -101,7 +100,7 @@ public class UserManager {
      */
 
     private static UserManager instance;
-    private Map<String, User> userCache;
+    private final Map<String, User> userCache;
 
     private UserManager(){
         userCache = new HashMap<>();

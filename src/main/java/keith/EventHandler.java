@@ -78,8 +78,9 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("pin", "sticky"), new Pin());
         commands.putAll(Arrays.asList("remind", "remindme"), new Remind());
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
+        commands.putAll(Arrays.asList("servericon", "guildicon", "icon", "serveravatar", "guildavatar"), new ServerIcon());
         commands.put("setprefix", new SetPrefix());
-        commands.put("admin", new Admin());
+        commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());
     }
 
@@ -89,6 +90,14 @@ public class EventHandler extends ListenerAdapter {
             if (!event.getAuthor().isBot()) {
                 MessageChannel channel = event.getChannel();
                 Message message = event.getMessage();
+                MessageType messageType = message.getType();
+                //automatically join any threads that are created so that bot feels easy to use in threads
+                if (channel instanceof ThreadChannel) {
+                    ThreadChannel thread = ((ThreadChannel) channel);
+                    if (!thread.isJoined()) {
+                        thread.join().queue();
+                    }
+                }
                 String messageContent = message.getContentRaw();
                 User user = userManager.getUser(event.getAuthor().getId());
                 String prefix;
@@ -124,7 +133,9 @@ public class EventHandler extends ListenerAdapter {
                                     //all checks passed, execute command
                                     try {
                                         Runnable execution = () -> {
-                                            channel.sendTyping().queue(); //THIS IS TEMPORARY UNTIL ITS DECIDED WHICH COMMANDS SHOULD SAY TYPING..
+                                            if (command.sendTyping()) {
+                                                channel.sendTyping().queue();
+                                            }
                                             command.run(event, tokens);
                                             user.incrementCommandCount();
                                         };

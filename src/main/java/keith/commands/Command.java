@@ -20,5 +20,6 @@ public interface Command {
     default int getTimeOut(){
         return 10;
     }
+    default boolean sendTyping() {return true;}
 
 }

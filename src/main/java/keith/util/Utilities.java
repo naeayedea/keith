@@ -248,4 +248,18 @@ public class Utilities {
         }
         return "";
     }
+
+    //Message to retrieve a MessageChannel by its ID when all we need is a message channel regardless of its type
+    public static MessageChannel getMessageChannelById(long id) {
+        MessageChannel channel = jda.getTextChannelById(id);
+        channel = channel != null ? channel : jda.getThreadChannelById(id);
+        channel = channel != null ? channel : jda.getPrivateChannelById(id);
+        return channel;
+    }
+    public static MessageChannel getMessageChannelById(String id) {
+        MessageChannel channel = jda.getTextChannelById(id);
+        channel = channel != null ? channel : jda.getThreadChannelById(id);
+        channel = channel != null ? channel : jda.getPrivateChannelById(id);
+        return channel;
+    }
 }
