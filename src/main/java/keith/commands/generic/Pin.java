@@ -110,7 +110,6 @@ public class Pin extends UserCommand{
     private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens){
         List<Message.Attachment> attachments = originalMessage.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Message From " + author.getName());
         String content = originalMessage.getContentRaw().trim();
         if (content.equals("") && attachments.isEmpty()) {
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
@@ -142,10 +141,21 @@ public class Pin extends UserCommand{
                 eb.setImage(attachment.getUrl());
 
             } else {
-                eb.appendDescription("[Attached Video]("+attachment.getUrl()+")\n\n");
+                eb.appendDescription("[Attached Video]("+attachment.getUrl()+") - download\n\n");
             }
         }
-        eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
+        BaseGuildMessageChannel channel = (BaseGuildMessageChannel) guild.getGuildChannelById(originalMessage.getChannel().getId());
+        if (channel != null) {
+            if (channel.isNSFW()) {
+                eb.appendDescription("[Message Link (NSFW)]("+originalMessage.getJumpUrl()+")");
+            } else {
+                eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
+            }
+            eb.setTitle("Message From " + author.getName() + "\nSent from "+ channel.getName());
+        } else {
+            eb.setTitle("Message From " + author.getName());
+            eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
+        }
         pinChannel.sendMessageEmbeds(eb.build()).queue((message) -> {
             EmbedBuilder reply = new EmbedBuilder();
             reply.setTitle(":pushpin: Message Pinned!");
