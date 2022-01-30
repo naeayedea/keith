@@ -1,6 +1,10 @@
 package keith;
 
 
+import com.github.ygimenez.exception.InvalidHandlerException;
+import com.github.ygimenez.model.PaginatorBuilder;
+import keith.util.Utilities;
+import keith.util.logs.Logger;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -36,11 +40,21 @@ public class Bot {
                 JDA jda = builder.build();
                 jda.awaitReady();
                 Thread.sleep(500);
+
+                //configure pagination library
+                PaginatorBuilder.createPaginator()
+                        .setHandler(jda)
+                        .shouldRemoveOnReact(false)
+                        .shouldEventLock(true)
+                        .activate();
+
                 jda.addEventListener(new EventHandler(database, jda, restartMessage, restartChannel));
             } catch (LoginException e){
                 e.printStackTrace();
             } catch (InterruptedException e){
                 //do nothing
+            } catch (InvalidHandlerException e) {
+                Logger.printWarning(e.getMessage());
             }
         }
 }
