@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 public class OnThisDay extends UserCommand {
 
     private static final String API_URL = "https://byabbe.se/on-this-day/";
-    private static final String[] formatList = {"dd MMMM", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
+    private static final String[] formatList = {"d, MMMM", "dd MMMM", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
 
     private final String defaultName;
 
