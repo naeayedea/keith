@@ -1,15 +1,11 @@
 package keith.commands.generic;
 
-import com.github.ygimenez.exception.InvalidHandlerException;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
-import com.github.ygimenez.model.Paginator;
-import com.github.ygimenez.model.PaginatorBuilder;
 import keith.util.Utilities;
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -17,6 +13,7 @@ import org.json.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -29,12 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class OnThisDay extends UserCommand {
 
     private static final String API_URL = "https://byabbe.se/on-this-day/";
-    private static final String[] formatList = {"d, MMMM", "dd MMMM", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
+    private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
 
     private final String defaultName;
 
@@ -76,18 +75,9 @@ public class OnThisDay extends UserCommand {
                 HttpURLConnection con = (HttpURLConnection) api.openConnection();
                 con.setRequestMethod("GET");
                 con.connect();
-                //read in the response
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder results = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    results.append(inputLine);
-                }
-                //close resources
-                in.close();
-                con.disconnect();
                 //parse json
-                JSONObject response = new JSONObject(results.toString());
+                JSONObject response = new JSONObject(readInputStream(con.getInputStream()));
+                con.disconnect();
                 JSONArray events = response.getJSONArray("events");
                 String day = response.getString("date");
                 EmbedBuilder eb;
@@ -107,10 +97,22 @@ public class OnThisDay extends UserCommand {
                     eb.setTitle("On This Day || "+day+" "+result.getString("year"));
                     eb.addField("Description", "```"+result.getString("description")+"```", false);
                     eb.setColor(Utilities.getColorFromString(result.getString("description")));
-                    eb.setThumbnail("https://upload.wikimedia.org/wikipedia/commons/d/db/Nasa_blue_marble.jpg");
+
                     eb.setFooter("Page "+c+"/"+n);
                     JSONArray wikipedia = result.getJSONArray("wikipedia");
                     StringBuilder links = new StringBuilder();
+                    for (int j = 0; j < Math.min(5, wikipedia.length()); j++) {
+                        JSONObject link = (JSONObject) wikipedia.get(j);
+                            URL firstLink = new URL(link.getString("wikipedia"));
+                            HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
+                            getImage.setRequestMethod("GET");
+                            getImage.connect();
+                            String imageURL = getImageURL(readInputStream(getImage.getInputStream()));
+                            if (!imageURL.equals("")) {
+                                eb.setImage(imageURL);
+                            }
+                            getImage.disconnect();
+                    }
                     for (Object wikiPage : wikipedia) {
                         JSONObject link = (JSONObject) wikiPage;
                         links.append(link.getString("title")).append("\n").append(link.getString("wikipedia")).append("\n");
@@ -129,10 +131,36 @@ public class OnThisDay extends UserCommand {
         }
     }
 
+    private String readInputStream(InputStream stream) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+        String inputLine;
+        StringBuilder results = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            if (inputLine.contains("</head>")) {
+                break;
+            }
+            results.append(inputLine).append("\n");
+        }
+        //close resources
+        in.close();
+        return results.toString();
+    }
+
+    private String getImageURL(String html) {
+        Pattern pattern = Pattern.compile("(?<=<meta property=\"og:image\" content=\")(\\S+)(\\s*)(?=\"/>)");
+        Matcher matcher = pattern.matcher(html);
+        String lastMatch = "";
+        while (matcher.find()) {
+            lastMatch = matcher.group();
+        }
+        return lastMatch;
+    }
+
     public LocalDate parseDate(String target) {
         for (String format : formatList) {
             try{
                 DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                        .parseCaseInsensitive()
                         .appendPattern(format)
                         .parseDefaulting(ChronoField.YEAR, 2020)
                         .toFormatter(Locale.ENGLISH);
