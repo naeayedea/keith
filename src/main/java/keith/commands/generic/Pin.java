@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Pin extends UserCommand{
 
@@ -98,8 +99,16 @@ public class Pin extends UserCommand{
                 }
             } else if (tokens.isEmpty() && message.getAttachments().isEmpty()) {
                 //invalid input, no reply and no message content
-                channel.sendMessage("Please input text/images to pin or pin a message by replying with pin or using pin [message id]").queue();
-                return null;
+
+                //new functionality:
+                //fetch last message in channel:
+                MessageHistory history = MessageHistory.getHistoryBefore(channel, message.getId()).limit(1).complete();
+                if (history.getRetrievedHistory().isEmpty()) {
+                    channel.sendMessage("Please input text/images to pin or pin a message by replying with pin or using pin [message id]").queue();
+                    return null;
+                } else {
+                    return history.getRetrievedHistory().get(0);
+                }
             } else {
               //there is some message content to pin therefore return the original message as the source.
               return message;
@@ -115,10 +124,15 @@ public class Pin extends UserCommand{
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
             return;
         }
-        if (type  == MessageType.INLINE_REPLY)
+        if (type == MessageType.INLINE_REPLY)
             eb.setDescription(content + "\n");
         else {
-            String description = content.substring(content.indexOf(" ") + 1) + "\n";
+            String description;
+            if (!tokens.isEmpty()) {
+                description = content.substring(content.indexOf(" ") + 1) + "\n";
+            } else {
+                description = content + "\n";
+            }
             if (!tokens.isEmpty()) {
                 try {
                     Long.parseLong(tokens.get(0));
