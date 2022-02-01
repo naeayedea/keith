@@ -14,16 +14,20 @@ import keith.managers.UserManager.User;
 import keith.util.Database;
 import keith.util.MultiMap;
 import keith.util.Utilities;
+import keith.util.logs.Logger;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -80,6 +84,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.putAll(Arrays.asList("servericon", "guildicon", "icon", "serveravatar", "guildavatar"), new ServerIcon());
         commands.putAll(Arrays.asList("otd", "onthisday", "events", "history"), new OnThisDay());
+        commands.putAll(Arrays.asList("banner", "getbanner", "header"), new Banner());
         commands.put("setprefix", new SetPrefix());
         commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());

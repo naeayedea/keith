@@ -50,7 +50,7 @@ public class Avatar extends UserCommand {
         if (event.getChannel() instanceof PrivateChannel) {
             embed.setColor(Utilities.getDefaultColor());
         } else {
-        embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
+            embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
         }
         //Build embed and send
         embed.setTitle(user.getName()+"'s Avatar");
