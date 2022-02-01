@@ -195,9 +195,27 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildJoin(GuildJoinEvent event){
+    public void onGuildJoin(GuildJoinEvent event) {
         Guild guild = event.getGuild();
+        Server server = serverManager.getServer(event.getGuild().getId());
+        TextChannel defaultChannel = guild.getDefaultChannel();
+        if (defaultChannel != null) {
+            defaultChannel.sendMessageEmbeds(new EmbedBuilder()
+                    .setColor(new Color(155,0,155))
+                    .setTitle("Hello!")
+                    .setFooter("Use "+server.getPrefix()+"feedback if you have any issues!- Succ")
+                    .setDescription("Use "+server.getPrefix()+"help to see available commands")
+                    .setThumbnail(Utilities.getJDAInstance().getSelfUser().getAvatarUrl())
+                    .build()).queue();
+            Logger.printSuccess("New Server "+guild+" has added the bot!");
+        }
+        Utilities.updateDefaultStatus();
+    }
 
+    @Override
+    public void onGuildLeave(GuildLeaveEvent event) {
+        Logger.printWarning("Server "+event.getGuild()+" has kicked the bot :(");
+        Utilities.updateDefaultStatus();
     }
 
     @Override
