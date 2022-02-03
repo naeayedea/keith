@@ -13,7 +13,6 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class Pin extends UserCommand{
 

@@ -96,7 +96,6 @@ public class EventHandler extends ListenerAdapter {
             if (!event.getAuthor().isBot()) {
                 MessageChannel channel = event.getChannel();
                 Message message = event.getMessage();
-                MessageType messageType = message.getType();
                 //automatically join any threads that are created so that bot feels easy to use in threads
                 if (channel instanceof ThreadChannel) {
                     ThreadChannel thread = ((ThreadChannel) channel);
