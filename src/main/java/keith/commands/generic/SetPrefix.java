@@ -33,11 +33,14 @@ public class SetPrefix extends UserCommand {
     public void run(MessageReceivedEvent event, List<String> tokens) {
         if (tokens.isEmpty()) {
             event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
-        } else if (tokens.size() > 1 || containsInvalidCharacters(tokens.get(0)) || tokens.get(0).length() > limit) {
+            return;
+        }
+        String newPrefix = tokens.get(0).trim().toLowerCase();
+        if (tokens.size() > 1 || containsInvalidCharacters(newPrefix) || newPrefix.length() > limit) {
             event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
         } else {
             ServerManager.Server server = ServerManager.getInstance().getServer(event.getGuild().getId());
-            if (server.setPrefix(tokens.get(0))) {
+            if (server.setPrefix(newPrefix)) {
                 event.getChannel().sendMessage("Prefix updated successfully to: '"+server.getPrefix()+"'").queue();
             }  else {
                 event.getChannel().sendMessage("Could not set prefix, please contact bot owner").queue();
