@@ -13,6 +13,10 @@ and additions can be found below:
     echo: bot will repeat anything passed to it via the command - only for users with higher access level
     invite: command to create bot invite now added - don't know why it was left so late
     servericon: similar to avatar but for servers
+    otd: will display a small selection of events that happened on this day in history
+    banner: retrieve users banner image/gif
+    servericon: similar to avatar but for servers
+    
     
 ### Improved Commands
 
@@ -106,6 +110,8 @@ and additions can be found below:
 
     Tokenisation of user input has also been improved and a list of tokens is passed through the command 
     interface to reduce constant need to call string.split(\\s+) in every command
+
+    Restart sequence has been improved
 
 ### Shard Support
     TODO 
