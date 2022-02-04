@@ -2,12 +2,10 @@ package keith.commands.generic;
 
 import keith.commands.AccessLevel;
 import keith.managers.ServerChatManager;
+import keith.managers.ServerManager;
 import keith.managers.UserManager;
 import keith.util.Utilities;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -47,10 +45,8 @@ public class Feedback extends UserCommand {
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);
         //check if the user is an admin looking to close the feedback session
-        if (active && UserManager.getInstance().getUser(event.getAuthor().getId()).hasPermission(AccessLevel.ADMIN)) {
-            if (!tokens.isEmpty() && tokens.get(0).equalsIgnoreCase("close")) {
-                chatManager.closeChat(channel.getId());
-            }
+        if (active && !tokens.isEmpty() && tokens.get(0).equalsIgnoreCase("close")) {
+            chatManager.closeChat(channel.getId());
         } else {
             if (tokens.isEmpty()) {
                 channel.sendMessage("Please enter a message to send").queue();
@@ -62,22 +58,34 @@ public class Feedback extends UserCommand {
                     MessageChannel feedbackChannel = chatManager.getFeedbackChannel();
                     Guild guild = event.getGuild();
                     User author = event.getAuthor();
+                    String prefix = ServerManager.getInstance().getServer(guild.getId()).getPrefix();
                     //send initial message
-                    channel.sendMessage("Please discuss your feedback inside this thread").queue(success ->
-                        //create thread inside the users guild
-                        success.createThreadChannel("Bot Feedback").queue(feedbackThread -> {
-                            StringBuilder feedback = new StringBuilder("Initial feedback from ");
-                            feedback.append(author.getName()).append(author.getDiscriminator())
-                                    .append(" in ").append(guild.getName()).append("\n\n")
-                                    .append("> ").append(Utilities.stringListToString(tokens));
-                            //create thread inside feedback channel
-                            feedbackChannel.sendMessage(feedback).queue(feedbackMessage ->
-                                    feedbackMessage.createThreadChannel("Feedback from "+guild.getName()).queue(feedbackChannelThread ->
-                                            chatManager.createChat(feedbackThread, feedbackChannelThread, false))
-                            );
-                        })
-                    );
-
+                    StringBuilder feedback = new StringBuilder("Initial feedback from ");
+                    feedback.append(author.getName()).append(author.getDiscriminator())
+                            .append(" in ").append(guild.getName()).append("\n\n")
+                            .append("> ").append(Utilities.stringListToString(tokens));
+                    if (channel instanceof ThreadChannel) {
+                        //create thread inside feedback channel
+                        feedbackChannel.sendMessage(feedback).queue(feedbackMessage ->
+                                feedbackMessage.createThreadChannel("Feedback from "+guild.getName()).queue(feedbackChannelThread -> {
+                                        chatManager.createChat(channel, feedbackChannelThread, false);
+                                        channel.sendMessage("Feedback session started - use \""+prefix+"feedback close\" to end the session").queue();
+                                })
+                        );
+                    } else {
+                        channel.sendMessage("Please discuss your feedback inside this thread").queue(success ->
+                                //create thread inside the users guild
+                                success.createThreadChannel("Bot Feedback").queue(feedbackThread -> {
+                                    //create thread inside feedback channel
+                                    feedbackChannel.sendMessage(feedback).queue(feedbackMessage ->
+                                            feedbackMessage.createThreadChannel("Feedback from "+guild.getName()).queue(feedbackChannelThread -> {
+                                                chatManager.createChat(feedbackThread, feedbackChannelThread, false);
+                                                feedbackThread.sendMessage("Feedback session started - use \""+prefix+"feedback close\" to end the session").queue();
+                                            })
+                                    );
+                                })
+                        );
+                    }
                 }
             }
         }
