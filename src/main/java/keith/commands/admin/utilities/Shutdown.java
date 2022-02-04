@@ -1,5 +1,6 @@
 package keith.commands.admin.utilities;
 
+import keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -29,6 +30,6 @@ public class Shutdown extends OwnerCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        event.getChannel().sendMessage("Goodbye").queue(success -> System.exit(0));
+        event.getChannel().sendMessage("Goodbye").queue(success -> Utilities.runShutdownProcedure());
     }
 }
