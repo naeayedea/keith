@@ -6,6 +6,7 @@ import keith.managers.UserManager;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -39,6 +40,10 @@ public class Feedback extends UserCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
+        if (channel instanceof PrivateChannel) {
+            channel.sendMessage("Feedback not supported in private channels").queue();
+            return;
+        }
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);
         //check if the user is an admin looking to close the feedback session
