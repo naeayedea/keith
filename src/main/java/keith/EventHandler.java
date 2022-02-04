@@ -7,6 +7,7 @@ import keith.commands.generic.*;
 import keith.commands.info.Help;
 import keith.commands.info.Invite;
 import keith.managers.ChannelCommandManager;
+import keith.managers.ServerChatManager;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.managers.UserManager;
@@ -38,6 +39,7 @@ public class EventHandler extends ListenerAdapter {
 
     ExecutorService commandService;
     ChannelCommandManager channelCommandService;
+    ServerChatManager chatManager;
     ScheduledExecutorService rateLimitService;
     Map<String, Integer> rateLimitRecord;
     MultiMap<String, Command> commands;
@@ -55,9 +57,12 @@ public class EventHandler extends ListenerAdapter {
     }
 
     private void initialise(DataSource database, JDA jda) {
+        Utilities.setJDA(jda);
+        Utilities.setRateLimitMax(7);
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
         commandService = Executors.newCachedThreadPool();
         channelCommandService = ChannelCommandManager.getInstance();
+        chatManager = ServerChatManager.getInstance();
         rateLimitService = Executors.newScheduledThreadPool(1);
         rateLimitRecord = new ConcurrentHashMap<>();
         serverManager = ServerManager.getInstance();
@@ -69,8 +74,6 @@ public class EventHandler extends ListenerAdapter {
         };
         rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
-        Utilities.setJDA(jda);
-        Utilities.setRateLimitMax(7);
         initialiseCommands();
     }
 
@@ -88,6 +91,7 @@ public class EventHandler extends ListenerAdapter {
         commands.put("setprefix", new SetPrefix());
         commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());
+        commands.put("feedback", new Feedback());
     }
 
     @Override
@@ -168,6 +172,8 @@ public class EventHandler extends ListenerAdapter {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
                         ChannelCommand cc = channelCommandService.getGame(channel.getId());
                         cc.evaluate(message, tokens, user);
+                    } else if (chatManager.hasActiveChat(channel.getId())) {
+                        chatManager.sendMessage(channel.getId(), event, false);
                     }
                 }
             }
