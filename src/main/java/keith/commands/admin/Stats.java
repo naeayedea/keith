@@ -15,7 +15,7 @@ import java.util.List;
 public class Stats extends AdminCommand {
 
     String defaultName;
-    private static final String VERSION = "3.0.3 \"ONTHISDAY\"";
+    private static final String VERSION = "3.0.4 \"FEEDBACK ENABLED\"";
 
     public Stats() {
         defaultName = "stats";
