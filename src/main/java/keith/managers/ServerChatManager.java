@@ -152,9 +152,9 @@ public class ServerChatManager {
         eb.setThumbnail(author.getAvatarUrl());
         eb.setDescription(event.getMessage().getContentRaw());
         if (isFeedback(id)) {
-            eb.setTitle("Feedback Sent By " + author.getName() +" from "+guild.getName());
+            eb.setTitle("Feedback sent by " + author.getName() +" from "+guild.getName());
         } else {
-            eb.setTitle("Message Sent By " + author.getName() +" from "+guild.getName());
+            eb.setTitle("Message sent by " + author.getName() +" from "+guild.getName());
         }
         getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> event.getMessage().addReaction("U+2709").queue());
     }
