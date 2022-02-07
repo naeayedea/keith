@@ -126,7 +126,7 @@ public class ServerChatManager {
 
     public void createChat(MessageChannel channelOne, MessageChannel channelTwo, boolean isFeedback) {
         long identifier = channelOne.hashCode() | ((long) channelTwo.hashCode() << 32);
-        chats.put(identifier, new Chat(new ChatAgent(channelOne, true), new ChatAgent(channelTwo, !oneWay)));
+        chats.put(identifier, new Chat(new ChatAgent(channelOne, isFeedback), new ChatAgent(channelTwo, false)));
         identifiers.put(channelOne.getId(), identifier);
         identifiers.put(channelTwo.getId(), identifier);
     }
@@ -144,23 +144,27 @@ public class ServerChatManager {
         return chat != null;
     }
 
-    public void sendMessage(String id, MessageReceivedEvent event, boolean isFeedback) {
+    public void sendMessage(String id, MessageReceivedEvent event) {
         Guild guild = event.getGuild();
         User author = event.getAuthor();
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Utilities.getMemberColor(guild, author));
         eb.setThumbnail(author.getAvatarUrl());
         eb.setDescription(event.getMessage().getContentRaw());
-        if (isFeedback) {
+        if (isFeedback(id)) {
             eb.setTitle("Feedback Sent By " + author.getName() +" from "+guild.getName());
         } else {
             eb.setTitle("Message Sent By " + author.getName() +" from "+guild.getName());
         }
-        getDestination(id).sendMessageEmbeds(eb.build()).queue();
+        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> event.getMessage().addReaction("U+2709").queue());
     }
 
     public MessageChannel getDestination(String id) {
         return chats.get(identifiers.get(id)).getDestination(id);
+    }
+
+    public boolean isFeedback(String id) {
+        return chats.get(identifiers.get(id)).getSelf(id).isFeedback;
     }
 
     public void closeAll() {

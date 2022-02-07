@@ -174,7 +174,7 @@ public class EventHandler extends ListenerAdapter {
                         ChannelCommand cc = channelCommandService.getGame(channel.getId());
                         cc.evaluate(message, tokens, user);
                     } else if (chatManager.hasActiveChat(channel.getId())) {
-                        chatManager.sendMessage(channel.getId(), event, false);
+                        chatManager.sendMessage(channel.getId(), event);
                     }
                 }
             }

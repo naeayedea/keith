@@ -52,7 +52,7 @@ public class Feedback extends UserCommand {
                 channel.sendMessage("Please enter a message to send").queue();
             } else {
                 if (active) {
-                    chatManager.sendMessage(id, event, true);
+                    chatManager.sendMessage(id, event);
                 } else {
                     //feedback session not in progress, time to create
                     MessageChannel feedbackChannel = chatManager.getFeedbackChannel();
