@@ -88,6 +88,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("servericon", "guildicon", "icon", "serveravatar", "guildavatar"), new ServerIcon());
         commands.putAll(Arrays.asList("otd", "onthisday", "events", "history"), new OnThisDay());
         commands.putAll(Arrays.asList("banner", "getbanner", "header"), new Banner());
+        commands.putAll(Arrays.asList("chat", "serverchat"), new Chat());
         commands.put("setprefix", new SetPrefix());
         commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());
