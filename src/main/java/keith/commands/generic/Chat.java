@@ -19,12 +19,13 @@ public class Chat extends UserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"\"";
+        return prefix+defaultName+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
     }
 
     @Override
     public String getLongDescription() {
-        return "";
+        return "Creates a connection between two guilds so that messages can be sent in between. " +
+                "Use your servers prefix before a message to avoid the message being sent!";
     }
 
     @Override
