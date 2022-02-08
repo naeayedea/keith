@@ -1,5 +1,6 @@
 package keith.util;
 
+import keith.managers.ServerChatManager;
 import keith.managers.ServerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -225,7 +226,7 @@ public class Utilities {
             setStatus("Restarting...");
             try {
                 if (p.waitFor(10, TimeUnit.SECONDS)) {
-                    System.exit(0);
+                    runShutdownProcedure();
                 } else {
                     event.getChannel().sendMessage("Restart failed...").queue();
                 }
@@ -235,6 +236,11 @@ public class Utilities {
             event.getChannel().sendMessage("Restart failed badly...").queue();
         }
 
+    }
+
+    public static void runShutdownProcedure() {
+        ServerChatManager.getInstance().closeAll();
+        System.exit(0);
     }
 
     public static String truncateString(String string, int length) {

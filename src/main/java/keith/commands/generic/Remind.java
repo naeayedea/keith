@@ -101,11 +101,6 @@ public class Remind extends UserCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        MessageChannel channel = event.getChannel();
-//        if(channel instanceof PrivateChannel) {
-//            channel.sendMessage("Reminders not supported in private channels yet!").queue();
-//            return;
-//        }
         if(tokens.size() < 2){
             event.getChannel().sendMessage("Insufficient Arguments").queue();
             return;

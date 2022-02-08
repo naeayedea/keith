@@ -1,12 +1,9 @@
 package keith.commands.admin;
 
 import keith.util.Utilities;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SetStatus extends AdminCommand {
 

@@ -2,13 +2,10 @@ package keith.commands.generic;
 
 import keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.awt.*;
 import java.util.List;
 
 public class Avatar extends UserCommand {
@@ -50,7 +47,7 @@ public class Avatar extends UserCommand {
         if (event.getChannel() instanceof PrivateChannel) {
             embed.setColor(Utilities.getDefaultColor());
         } else {
-        embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
+            embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
         }
         //Build embed and send
         embed.setTitle(user.getName()+"'s Avatar");

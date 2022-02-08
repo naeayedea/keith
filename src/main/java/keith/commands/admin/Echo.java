@@ -31,6 +31,8 @@ public class Echo extends AdminCommand {
     public void run(MessageReceivedEvent event, List<String> tokens) {
         StringBuilder response = new StringBuilder();
         tokens.forEach(string -> response.append(string).append(" "));
-        event.getChannel().sendMessage(response).queue();
+        event.getChannel().sendMessage(response).queue(success -> {
+            event.getMessage().delete().queue();
+        });
     }
 }

@@ -4,6 +4,7 @@ Third major version of keith, the bot has been rebuilt from the ground up. V3 ha
 but with significantly tidier codebase, greatly improved database and user/server manager code. A list of improvements
 and additions can be found below: 
 
+[Add Me](https://discord.com/oauth2/authorize?client_id=624702573064224803&scope=bot&permissions=8)
 ## User Facing Changes
 
 ### Command Aliases
@@ -11,8 +12,19 @@ and additions can be found below:
 
 ### New Commands
     echo: bot will repeat anything passed to it via the command - only for users with higher access level
+
     invite: command to create bot invite now added - don't know why it was left so late
+
     servericon: similar to avatar but for servers
+
+    otd: will display a small selection of events that happened on this day in history
+
+    banner: retrieve users banner image/gif
+
+    servericon: similar to avatar but for servers
+
+    chat: inter-server communication with simple matchmaking to allow servers to send messages to eachother 
+    
     
 ### Improved Commands
 
@@ -37,13 +49,16 @@ and additions can be found below:
     remind: reminders now support the long needed feature of "on date at time" e.g. remind on 21/03/2021
     at 14:40 [text]. The code is significantly cleaner with much less code reuse and the pins now look
     nicer with a fresh lick of paint on top (e.g. they now use embeds for the reply, no more ugly code 
-    blocks). The embed also uses a random colour every time which gives it a nicer look than the black
-    bar when no colour is set
+    blocks). The embed also uses a colour determined by the reminder content which gives it a nicer look
+    than the black bar when no colour is set
 
     setprefix: now supports more than one character (see below)
 
     calculate: calculate now supports brackets, sqrt function and the common trig functions sin,cos and tan. 
     thank you to [Boann](https://stackoverflow.com/a/26227947)for the nice recursive descent parser
+
+    feedback: thanks to the new ServerChatManager, feedback is much more streamlined with threaded
+    conversations to keep things compact and easy to manage
 
 ### Improved Prefixes
     prefixes can now be longer than one character due to security improvements in the database, due to 
@@ -80,7 +95,7 @@ and additions can be found below:
 ### Database
     The database code is now vastly superior to v2's iteration. Coupling between the database and other
     classes has been completely removed and the database code functions standalone. The  database code 
-    can prepare statements and executethem with some different methods depending on the desired format 
+    can prepare statements and execute them with some different methods depending on the desired format 
     of the results. The strings for preparing statements are passed externally into the code which 
     significantly reduces coupling of the code. 
 
@@ -106,6 +121,8 @@ and additions can be found below:
 
     Tokenisation of user input has also been improved and a list of tokens is passed through the command 
     interface to reduce constant need to call string.split(\\s+) in every command
+
+    Restart sequence has been improved
 
 ### Shard Support
     TODO 

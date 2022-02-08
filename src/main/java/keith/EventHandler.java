@@ -7,6 +7,7 @@ import keith.commands.generic.*;
 import keith.commands.info.Help;
 import keith.commands.info.Invite;
 import keith.managers.ChannelCommandManager;
+import keith.managers.ServerChatManager;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.managers.UserManager;
@@ -14,16 +15,20 @@ import keith.managers.UserManager.User;
 import keith.util.Database;
 import keith.util.MultiMap;
 import keith.util.Utilities;
+import keith.util.logs.Logger;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +39,7 @@ public class EventHandler extends ListenerAdapter {
 
     ExecutorService commandService;
     ChannelCommandManager channelCommandService;
+    ServerChatManager chatManager;
     ScheduledExecutorService rateLimitService;
     Map<String, Integer> rateLimitRecord;
     MultiMap<String, Command> commands;
@@ -51,9 +57,12 @@ public class EventHandler extends ListenerAdapter {
     }
 
     private void initialise(DataSource database, JDA jda) {
+        Utilities.setJDA(jda);
+        Utilities.setRateLimitMax(7);
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
         commandService = Executors.newCachedThreadPool();
         channelCommandService = ChannelCommandManager.getInstance();
+        chatManager = ServerChatManager.getInstance();
         rateLimitService = Executors.newScheduledThreadPool(1);
         rateLimitRecord = new ConcurrentHashMap<>();
         serverManager = ServerManager.getInstance();
@@ -65,8 +74,6 @@ public class EventHandler extends ListenerAdapter {
         };
         rateLimitService.scheduleAtFixedRate(clearHistory, 30, 30, TimeUnit.SECONDS);
         Database.setSource(database);
-        Utilities.setJDA(jda);
-        Utilities.setRateLimitMax(7);
         initialiseCommands();
     }
 
@@ -79,9 +86,13 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("remind", "remindme"), new Remind());
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.putAll(Arrays.asList("servericon", "guildicon", "icon", "serveravatar", "guildavatar"), new ServerIcon());
+        commands.putAll(Arrays.asList("otd", "onthisday", "events", "history"), new OnThisDay());
+        commands.putAll(Arrays.asList("banner", "getbanner", "header"), new Banner());
+        commands.putAll(Arrays.asList("chat", "serverchat"), new Chat());
         commands.put("setprefix", new SetPrefix());
         commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());
+        commands.put("feedback", new Feedback());
     }
 
     @Override
@@ -90,7 +101,6 @@ public class EventHandler extends ListenerAdapter {
             if (!event.getAuthor().isBot()) {
                 MessageChannel channel = event.getChannel();
                 Message message = event.getMessage();
-                MessageType messageType = message.getType();
                 //automatically join any threads that are created so that bot feels easy to use in threads
                 if (channel instanceof ThreadChannel) {
                     ThreadChannel thread = ((ThreadChannel) channel);
@@ -163,6 +173,8 @@ public class EventHandler extends ListenerAdapter {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
                         ChannelCommand cc = channelCommandService.getGame(channel.getId());
                         cc.evaluate(message, tokens, user);
+                    } else if (chatManager.hasActiveChat(channel.getId())) {
+                        chatManager.sendMessage(channel.getId(), event);
                     }
                 }
             }
@@ -189,9 +201,27 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildJoin(GuildJoinEvent event){
+    public void onGuildJoin(GuildJoinEvent event) {
         Guild guild = event.getGuild();
+        Server server = serverManager.getServer(event.getGuild().getId());
+        TextChannel defaultChannel = guild.getDefaultChannel();
+        if (defaultChannel != null) {
+            defaultChannel.sendMessageEmbeds(new EmbedBuilder()
+                    .setColor(new Color(155,0,155))
+                    .setTitle("Hello!")
+                    .setFooter("Use "+server.getPrefix()+"feedback if you have any issues!- Succ")
+                    .setDescription("Use "+server.getPrefix()+"help to see available commands")
+                    .setThumbnail(Utilities.getJDAInstance().getSelfUser().getAvatarUrl())
+                    .build()).queue();
+            Logger.printSuccess("New Server "+guild+" has added the bot!");
+        }
+        Utilities.updateDefaultStatus();
+    }
 
+    @Override
+    public void onGuildLeave(GuildLeaveEvent event) {
+        Logger.printWarning("Server "+event.getGuild()+" has kicked the bot :(");
+        Utilities.updateDefaultStatus();
     }
 
     @Override

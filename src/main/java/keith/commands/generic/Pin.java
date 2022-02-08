@@ -52,11 +52,10 @@ public class Pin extends UserCommand{
         } else {
             //pin command found, send pin
             Message messageSource = getMessageSource(message, tokens);
-            System.out.println(messageSource);
             if (messageSource == null){
                 return;
             }
-            sendEmbed(messageSource.getAuthor(), event.getAuthor(), messageSource, pinChannel, channel, guild, message.getType(), tokens);
+            sendEmbed(messageSource.getAuthor(), event.getAuthor(), messageSource, message, pinChannel, channel, guild, message.getType(), tokens);
         }
     }
 
@@ -87,19 +86,16 @@ public class Pin extends UserCommand{
             return message.getReferencedMessage();
         } else {
             //need to garner source from message content
-
-            //check for pinning message
-            if (tokens.size() == 1) {
-                try {
-                    long potentialMessageId = Long.parseLong(tokens.get(0));
-                    return channel.retrieveMessageById(potentialMessageId).complete();
-                } catch (NumberFormatException e) {
-                    return message;
+            if (tokens.isEmpty() && message.getAttachments().isEmpty()) {
+                //new functionality:
+                //fetch last message in channel:
+                MessageHistory history = MessageHistory.getHistoryBefore(channel, message.getId()).limit(1).complete();
+                if (history.getRetrievedHistory().isEmpty()) {
+                    channel.sendMessage("Please input text/images to pin or pin a message by replying with pin or using pin [message id]").queue();
+                    return null;
+                } else {
+                    return history.getRetrievedHistory().get(0);
                 }
-            } else if (tokens.isEmpty() && message.getAttachments().isEmpty()) {
-                //invalid input, no reply and no message content
-                channel.sendMessage("Please input text/images to pin or pin a message by replying with pin or using pin [message id]").queue();
-                return null;
             } else {
               //there is some message content to pin therefore return the original message as the source.
               return message;
@@ -107,28 +103,21 @@ public class Pin extends UserCommand{
         }
     }
 
-    private void sendEmbed(User author, User pinner, Message originalMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens){
-        List<Message.Attachment> attachments = originalMessage.getAttachments();
+    private void sendEmbed(User author, User pinner, Message messageSource, Message commandMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens){
+        List<Message.Attachment> attachments = messageSource.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Message From " + author.getName());
-        String content = originalMessage.getContentRaw().trim();
+        String content = messageSource.getContentRaw().trim();
         if (content.equals("") && attachments.isEmpty()) {
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
             return;
         }
-        if (type  == MessageType.INLINE_REPLY)
+        if (type == MessageType.INLINE_REPLY)
             eb.setDescription(content + "\n");
         else {
-            String description = content.substring(content.indexOf(" ") + 1) + "\n";
-            if (!tokens.isEmpty()) {
-                try {
-                    Long.parseLong(tokens.get(0));
-                    eb.setDescription(content + "\n");
-                } catch (NumberFormatException e) {
-                    eb.setDescription(description);
-                }
+            if (messageSource.equals(commandMessage)) {
+                eb.setDescription(Utilities.stringListToString(tokens) + "\n");
             } else {
-                eb.setDescription(description);
+                eb.setDescription(content + "\n");
             }
         }
         eb.setColor(Utilities.getMemberColor(guild, author));
@@ -138,14 +127,24 @@ public class Pin extends UserCommand{
         //Do embed stuff
         if(attachments.size() > 0) {
             Message.Attachment attachment = attachments.get(0);
-            if(attachment.isImage()) {
+            if (attachment.isImage()) {
                 eb.setImage(attachment.getUrl());
-
             } else {
-                eb.appendDescription("[Attached Video]("+attachment.getUrl()+")\n\n");
+                eb.appendDescription("[Attached Video]("+attachment.getUrl()+") - download\n\n");
             }
         }
-        eb.appendDescription("[Message Link]("+originalMessage.getJumpUrl()+")");
+        BaseGuildMessageChannel channel = (BaseGuildMessageChannel) guild.getGuildChannelById(messageSource.getChannel().getId());
+        if (channel != null) {
+            if (channel.isNSFW()) {
+                eb.appendDescription("[Message Link (NSFW)]("+messageSource.getJumpUrl()+")");
+            } else {
+                eb.appendDescription("[Message Link]("+messageSource.getJumpUrl()+")");
+            }
+            eb.setTitle("Message From " + author.getName() + "\nSent from "+ channel.getName());
+        } else {
+            eb.setTitle("Message From " + author.getName());
+            eb.appendDescription("[Message Link]("+messageSource.getJumpUrl()+")");
+        }
         pinChannel.sendMessageEmbeds(eb.build()).queue((message) -> {
             EmbedBuilder reply = new EmbedBuilder();
             reply.setTitle(":pushpin: Message Pinned!");
