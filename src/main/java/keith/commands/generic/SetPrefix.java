@@ -30,6 +30,11 @@ public class SetPrefix extends UserCommand {
     }
 
     @Override
+    public boolean isPrivateMessageCompatible() {
+        return false;
+    }
+
+    @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         if (tokens.isEmpty()) {
             event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();

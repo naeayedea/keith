@@ -17,9 +17,15 @@ public interface Command {
     default boolean isHidden() {
         return false;
     }
+
     default int getTimeOut(){
         return 10;
     }
+
+    default boolean isPrivateMessageCompatible() {
+        return true;
+    }
+
     default boolean sendTyping() {return true;}
 
 }

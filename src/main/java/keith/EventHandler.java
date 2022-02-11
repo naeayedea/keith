@@ -140,22 +140,26 @@ public class EventHandler extends ListenerAdapter {
                             rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                             if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
-                                    //all checks passed, execute command
-                                    try {
-                                        Runnable execution = () -> {
-                                            if (command.sendTyping()) {
-                                                channel.sendTyping().queue();
-                                            }
-                                            command.run(event, tokens);
-                                            user.incrementCommandCount();
-                                        };
-                                        commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
-                                    } catch (PermissionException e) {
-                                        Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
-                                    } catch (IllegalArgumentException e) {
-                                        Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
-                                    } catch (Exception e) {
-                                        Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                    if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
+                                        //all checks passed, execute command
+                                        try {
+                                            Runnable execution = () -> {
+                                                if (command.sendTyping()) {
+                                                    channel.sendTyping().queue();
+                                                }
+                                                command.run(event, tokens);
+                                                user.incrementCommandCount();
+                                            };
+                                            commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+                                        } catch (PermissionException e) {
+                                            Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
+                                        } catch (IllegalArgumentException e) {
+                                            Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
+                                        } catch (Exception e) {
+                                            Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                        }
+                                    } else {
+                                        sendMessage(channel, command.getDefaultName()+" cannot be used in private message!");
                                     }
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");

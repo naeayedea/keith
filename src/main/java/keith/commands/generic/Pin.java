@@ -34,14 +34,14 @@ public class Pin extends UserCommand{
     }
 
     @Override
+    public boolean isPrivateMessageCompatible() {
+        return false;
+    }
+
+    @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         //ensure message is not in a private channel
         MessageChannel channel = event.getChannel();
-        if (channel instanceof PrivateChannel) {
-            channel.sendMessage("This command cannot be used in a private channel!").queue();
-            return;
-        }
-
         Message message = event.getMessage();
         Guild guild = event.getGuild();
         Server server = ServerManager.getInstance().getServer(guild.getId());

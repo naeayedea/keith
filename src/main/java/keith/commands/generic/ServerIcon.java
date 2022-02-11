@@ -30,6 +30,11 @@ public class ServerIcon extends UserCommand {
     }
 
     @Override
+    public boolean isPrivateMessageCompatible() {
+        return false;
+    }
+
+    @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         EmbedBuilder embed = new EmbedBuilder();
         Guild guild = event.getGuild();
