@@ -15,7 +15,7 @@ import java.util.List;
 public class Stats extends AdminCommand {
 
     String defaultName;
-    private static final String VERSION = "3.0.5 \"CHAT UPDATE\"";
+    private static final String VERSION = "3.0.6 \"DM HOTFIX\"";
 
     public Stats() {
         defaultName = "stats";
