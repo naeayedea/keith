@@ -38,10 +38,6 @@ public class Feedback extends UserCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
-        if (channel instanceof PrivateChannel) {
-            channel.sendMessage("Feedback not supported in private channels").queue();
-            return;
-        }
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);
         //check if the user is an admin looking to close the feedback session
@@ -56,19 +52,27 @@ public class Feedback extends UserCommand {
                 } else {
                     //feedback session not in progress, time to create
                     MessageChannel feedbackChannel = chatManager.getFeedbackChannel();
-                    Guild guild = event.getGuild();
+                    String name;
+                    String prefix;
+                    if (channel instanceof PrivateChannel) {
+                        name = "Private Message";
+                        prefix = "?";
+                    } else {
+                        Guild guild = event.getGuild();
+                        prefix = ServerManager.getInstance().getServer(guild.getId()).getPrefix();
+                        name = event.getGuild().getName();
+                    }
                     User author = event.getAuthor();
-                    String prefix = ServerManager.getInstance().getServer(guild.getId()).getPrefix();
                     //send initial message
                     StringBuilder feedback = new StringBuilder("Initial feedback from ");
                     feedback.append(author.getName()).append(author.getDiscriminator())
-                            .append(" in ").append(guild.getName()).append("\n\n")
+                            .append(" in ").append(name).append("\n\n")
                             .append("> ").append(Utilities.stringListToString(tokens));
-                    if (channel instanceof ThreadChannel) {
+                    if (channel instanceof ThreadChannel || channel instanceof PrivateChannel) {
                         //create thread inside feedback channel
                         feedbackChannel.sendMessage(feedback).queue(feedbackMessage ->
-                                feedbackMessage.createThreadChannel("Feedback from "+guild.getName()).queue(feedbackChannelThread -> {
-                                        chatManager.createChat(channel, feedbackChannelThread, false);
+                                feedbackMessage.createThreadChannel("Feedback from "+name).queue(feedbackChannelThread -> {
+                                        chatManager.createChat(channel, feedbackChannelThread, true);
                                         channel.sendMessage("Feedback session started - use \""+prefix+"feedback close\" to end the session").queue();
                                 })
                         );
@@ -78,8 +82,8 @@ public class Feedback extends UserCommand {
                                 success.createThreadChannel("Bot Feedback").queue(feedbackThread -> {
                                     //create thread inside feedback channel
                                     feedbackChannel.sendMessage(feedback).queue(feedbackMessage ->
-                                            feedbackMessage.createThreadChannel("Feedback from "+guild.getName()).queue(feedbackChannelThread -> {
-                                                chatManager.createChat(feedbackThread, feedbackChannelThread, false);
+                                            feedbackMessage.createThreadChannel("Feedback from "+name).queue(feedbackChannelThread -> {
+                                                chatManager.createChat(feedbackThread, feedbackChannelThread, true);
                                                 feedbackThread.sendMessage("Feedback session started - use \""+prefix+"feedback close\" to end the session").queue();
                                             })
                                     );
