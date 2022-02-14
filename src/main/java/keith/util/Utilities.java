@@ -8,7 +8,10 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +19,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utilities {
 
@@ -262,10 +267,42 @@ public class Utilities {
         channel = channel != null ? channel : jda.getPrivateChannelById(id);
         return channel;
     }
+
     public static MessageChannel getMessageChannelById(String id) {
         MessageChannel channel = jda.getTextChannelById(id);
         channel = channel != null ? channel : jda.getThreadChannelById(id);
         channel = channel != null ? channel : jda.getPrivateChannelById(id);
         return channel;
+    }
+
+    public static String readInputStream(InputStream stream) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+        String inputLine;
+        StringBuilder results = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            results.append(inputLine).append("\n");
+        }
+        //close resources
+        in.close();
+        return results.toString();
+    }
+
+    public static String getImageURL(String html) {
+        Pattern pattern = Pattern.compile("(?<=property=\"og:image\" content=\")(\\S+)(\\s*)(?=\")");
+        Matcher matcher = pattern.matcher(html);
+        String lastMatch = "";
+        while (matcher.find()) {
+            lastMatch = matcher.group();
+        }
+        return lastMatch;
+    }
+
+    public static String getVideoURL(String html) {
+        Pattern pattern = Pattern.compile("(?<=property=\"og:url\" content=\")(\\S+)(\\s*)(?=\")");
+        Matcher matcher = pattern.matcher(html);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return "";
     }
 }
