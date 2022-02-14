@@ -2,13 +2,11 @@ package keith.managers;
 
 import keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -147,9 +145,11 @@ public class ServerChatManager {
 
     public void sendMessage(String id, MessageReceivedEvent event) {
         MessageChannel channel = event.getChannel();
+        Message message = event.getMessage();
         EmbedBuilder eb = new EmbedBuilder();
         User author = event.getAuthor();
         String name;
+        //Check for message from private channel and adjust name accordingly
         if (channel instanceof PrivateChannel) {
             name = "Private Message";
             eb.setColor(Utilities.getBotColor());
@@ -158,14 +158,21 @@ public class ServerChatManager {
             name = event.getGuild().getName();
             eb.setColor(Utilities.getMemberColor(guild, author));
         }
+        //Check if the user has sent any embeds
+        if (!message.getAttachments().isEmpty()) {
+            Message.Attachment attachment = message.getAttachments().get(0);
+            if (attachment.isImage()) {
+                eb.setImage(attachment.getUrl());
+            }
+        }
+        eb.setDescription(message.getContentRaw());
         eb.setThumbnail(author.getAvatarUrl());
-        eb.setDescription(event.getMessage().getContentRaw());
         if (isFeedback(id)) {
             eb.setTitle("Feedback sent by " + author.getName() +" from "+name);
         } else {
             eb.setTitle("Message sent by " + author.getName() +" from "+name);
         }
-        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> event.getMessage().addReaction("U+2709").queue());
+        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> message.addReaction("U+2709").queue());
     }
 
     public MessageChannel getDestination(String id) {
