@@ -168,16 +168,17 @@ public class ServerChatManager {
         } else if (!message.getEmbeds().isEmpty()) {
             MessageEmbed embed = message.getEmbeds().get(0);
             String link = embed.getUrl();
-            if (embed.getType().equals(EmbedType.IMAGE)) {
-                eb.setImage(link);
-            } else if (link != null) {
-                if (link.contains("tenor")) {
+            if (link != null) {
+                if (embed.getType().equals(EmbedType.IMAGE)) {
+                    eb.setImage(link);
+                    content = content.replace(link, "");
+                } else {
                     try {
                         URL firstLink = new URL(link);
-                        HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
-                        getImage.setRequestMethod("GET");
-                        getImage.connect();
-                        String videoURL = Utilities.getVideoURL(Utilities.readInputStream(getImage.getInputStream()));
+                        HttpURLConnection getVideo = (HttpURLConnection) firstLink.openConnection();
+                        getVideo.setRequestMethod("GET");
+                        getVideo.connect();
+                        String videoURL = Utilities.getVideoURL(Utilities.readInputStream(getVideo.getInputStream()));
                         content = content.replace(link, "");
                         eb.setImage(videoURL);
                     } catch (IOException ignored) {}
