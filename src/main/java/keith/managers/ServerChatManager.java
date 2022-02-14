@@ -5,8 +5,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -149,6 +151,7 @@ public class ServerChatManager {
         EmbedBuilder eb = new EmbedBuilder();
         User author = event.getAuthor();
         String name;
+        String content = message.getContentRaw();
         //Check for message from private channel and adjust name accordingly
         if (channel instanceof PrivateChannel) {
             name = "Private Message";
@@ -161,11 +164,27 @@ public class ServerChatManager {
         //Check if the user has sent any embeds
         if (!message.getAttachments().isEmpty()) {
             Message.Attachment attachment = message.getAttachments().get(0);
-            if (attachment.isImage()) {
-                eb.setImage(attachment.getUrl());
+            eb.setImage(attachment.getUrl());
+        } else if (!message.getEmbeds().isEmpty()) {
+            MessageEmbed embed = message.getEmbeds().get(0);
+            String link = embed.getUrl();
+            if (embed.getType().equals(EmbedType.IMAGE)) {
+                eb.setImage(link);
+            } else if (link != null) {
+                if (link.contains("tenor")) {
+                    try {
+                        URL firstLink = new URL(link);
+                        HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
+                        getImage.setRequestMethod("GET");
+                        getImage.connect();
+                        String videoURL = Utilities.getVideoURL(Utilities.readInputStream(getImage.getInputStream()));
+                        content = content.replace(link, "");
+                        eb.setImage(videoURL);
+                    } catch (IOException ignored) {}
+                }
             }
         }
-        eb.setDescription(message.getContentRaw());
+        eb.setDescription(content);
         eb.setThumbnail(author.getAvatarUrl());
         if (isFeedback(id)) {
             eb.setTitle("Feedback sent by " + author.getName() +" from "+name);
