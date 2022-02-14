@@ -62,7 +62,7 @@ public class Database {
 
             //Get column names
             for (int i = 1; i <= columnCount; i++) {
-                currentResult.append(Utilities.truncateString(rs.getMetaData().getColumnName(i), length)).append("\t");
+                currentResult.append(Utilities.truncateString(rs.getMetaData().getColumnLabel(i), length)).append("\t");
             }
 
             //get the information from each row separated by a tab
