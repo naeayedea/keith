@@ -193,7 +193,7 @@ public class EventHandler extends ListenerAdapter {
         return commands.get(commandString);
     }
 
-    //wrapper for channel.sendMesssage(content).queue() so dont have to write it in full every time.
+    //wrapper for channel.sendMessage(content).queue() so dont have to write it in full every time.
     private void sendMessage(MessageChannel channel, String content) {
         channel.sendMessage(content).queue();
     }
@@ -206,7 +206,7 @@ public class EventHandler extends ListenerAdapter {
     public void onGuildJoin(GuildJoinEvent event) {
         Guild guild = event.getGuild();
         Server server = serverManager.getServer(event.getGuild().getId());
-        TextChannel defaultChannel = guild.getDefaultChannel();
+        TextChannel defaultChannel = (TextChannel) guild.getDefaultChannel();
         if (defaultChannel != null) {
             defaultChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(new Color(155,0,155))

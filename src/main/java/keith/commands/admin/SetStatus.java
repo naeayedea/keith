@@ -7,26 +7,19 @@ import java.util.List;
 
 public class SetStatus extends AdminCommand {
 
-    String defaultName;
-
     public SetStatus() {
-        defaultName = "setstatus";
+        super("setstatus");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"sets the bots status to the specified message\"";
+        return prefix+getDefaultName()+": \"sets the bots status to the specified message\"";
     }
 
     @Override
     public String getLongDescription() {
         return "sets the bot status to the specified message, can also do \"" +
                 "setstatus default\" to return the bot status to the default setting";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

@@ -11,25 +11,18 @@ import java.util.List;
 
 public class SendMessage extends AdminCommand {
 
-    String defaultName;
-
     public SendMessage() {
-        defaultName = "send";
+        super("send");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"lets you send a message to another channel\"";
+        return prefix+getDefaultName()+": \"lets you send a message to another channel\"";
     }
 
     @Override
     public String getLongDescription() {
         return "lets you send a message to another channel - use \"send message/embed [channelid] [title(embed only] [message]\"";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

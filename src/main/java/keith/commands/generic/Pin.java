@@ -16,6 +16,10 @@ import java.util.List;
 
 public class Pin extends UserCommand{
 
+    public Pin() {
+        super("pin");
+    }
+
     @Override
     public String getShortDescription(String prefix) {
         return prefix+"pin: \"reply with "+prefix+"pin to a message to 'pin' it in a separate channel - useful when channel pins are full!"
@@ -26,11 +30,6 @@ public class Pin extends UserCommand{
     public String getLongDescription() {
         return "Pin allows users to 'pin' messages to a separate read only channel. They can pin a message by replying, with the message"
                 +"id or by using 'pin [text]' to pin the text entered in the message.";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return "pin";
     }
 
     @Override

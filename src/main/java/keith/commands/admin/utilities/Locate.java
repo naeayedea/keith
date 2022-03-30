@@ -10,25 +10,18 @@ import java.util.List;
 
 public class Locate extends AdminCommand {
 
-    String defaultName;
-
     public Locate() {
-        defaultName = "locate";
+        super("locate");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Find a user or server\"";
+        return prefix+getDefaultName()+": \"Find a user or server\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Enter the ID of a user or server to locate it within the database";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

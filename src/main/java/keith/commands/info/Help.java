@@ -12,28 +12,22 @@ import java.util.Map;
 public class Help extends InfoCommand {
 
     private final Map<String, Command> commands;
-    private final String defaultName;
 
     public Help (Map<String, Command> commandMap) {
+        super("help");
         this.commands = commandMap;
-        this.defaultName = "help";
     }
 
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"for more information on a command use "+prefix+"help [command]\"";
+        return prefix+getDefaultName()+": \"for more information on a command use "+prefix+"help [command]\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Help lists all available commands as well as going into further detail when help on a specific command" +
                 "is requested using one of its aliases";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

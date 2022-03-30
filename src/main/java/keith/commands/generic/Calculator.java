@@ -9,14 +9,13 @@ import java.util.List;
 
 public class Calculator extends UserCommand {
 
-    String defaultName;
     public Calculator() {
-        defaultName = "calculate";
+        super("calculate");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"evaluates the expression passed using "+prefix+defaultName+" [expression]\"";
+        return prefix+getDefaultName()+": \"evaluates the expression passed using "+prefix+getDefaultName()+" [expression]\"";
     }
 
     @Override
@@ -26,11 +25,6 @@ public class Calculator extends UserCommand {
                 "and some functions such as:\n" +
                 "sqrt(num), sin(num), cos(num), tan(num)\n" +
                 "please note that there is a limit to calculations and very large numbers will be returned as infinity";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

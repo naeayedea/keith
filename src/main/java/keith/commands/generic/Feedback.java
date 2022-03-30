@@ -12,27 +12,21 @@ import java.util.List;
 
 public class Feedback extends UserCommand {
 
-    private final String defaultName;
     private final ServerChatManager chatManager;
 
     public Feedback() {
-        defaultName = "feedback";
+        super("feedback");
         chatManager = ServerChatManager.getInstance();
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"bugs or ideas for the bot? use this command to voice your opinion\\\"\"";
+        return prefix+getDefaultName()+": \"bugs or ideas for the bot? use this command to voice your opinion\\\"\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Have a suggestion? Use this command to contact the bot owner directly!";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

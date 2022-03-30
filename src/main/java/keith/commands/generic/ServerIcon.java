@@ -8,25 +8,18 @@ import java.util.List;
 
 public class ServerIcon extends UserCommand {
 
-    String defaultName;
-
     public ServerIcon() {
-        defaultName = "servericon";
+        super("servericon");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"displays icon of the current guild/server\"";
+        return prefix+getDefaultName()+": \"displays icon of the current guild/server\"";
     }
 
     @Override
     public String getLongDescription() {
         return "servericon displays the icon of the current server/guild";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

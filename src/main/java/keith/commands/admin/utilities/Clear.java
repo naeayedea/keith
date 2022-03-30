@@ -10,25 +10,18 @@ import java.util.List;
 
 public class Clear extends AdminCommand {
 
-    String defaultName;
-
     public Clear() {
-        defaultName = "clear-cache";
+        super("clear");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"clear manager caches\"";
+        return prefix+getDefaultName()+": \"clear manager caches\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Used to clear the cache of the UserManager or ServerManager class\n\n Use ?admin utils clear-cache [server, user, all]";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

@@ -35,16 +35,14 @@ public class OnThisDay extends UserCommand {
     private static final String API_URL = "https://byabbe.se/on-this-day/";
     private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
 
-    private final String defaultName;
-
 
     public OnThisDay() {
-        defaultName = "otd";
+        super("otd");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Find out what happened this day in history!\"";
+        return prefix+getDefaultName()+": \"Find out what happened this day in history!\"";
     }
 
     @Override
@@ -53,10 +51,6 @@ public class OnThisDay extends UserCommand {
                 "date or just \"?otd\" for today!";
     }
 
-    @Override
-    public String getDefaultName() {
-        return defaultName;
-    }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {

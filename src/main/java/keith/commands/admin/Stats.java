@@ -14,26 +14,20 @@ import java.util.List;
 
 public class Stats extends AdminCommand {
 
-    String defaultName;
     private static final String VERSION = "3.0.6 \"DM HOTFIX\"";
 
     public Stats() {
-        defaultName = "stats";
+        super("stats");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"returns various bot stats from database\"";
+        return prefix+getDefaultName()+": \"returns various bot stats from database\"";
     }
 
     @Override
     public String getLongDescription() {
         return "usage: admin stats (servers/users/admins)";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return "stats";
     }
 
     @Override

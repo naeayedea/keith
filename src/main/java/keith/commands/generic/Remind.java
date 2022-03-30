@@ -54,7 +54,6 @@ public class Remind extends UserCommand {
         }
     }
 
-    String defaultName;
     String inTimeRegex = "((^in)( )+[0-9]+( )*(month(s)?))?((^in )?((,)?(( )*and)?( )*)?[0-9]+( )*(week(s)?))?((^in )?((,)?(( )*and)?( )*)?[0-9]+( )*(day(s)?))?((^in )?((,)?(( )*and)?( )*)?[0-9]+( )*(hour(s)?))?((^in )?((,)?(( )*and)?( )*)?[0-9]+( )*(minute(s)?))?((^in )?((,)?(( )*and)?( )*)?[0-9]+( )*(second(s)?))?";
     String onDateRegex = "(?<=on)( )*(\\d{1,2}/\\d{1,2}/\\d{4}|(\\d{1,2}-\\d{1,2}-\\d{4})|(\\d{1,2} \\d{1,2} \\d{4}))";
     String timeRegex = "(?<=at)( )*([0-9]{1,2}:[0-9]{1,2})?";
@@ -62,7 +61,7 @@ public class Remind extends UserCommand {
     RemindExecutor executor;
 
     public Remind() {
-        defaultName = "remind";
+        super("remind");
         executor = new RemindExecutor(200);
         executor.scheduleAtFixedRate(executor::cleanup, 12, 12, TimeUnit.HOURS);
         loadReminders();
@@ -70,7 +69,7 @@ public class Remind extends UserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"set a reminder and the bot will message you after the specified timeframe!\"";
+        return prefix+getDefaultName()+": \"set a reminder and the bot will message you after the specified timeframe!\"";
     }
 
     @Override
@@ -80,11 +79,6 @@ public class Remind extends UserCommand {
                 "\"remind in X months, Y days, Z hours [message]\" etc. you do not need to include all times so \"remind in X hours [message]\" will also work!\n" +
                 "\"remind on [date] at [time] [message]\" - please use format dd/mm/yyyy, dd-mm-yyyy or dd mm yyyy, it is not necessary to specify a time\n\n" +
                 "please note that reminders cannot be empty e.g. you must have something to be reminded of!";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     private PreparedStatement getRemindersStatement() {

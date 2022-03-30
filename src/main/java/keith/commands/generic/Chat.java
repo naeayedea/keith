@@ -8,28 +8,22 @@ import java.util.List;
 
 public class Chat extends UserCommand {
 
-    private final String defaultName;
     private final ServerChatManager chatManager;
 
     public Chat() {
-        defaultName = "chat";
+        super("chat");
         chatManager = ServerChatManager.getInstance();
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
+        return prefix+getDefaultName()+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Creates a connection between two guilds so that messages can be sent in between. " +
                 "Use your servers prefix before a message to avoid the message being sent!";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

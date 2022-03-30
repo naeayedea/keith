@@ -7,25 +7,18 @@ import java.util.List;
 
 public class Shutdown extends OwnerCommand {
 
-    String defaultName;
-
     public Shutdown() {
-        defaultName = "shutdown";
+        super("shutdown");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"shut down the bot completely\"";
+        return prefix+getDefaultName()+": \"shut down the bot completely\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Will shutdown the bot and terminate all processes without restarting";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

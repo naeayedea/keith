@@ -7,28 +7,21 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Guess extends UserCommand{
-
-    String defaultName;
+public class Guess extends UserCommand {
 
     public Guess() {
-        defaultName = "guess";
+        super("guess");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"number guessing game: use '"+prefix+"guess' or '"+prefix+"guess [number]' to start a game!\"";
+        return prefix+getDefaultName()+": \"number guessing game: use '"+prefix+"guess' or '"+prefix+"guess [number]' to start a game!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Guess lets you and your friends to guess the number generated between 1-100 or 1-[number] where [number]"
                 +" can be any number between 1-5000! Simply start the game and type your guess in chat to play!";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

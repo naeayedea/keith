@@ -7,26 +7,20 @@ import java.util.List;
 
 public class SetPrefix extends UserCommand {
 
-    String defaultName;
     int limit;
     public SetPrefix() {
-        defaultName = "setprefix";
+        super("setprefix");
         limit = 10;
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"sets the prefix of the bot in your server, for prefix limits do "+prefix+"help setprefix!\"";
+        return prefix+getDefaultName()+": \"sets the prefix of the bot in your server, for prefix limits do "+prefix+"help setprefix!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than "+limit+" characters";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override
