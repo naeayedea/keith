@@ -37,7 +37,7 @@ public abstract class Command implements ICommand {
 
     @Override
     public String getLongDescription() {
-        return "DEFAULT LONG DESCRIPTION]";
+        return "[DEFAULT LONG DESCRIPTION]";
     }
 
     //Hidden commands won't be displayed to users but can still be accessed by people with sufficient level who know of them
