@@ -22,7 +22,9 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -200,6 +202,22 @@ public class EventHandler extends ListenerAdapter {
 
     private void sendEmbed(MessageChannel channel, MessageEmbed embed) {
         channel.sendMessageEmbeds(embed).queue();
+    }
+
+    @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+        MessageReaction.ReactionEmote emote = event.getReaction().getReactionEmote();
+        Member member = event.getMember();
+
+        if (member != null && !member.getUser().isBot() && emote.isEmoji()) {
+            if (emote.getEmoji().equals("📌")) {
+                Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
+                String messageContent = message.getContentRaw().trim();
+                //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+                List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+                ((Pin)commands.get("pin")).run(event, tokens, message, member.getUser());
+            }
+        }
     }
 
     @Override
