@@ -124,6 +124,9 @@ public class Pin extends UserCommand implements IReactionCommand {
     private void sendEmbed(User author, User pinner, Message messageSource, Message commandMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens){
         List<Message.Attachment> attachments = messageSource.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
+        if (pinChannel.getId().equals(commandChannel.getId())) {
+            return;
+        }
         String content = messageSource.getContentRaw().trim();
         if (content.equals("") && attachments.isEmpty()) {
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
