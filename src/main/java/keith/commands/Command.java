@@ -1,6 +1,6 @@
 package keith.commands;
 
-public abstract class Command implements ICommand {
+public abstract class Command implements IMessageCommand {
 
     private final String defaultName;
     private final boolean isPrivateMessageCompatible;

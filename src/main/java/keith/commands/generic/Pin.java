@@ -1,5 +1,6 @@
 package keith.commands.generic;
 
+import keith.commands.IReactionCommand;
 import keith.managers.ServerManager;
 import keith.managers.ServerManager.Server;
 import keith.util.Utilities;
@@ -11,11 +12,10 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
-public class Pin extends UserCommand{
+public class Pin extends UserCommand implements IReactionCommand {
 
     public Pin() {
         super("pin");
@@ -31,6 +31,24 @@ public class Pin extends UserCommand{
     public String getLongDescription() {
         return "Pin allows users to 'pin' messages to a separate read only channel. They can pin a message by replying, with the message"
                 +"id or by using 'pin [text]' to pin the text entered in the message.";
+    }
+
+    @Override
+    public void run(MessageReactionAddEvent event, User user) {
+        MessageChannel channel = event.getChannel();
+        Message message = channel.retrieveMessageById(event.getMessageId()).complete();
+        String messageContent = message.getContentRaw().trim();
+        List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+        Guild guild = event.getGuild();
+        Server server = ServerManager.getInstance().getServer(guild.getId());
+        MessageChannel pinChannel = getPinChannel(server, guild);
+        if (pinChannel == null) {
+            //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
+            event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
+        } else {
+            //pin command found, send pin
+            sendEmbed(message.getAuthor(), user, message, message, pinChannel, message.getChannel(), guild, MessageType.DEFAULT, tokens);
+        }
     }
 
     @Override
@@ -56,22 +74,6 @@ public class Pin extends UserCommand{
                 return;
             }
             sendEmbed(messageSource.getAuthor(), event.getAuthor(), messageSource, message, pinChannel, channel, guild, message.getType(), tokens);
-        }
-    }
-
-    public void run(MessageReactionAddEvent event, List<String> tokens, Message messageSource, User author) {
-        Guild guild = event.getGuild();
-        Server server = ServerManager.getInstance().getServer(guild.getId());
-        MessageChannel pinChannel = getPinChannel(server, guild);
-        if (pinChannel == null) {
-            //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
-            event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
-        } else {
-            //pin command found, send pin
-            if (messageSource == null){
-                return;
-            }
-            sendEmbed(messageSource.getAuthor(), author, messageSource, messageSource, pinChannel, messageSource.getChannel(), guild, MessageType.DEFAULT, tokens);
         }
     }
 
@@ -166,7 +168,8 @@ public class Pin extends UserCommand{
             reply.setTitle(":pushpin: Message Pinned!");
             reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
             reply.setColor(new Color(155,0,155));
-            commandChannel.sendMessageEmbeds(reply.build()).queue();
+            messageSource.replyEmbeds(reply.build()).queue();
+            //commandChannel.sendMessageEmbeds(reply.build()).queue();
         });
     }
 
