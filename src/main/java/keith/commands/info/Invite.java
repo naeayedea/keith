@@ -7,25 +7,18 @@ import java.util.List;
 
 public class Invite extends InfoCommand {
 
-    private final String defaultName;
-
     public Invite() {
-        this.defaultName = "invite";
+        super("invite");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Invite me to your other servers!\"";
+        return prefix+getDefaultName()+": \"Invite me to your other servers!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "sends a link which can be used to invite keith to other servers!";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return this.defaultName;
     }
 
     @Override

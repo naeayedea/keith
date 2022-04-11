@@ -2,24 +2,22 @@ package keith.commands.generic;
 
 import keith.managers.ServerChatManager;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
 public class Chat extends UserCommand {
 
-    private final String defaultName;
     private final ServerChatManager chatManager;
 
     public Chat() {
-        defaultName = "chat";
+        super("chat");
         chatManager = ServerChatManager.getInstance();
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
+        return prefix+getDefaultName()+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
     }
 
     @Override
@@ -29,17 +27,13 @@ public class Chat extends UserCommand {
     }
 
     @Override
-    public String getDefaultName() {
-        return defaultName;
+    public boolean isPrivateMessageCompatible() {
+        return false;
     }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
-        if (channel instanceof PrivateChannel) {
-            channel.sendMessage("Feedback not supported in private channels").queue();
-            return;
-        }
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);
         //check if the user is looking to close the chat session

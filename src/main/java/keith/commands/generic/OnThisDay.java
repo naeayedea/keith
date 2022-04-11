@@ -35,16 +35,14 @@ public class OnThisDay extends UserCommand {
     private static final String API_URL = "https://byabbe.se/on-this-day/";
     private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
 
-    private final String defaultName;
-
 
     public OnThisDay() {
-        defaultName = "otd";
+        super("otd");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"Find out what happened this day in history!\"";
+        return prefix+getDefaultName()+": \"Find out what happened this day in history!\"";
     }
 
     @Override
@@ -53,10 +51,6 @@ public class OnThisDay extends UserCommand {
                 "date or just \"?otd\" for today!";
     }
 
-    @Override
-    public String getDefaultName() {
-        return defaultName;
-    }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
@@ -76,7 +70,7 @@ public class OnThisDay extends UserCommand {
                 con.setRequestMethod("GET");
                 con.connect();
                 //parse json
-                JSONObject response = new JSONObject(readInputStream(con.getInputStream()));
+                JSONObject response = new JSONObject(Utilities.readInputStream(con.getInputStream()));
                 con.disconnect();
                 JSONArray events = response.getJSONArray("events");
                 String day = response.getString("date");
@@ -107,7 +101,7 @@ public class OnThisDay extends UserCommand {
                             HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
                             getImage.setRequestMethod("GET");
                             getImage.connect();
-                            String imageURL = getImageURL(readInputStream(getImage.getInputStream()));
+                            String imageURL = Utilities.getImageURL(Utilities.readInputStream(getImage.getInputStream()));
                             if (!imageURL.equals("")) {
                                 eb.setImage(imageURL);
                             }
@@ -129,31 +123,6 @@ public class OnThisDay extends UserCommand {
         } else {
             channel.sendMessage("Could not locate that date, please enter a day and month such as 01 January").queue();
         }
-    }
-
-    private String readInputStream(InputStream stream) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-        String inputLine;
-        StringBuilder results = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            if (inputLine.contains("</head>")) {
-                break;
-            }
-            results.append(inputLine).append("\n");
-        }
-        //close resources
-        in.close();
-        return results.toString();
-    }
-
-    private String getImageURL(String html) {
-        Pattern pattern = Pattern.compile("(?<=<meta property=\"og:image\" content=\")(\\S+)(\\s*)(?=\"/>)");
-        Matcher matcher = pattern.matcher(html);
-        String lastMatch = "";
-        while (matcher.find()) {
-            lastMatch = matcher.group();
-        }
-        return lastMatch;
     }
 
     public LocalDate parseDate(String target) {

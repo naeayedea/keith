@@ -15,28 +15,22 @@ public class Admin extends AdminCommand {
     MultiMap<String, Command> commands;
     ServerManager serverManager;
     UserManager userManager;
-    String defaultName;
 
-    public Admin () {
+    public Admin() {
+        super("admin", true,  true);
         serverManager = ServerManager.getInstance();
         userManager = UserManager.getInstance();
-        defaultName = "admin";
         initialiseCommands();
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"admin command portal, for authorised users only\"";
+        return prefix+getDefaultName()+": \"admin command portal, for authorised users only\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Allows authorised users to access more powerful commands such as moderation, bot utilities and the database";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override
@@ -46,11 +40,6 @@ public class Admin extends AdminCommand {
         if (command != null) {
             command.run(event, tokens);
         }
-    }
-
-    @Override
-    public boolean isHidden() {
-        return true;
     }
 
     @Override
@@ -66,6 +55,7 @@ public class Admin extends AdminCommand {
         commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats());
         commands.putAll(Arrays.asList("setstatus", "newstatus"), new SetStatus());
         commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands));
+        commands.put("sneaky", new Sneaky());
         commands.put("ban", new Ban());
         commands.put("send", new SendMessage());
     }

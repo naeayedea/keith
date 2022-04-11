@@ -12,28 +12,22 @@ import java.util.Map;
 public class Help extends InfoCommand {
 
     private final Map<String, Command> commands;
-    private final String defaultName;
 
     public Help (Map<String, Command> commandMap) {
+        super("help");
         this.commands = commandMap;
-        this.defaultName = "help";
     }
 
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"for more information on a command use "+prefix+"help [command]\"";
+        return prefix+getDefaultName()+": \"for more information on a command use "+prefix+"help [command]\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Help lists all available commands as well as going into further detail when help on a specific command" +
                 "is requested using one of its aliases";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override
@@ -78,11 +72,15 @@ public class Help extends InfoCommand {
                     knownAliases.append(key).append(", ");}
             });
             eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
+            eb.addField("Is Hidden", command.isHidden() ? "True" : "False" , false);
+            eb.addField("Private Message Compatible", command.isPrivateMessageCompatible() ? "True" : "False", false);
+            eb.addField("Time Out", ""+command.getTimeOut()+"s", false);
             if (knownAliases.toString().trim().equals("")) {
                 eb.addField("Known Aliases", "No aliases", false);
             } else {
-            eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length()-2), false);
+                eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length()-2), false);
             }
+
             eb.addField("Information", command.getLongDescription(), false);
             channel.sendMessageEmbeds(eb.build()).queue();
         } else {

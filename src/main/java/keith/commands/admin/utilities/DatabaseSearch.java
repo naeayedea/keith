@@ -9,25 +9,18 @@ import java.util.List;
 
 public class DatabaseSearch extends OwnerCommand {
 
-    String defaultName;
-
     public DatabaseSearch() {
-        defaultName = "database";
+        super("database");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"use the database\"";
+        return prefix+getDefaultName()+": \"use the database\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Used for interacting with the database directly - be careful";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

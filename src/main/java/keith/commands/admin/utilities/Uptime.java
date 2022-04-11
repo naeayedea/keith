@@ -8,25 +8,18 @@ import java.util.List;
 
 public class Uptime extends AdminCommand {
 
-    String defaultName;
-
     public Uptime() {
-        defaultName = "uptime";
+        super("uptime");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"get uptime\"";
+        return prefix+getDefaultName()+": \"get uptime\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Returns the current uptime since last restart or major disconnect";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

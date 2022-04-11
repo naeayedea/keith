@@ -12,25 +12,18 @@ import java.util.List;
 
 public class Ban extends AdminCommand {
 
-    String defaultName;
-
     public Ban() {
-        defaultName = "ban";
+        super("ban");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"gives admins the ability to ban users/servers\"";
+        return prefix+getDefaultName()+": \"gives admins the ability to ban users/servers\"";
     }
 
     @Override
     public String getLongDescription() {
         return "bans the specified user or server - do 'ban user/server [user or server id]'";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

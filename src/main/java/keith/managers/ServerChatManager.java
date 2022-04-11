@@ -2,11 +2,12 @@ package keith.managers;
 
 import keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -145,18 +146,53 @@ public class ServerChatManager {
     }
 
     public void sendMessage(String id, MessageReceivedEvent event) {
-        Guild guild = event.getGuild();
-        User author = event.getAuthor();
+        MessageChannel channel = event.getChannel();
+        Message message = event.getMessage();
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Utilities.getMemberColor(guild, author));
-        eb.setThumbnail(author.getAvatarUrl());
-        eb.setDescription(event.getMessage().getContentRaw());
-        if (isFeedback(id)) {
-            eb.setTitle("Feedback sent by " + author.getName() +" from "+guild.getName());
+        User author = event.getAuthor();
+        String name;
+        String content = message.getContentRaw();
+        //Check for message from private channel and adjust name accordingly
+        if (channel instanceof PrivateChannel) {
+            name = "Private Message";
+            eb.setColor(Utilities.getBotColor());
         } else {
-            eb.setTitle("Message sent by " + author.getName() +" from "+guild.getName());
+            Guild guild = event.getGuild();
+            name = event.getGuild().getName();
+            eb.setColor(Utilities.getMemberColor(guild, author));
         }
-        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> event.getMessage().addReaction("U+2709").queue());
+        //Check if the user has sent any embeds
+        if (!message.getAttachments().isEmpty()) {
+            Message.Attachment attachment = message.getAttachments().get(0);
+            eb.setImage(attachment.getUrl());
+        } else if (!message.getEmbeds().isEmpty()) {
+            MessageEmbed embed = message.getEmbeds().get(0);
+            String link = embed.getUrl();
+            if (link != null) {
+                if (embed.getType().equals(EmbedType.IMAGE)) {
+                    eb.setImage(link);
+                    content = content.replace(link, "");
+                } else {
+                    try {
+                        URL firstLink = new URL(link);
+                        HttpURLConnection getVideo = (HttpURLConnection) firstLink.openConnection();
+                        getVideo.setRequestMethod("GET");
+                        getVideo.connect();
+                        String videoURL = Utilities.getVideoURL(Utilities.readInputStream(getVideo.getInputStream()));
+                        content = content.replace(link, "");
+                        eb.setImage(videoURL);
+                    } catch (IOException ignored) {}
+                }
+            }
+        }
+        eb.setDescription(content);
+        eb.setThumbnail(author.getAvatarUrl());
+        if (isFeedback(id)) {
+            eb.setTitle("Feedback sent by " + author.getName() +" from "+name);
+        } else {
+            eb.setTitle("Message sent by " + author.getName() +" from "+name);
+        }
+        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> message.addReaction("U+2709").queue());
     }
 
     public MessageChannel getDestination(String id) {

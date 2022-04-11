@@ -10,26 +10,19 @@ import java.util.List;
 
 public class Avatar extends UserCommand {
 
-    String defaultName;
-
     public Avatar() {
-        defaultName = "avatar";
+        super("avatar");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"displays avatar of a user\"";
+        return prefix+getDefaultName()+": \"displays avatar of a user\"";
     }
 
     @Override
     public String getLongDescription() {
         return "avatar retrieves the current discord avatar of the user doing the command, alternatively avatar can "
-                +" retrieve the avatar of another user that has been tagged such as ?avatar @Succ would return succs avatar";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
+                +" retrieve the avatar of another user that has been tagged such as ?avatar @Succ would return succ's avatar";
     }
 
     @Override

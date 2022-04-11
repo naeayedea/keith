@@ -3,7 +3,6 @@ package keith;
 
 import com.github.ygimenez.exception.InvalidHandlerException;
 import com.github.ygimenez.model.PaginatorBuilder;
-import keith.util.Utilities;
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;

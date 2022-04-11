@@ -22,17 +22,17 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class EventHandler extends ListenerAdapter {
@@ -140,22 +140,26 @@ public class EventHandler extends ListenerAdapter {
                             rateLimitRecord.put(user.getId(), numRecentCommands + 1);
                             if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
-                                    //all checks passed, execute command
-                                    try {
-                                        Runnable execution = () -> {
-                                            if (command.sendTyping()) {
-                                                channel.sendTyping().queue();
-                                            }
-                                            command.run(event, tokens);
-                                            user.incrementCommandCount();
-                                        };
-                                        commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
-                                    } catch (PermissionException e) {
-                                        Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
-                                    } catch (IllegalArgumentException e) {
-                                        Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
-                                    } catch (Exception e) {
-                                        Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                    if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
+                                        //all checks passed, execute command
+                                        try {
+                                            Runnable execution = () -> {
+                                                if (command.sendTyping()) {
+                                                    channel.sendTyping().queue();
+                                                }
+                                                command.run(event, tokens);
+                                                user.incrementCommandCount();
+                                            };
+                                            commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+                                        } catch (PermissionException e) {
+                                            Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
+                                        } catch (IllegalArgumentException e) {
+                                            Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
+                                        } catch (Exception e) {
+                                            Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                        }
+                                    } else {
+                                        sendMessage(channel, command.getDefaultName()+" cannot be used in private message!");
                                     }
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");
@@ -191,7 +195,7 @@ public class EventHandler extends ListenerAdapter {
         return commands.get(commandString);
     }
 
-    //wrapper for channel.sendMesssage(content).queue() so dont have to write it in full every time.
+    //wrapper for channel.sendMessage(content).queue() so dont have to write it in full every time.
     private void sendMessage(MessageChannel channel, String content) {
         channel.sendMessage(content).queue();
     }
@@ -201,10 +205,26 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+        MessageReaction.ReactionEmote emote = event.getReaction().getReactionEmote();
+        Member member = event.getMember();
+
+        if (member != null && !member.getUser().isBot() && emote.isEmoji()) {
+            if (emote.getEmoji().equals("📌")) {
+                Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
+                String messageContent = message.getContentRaw().trim();
+                //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+                List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+                ((Pin)commands.get("pin")).run(event, tokens, message, member.getUser());
+            }
+        }
+    }
+
+    @Override
     public void onGuildJoin(GuildJoinEvent event) {
         Guild guild = event.getGuild();
         Server server = serverManager.getServer(event.getGuild().getId());
-        TextChannel defaultChannel = guild.getDefaultChannel();
+        TextChannel defaultChannel = (TextChannel) guild.getDefaultChannel();
         if (defaultChannel != null) {
             defaultChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(new Color(155,0,155))

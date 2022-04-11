@@ -12,26 +12,19 @@ import java.util.List;
 
 public class SetUserLevel extends AdminCommand {
 
-    String defaultName;
-
     public SetUserLevel() {
-        defaultName = "setlevel";
+        super("setlevel");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"sets the UserLevel of the specified user\"";
+        return prefix+getDefaultName()+": \"sets the UserLevel of the specified user\"";
     }
 
     @Override
     public String getLongDescription() {
         return "sets the UserLevel of the user that corresponds to the entered id or any users that have been tagged" +
                 "UserLevels are: 3 (OWNER), 2 (ADMIN), 1 (USER), 0 (BANNED) please use the integer for this command.";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

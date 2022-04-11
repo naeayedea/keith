@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
@@ -15,6 +16,10 @@ import java.util.Date;
 import java.util.List;
 
 public class Pin extends UserCommand{
+
+    public Pin() {
+        super("pin");
+    }
 
     @Override
     public String getShortDescription(String prefix) {
@@ -29,19 +34,14 @@ public class Pin extends UserCommand{
     }
 
     @Override
-    public String getDefaultName() {
-        return "pin";
+    public boolean isPrivateMessageCompatible() {
+        return false;
     }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         //ensure message is not in a private channel
         MessageChannel channel = event.getChannel();
-        if (channel instanceof PrivateChannel) {
-            channel.sendMessage("This command cannot be used in a private channel!").queue();
-            return;
-        }
-
         Message message = event.getMessage();
         Guild guild = event.getGuild();
         Server server = ServerManager.getInstance().getServer(guild.getId());
@@ -56,6 +56,22 @@ public class Pin extends UserCommand{
                 return;
             }
             sendEmbed(messageSource.getAuthor(), event.getAuthor(), messageSource, message, pinChannel, channel, guild, message.getType(), tokens);
+        }
+    }
+
+    public void run(MessageReactionAddEvent event, List<String> tokens, Message messageSource, User author) {
+        Guild guild = event.getGuild();
+        Server server = ServerManager.getInstance().getServer(guild.getId());
+        MessageChannel pinChannel = getPinChannel(server, guild);
+        if (pinChannel == null) {
+            //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
+            event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
+        } else {
+            //pin command found, send pin
+            if (messageSource == null){
+                return;
+            }
+            sendEmbed(messageSource.getAuthor(), author, messageSource, messageSource, pinChannel, messageSource.getChannel(), guild, MessageType.DEFAULT, tokens);
         }
     }
 

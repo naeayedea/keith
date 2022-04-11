@@ -6,25 +6,18 @@ import java.util.List;
 
 public class Echo extends AdminCommand {
 
-    String defaultName;
-
     public Echo() {
-        defaultName = "echo";
+        super("echo");
     }
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \"bot simply returns the text included in the command minus the prefix/command\"";
+        return prefix+getDefaultName()+": \"bot simply returns the text included in the command minus the prefix/command\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Echo command is self explanatory, the bot will echo any text given to it minus the prefix+command";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override

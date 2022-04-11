@@ -13,11 +13,10 @@ import java.util.List;
 
 public class AdminUtilities extends AdminCommand {
 
-    String defaultName;
     MultiMap<String, Command> commands;
 
     public AdminUtilities() {
-        defaultName = "utils";
+        super("utils");
         initialiseCommands();
     }
 
@@ -26,7 +25,7 @@ public class AdminUtilities extends AdminCommand {
         commands.put("restart", new Restart());
         commands.put("uptime", new Uptime());
         commands.putAll(Arrays.asList("clear-cache", "clearcache", "clear"), new Clear());
-        commands.putAll(Arrays.asList("database", "db"), new DatabaseSearch());
+        commands.putAll(Arrays.asList("database", "db", "sql"), new DatabaseSearch());
         commands.putAll(Arrays.asList("shutdown", "kill"), new Shutdown());
         commands.putAll(Arrays.asList("locate", "find"), new Locate());
         commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands));
@@ -34,17 +33,12 @@ public class AdminUtilities extends AdminCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+defaultName+": \":eyes:\"";
+        return prefix+getDefaultName()+": \":eyes:\"";
     }
 
     @Override
     public String getLongDescription() {
         return ":eyes: nunaya";
-    }
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
     }
 
     @Override
