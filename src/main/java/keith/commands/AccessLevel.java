@@ -1,7 +1,5 @@
 package keith.commands;
 
-import keith.managers.UserManager;
-
 public enum AccessLevel {
 
     //Only bot owner(s)

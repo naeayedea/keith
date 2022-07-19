@@ -2,6 +2,7 @@ package keith.commands.admin;
 
 import keith.commands.AccessLevel;
 import keith.commands.Command;
+import keith.commands.admin.utilities.Shutdown;
 import keith.commands.admin.utilities.*;
 import keith.commands.info.Help;
 import keith.managers.UserManager;

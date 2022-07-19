@@ -1,9 +1,7 @@
 package keith.commands.generic;
 
-import keith.commands.AccessLevel;
 import keith.managers.ServerChatManager;
 import keith.managers.ServerManager;
-import keith.managers.UserManager;
 import keith.util.Utilities;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

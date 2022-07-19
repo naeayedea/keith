@@ -1,10 +1,7 @@
 package keith.commands;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-
-import java.util.List;
 
 /**
  * Defines an interface for running commands through the MessageReactionAddEvent listener
