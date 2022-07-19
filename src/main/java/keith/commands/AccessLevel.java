@@ -30,4 +30,17 @@ public enum AccessLevel {
                 return USER;
         }
     }
+
+    public String toString() {
+        switch (num) {
+            case 0:
+                return "All";
+            case 2:
+                return "Admin";
+            case 3:
+                return "Owner";
+            default:
+                return "User";
+        }
+    }
 }
