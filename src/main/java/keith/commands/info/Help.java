@@ -72,6 +72,7 @@ public class Help extends InfoCommand {
                     knownAliases.append(key).append(", ");}
             });
             eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
+            eb.addField("User Level", command.getAccessLevel().toString(), false);
             eb.addField("Is Hidden", command.isHidden() ? "True" : "False" , false);
             eb.addField("Private Message Compatible", command.isPrivateMessageCompatible() ? "True" : "False", false);
             eb.addField("Time Out", ""+command.getTimeOut()+"s", false);

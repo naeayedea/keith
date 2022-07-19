@@ -48,10 +48,8 @@ public class SetPrefix extends UserCommand {
     }
 
 
-    //This function checks for spaces that discord removes but isn't considered whitespace such as U+2800 braille space
+    //This function checks ensures that the characters within the new prefix are within the desired range of ascii characters
     public boolean containsInvalidCharacters(String token) {
-        boolean[] result = new boolean[1];
-        token.chars().forEach(c -> result[0] = c >= 128);
-        return result[0];
+        return token.chars().mapToObj(c -> (char) c).map(c -> c > 32 && c < 127).anyMatch(b -> !b);
     }
 }

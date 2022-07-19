@@ -1,7 +1,5 @@
 package keith.commands;
 
-import keith.managers.UserManager;
-
 public enum AccessLevel {
 
     //Only bot owner(s)
@@ -28,6 +26,19 @@ public enum AccessLevel {
                 return OWNER;
             default:
                 return USER;
+        }
+    }
+
+    public String toString() {
+        switch (num) {
+            case 0:
+                return "All";
+            case 2:
+                return "Admin";
+            case 3:
+                return "Owner";
+            default:
+                return "User";
         }
     }
 }

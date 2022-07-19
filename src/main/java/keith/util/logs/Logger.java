@@ -1,7 +1,5 @@
 package keith.util.logs;
 
-import keith.util.Database;
-
 public class Logger {
 
 

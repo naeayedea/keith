@@ -2,12 +2,10 @@ package keith.util;
 
 import keith.util.logs.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.sqlite.jdbc4.JDBC4Connection;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Database {
 
