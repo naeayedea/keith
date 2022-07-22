@@ -47,6 +47,11 @@ public class OnThisDay extends UserCommand {
                 "date or just \"?otd\" for today!";
     }
 
+    //OTD utilises an external api, so increase cost of command so not to rate limit ourselves
+    @Override
+    public int getCost() {
+        return 5;
+    }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
