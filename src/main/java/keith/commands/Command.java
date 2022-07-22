@@ -5,29 +5,65 @@ public abstract class Command implements IMessageCommand {
     private final String defaultName;
     private final boolean isPrivateMessageCompatible;
     private final boolean isHidden;
+    private final int cost;
 
     /**
-     * Default command constructor with a name and default properties:
+     * Default command constructor that only requires name
+     * @param name the defaultName of the command
+     * default properties:
      * isPrivateMessageCompatible: true
      * isHidden: true
-     * @param name the defaultName of the command
+     * cost: 1
      */
     public Command(String name) {
         defaultName = name;
         this.isPrivateMessageCompatible = true;
         this.isHidden = false;
+        this.cost = 1;
     }
 
     /**
-     * command constructor to specify properties
+     * command constructor to specify the name and private message compatibility
+     * @param name the defaultName of the command
+     * @param isPrivateMessageCompatible set false if command will not work in private message
+     * default values:
+     * isHidden: true
+     * cost: 1
+     */
+    public Command(String name, boolean isPrivateMessageCompatible) {
+        defaultName = name;
+        this.isPrivateMessageCompatible = isPrivateMessageCompatible;
+        isHidden = false;
+        this.cost = 1;
+    }
+
+    /**
+     * command constructor to specify the name, private message compatibility and the hidden property
      * @param name the default name of the command
      * @param isPrivateMessageCompatible set false if command will not work in private message
      * @param isHidden set true if command shouldn't show up in help
+     * default properties:
+     * cost: 1
      */
     public Command(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
         defaultName = name;
         this.isPrivateMessageCompatible = isPrivateMessageCompatible;
         this.isHidden = isHidden;
+        this.cost = 1;
+    }
+
+    /**
+     * command constructor to specify all values of a command
+     * @param name the default name of the command
+     * @param isPrivateMessageCompatible set false if command will not work in private message
+     * @param isHidden set true if command shouldn't show up in help
+     * @param cost the cost of a command with respect to rate limiting
+     */
+    public Command(String name, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
+        defaultName = name;
+        this.isPrivateMessageCompatible = isPrivateMessageCompatible;
+        this.isHidden = isHidden;
+        this.cost = cost;
     }
 
     @Override
@@ -62,5 +98,10 @@ public abstract class Command implements IMessageCommand {
     @Override
     public String getDefaultName() {
         return defaultName;
+    }
+
+    @Override
+    public int getCost() {
+        return cost;
     }
 }

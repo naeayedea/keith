@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 /**
  * Defines an interface for running commands through the MessageReactionAddEvent listener
  */
-public interface IReactionCommand {
+public interface IReactionCommand extends ICommand {
 
     /**
      * Execute the command described by the implementing class
@@ -14,9 +14,4 @@ public interface IReactionCommand {
      */
     void run(MessageReactionAddEvent event, User user);
 
-    /**
-     * Determine if a command is usable in private messages
-     * @return true if compatible, false otherwise.
-     */
-    boolean isPrivateMessageCompatible();
 }

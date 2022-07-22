@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public interface IMessageCommand {
+public interface IMessageCommand extends ICommand {
 
     /**
      * Returns a short description of the command, used when help is used to show all commands in a category
@@ -26,12 +26,6 @@ public interface IMessageCommand {
      */
     String getDefaultName();
 
-    /**
-     * Retrieve the {@link AccessLevel AccessLevel} of the command
-     * @return an {@link AccessLevel AccessLevel} object representing the permissions required for a command
-     * @see AccessLevel
-     */
-    AccessLevel getAccessLevel();
 
     /**
      * Runs the given command
@@ -45,23 +39,5 @@ public interface IMessageCommand {
      * @return true if hidden, false otherwise
      */
     boolean isHidden();
-
-    /**
-     * Get the message timeout of a command
-     * @return the timeout period of a command in seconds
-     */
-    int getTimeOut();
-
-    /**
-     * Determine if a command is usable in private messages
-     * @return true if compatible, false otherwise.
-     */
-    boolean isPrivateMessageCompatible();
-
-    /**
-     * Determine if this command should send a typing message to discord when the command is run
-     * @return true if the command should send a typing signal, false otherwise
-     */
-    boolean sendTyping();
 
 }
