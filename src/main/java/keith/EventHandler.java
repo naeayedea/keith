@@ -141,7 +141,6 @@ public class EventHandler extends ListenerAdapter {
                         Command command = findCommand(tokens);
                         Integer numRecentCommandsObj = rateLimitRecord.get(user.getId());
                         int numRecentCommands = numRecentCommandsObj == null ? 0 : numRecentCommandsObj;
-
                         //Check if command was found and that user isn't rate limited
                         if (command != null ) {
                             /*
@@ -174,7 +173,7 @@ public class EventHandler extends ListenerAdapter {
                                 } else {
                                         sendMessage(channel, "You do not have access to this command");
                                 }
-                            } else if (numRecentCommands == Utilities.getRateLimitMax()) {
+                            } else {
                                 sendMessage(channel, "Too many commands in a short time.. please wait 30 seconds");
                             }
 
