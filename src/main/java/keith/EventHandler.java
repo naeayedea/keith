@@ -147,7 +147,7 @@ public class EventHandler extends ListenerAdapter {
                             /*
                              * command was found, check that user is not rate limited and that they have permission
                              */
-                            rateLimitRecord.put(user.getId(), numRecentCommands + 1);
+                            rateLimitRecord.put(user.getId(), numRecentCommands + command.getCost());
                             if (numRecentCommands < Utilities.getRateLimitMax()) {
                                 if (user.hasPermission(command.getAccessLevel())) {
                                     if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
