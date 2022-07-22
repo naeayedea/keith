@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import java.util.List;
 
-public interface ChannelCommand {
+public interface IChannelCommand {
 
     void evaluate(Message channel, List<String> message, User user);
 }

@@ -3,7 +3,7 @@ package keith;
 import keith.commands.Command;
 import keith.commands.IReactionCommand;
 import keith.commands.admin.Admin;
-import keith.commands.channel_commands.ChannelCommand;
+import keith.commands.channel_commands.IChannelCommand;
 import keith.commands.generic.*;
 import keith.commands.info.Help;
 import keith.commands.info.Invite;

@@ -1,6 +1,6 @@
 package keith.managers;
 
-import keith.commands.channel_commands.ChannelCommand;
+import keith.commands.channel_commands.IChannelCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ public class ChannelCommandManager {
 
     private static ChannelCommandManager instance;
 
-    private final Map<String, ChannelCommand> gamesInProgress;
+    private final Map<String, IChannelCommand> gamesInProgress;
 
     private ChannelCommandManager() {
         gamesInProgress = new HashMap<>();
@@ -19,7 +19,7 @@ public class ChannelCommandManager {
         return gamesInProgress.get(channelId) != null;
     }
 
-    public boolean addGame(String channelId, ChannelCommand newGame) {
+    public boolean addGame(String channelId, IChannelCommand newGame) {
         if (gameInProgress(channelId)) {
             return false;
         } else {
@@ -32,7 +32,7 @@ public class ChannelCommandManager {
         gamesInProgress.remove(channelId);
     }
 
-    public ChannelCommand getGame(String channelId) {
+    public IChannelCommand getGame(String channelId) {
         return gamesInProgress.get(channelId);
     }
 

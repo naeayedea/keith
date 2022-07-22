@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class GuessDriver implements ChannelCommand {
+public class GuessDriver implements IChannelCommand {
 
     private final ScheduledExecutorService timer;
     private ScheduledFuture<?> timerTask;
