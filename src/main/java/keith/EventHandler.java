@@ -39,6 +39,7 @@ import java.util.concurrent.*;
 
 public class EventHandler extends ListenerAdapter {
 
+    ExecutorService incomingMessageService;
     ExecutorService commandService;
     ChannelCommandManager channelCommandService;
     ServerChatManager chatManager;
@@ -63,6 +64,7 @@ public class EventHandler extends ListenerAdapter {
         Utilities.setJDA(jda);
         Utilities.setRateLimitMax(7);
         jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+        incomingMessageService = Executors.newCachedThreadPool();
         commandService = Executors.newCachedThreadPool();
         channelCommandService = ChannelCommandManager.getInstance();
         chatManager = ServerChatManager.getInstance();
@@ -105,7 +107,7 @@ public class EventHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        new Thread(() -> {
+        incomingMessageService.submit(() -> {
             if (!event.getAuthor().isBot()) {
                 MessageChannel channel = event.getChannel();
                 Message message = event.getMessage();
@@ -183,14 +185,14 @@ public class EventHandler extends ListenerAdapter {
                         //else ignore
                     } else if (channelCommandService.gameInProgress(channel.getId())) {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
-                        ChannelCommand cc = channelCommandService.getGame(channel.getId());
+                        IChannelCommand cc = channelCommandService.getGame(channel.getId());
                         cc.evaluate(message, tokens, user);
                     } else if (chatManager.hasActiveChat(channel.getId())) {
                         chatManager.sendMessage(channel.getId(), event);
                     }
                 }
             }
-        }).start();
+        });
     }
 
     private boolean findPrefix(String message, String prefix) {
@@ -213,44 +215,49 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        MessageReaction.ReactionEmote emote = event.getReaction().getReactionEmote();
-        Member member = event.getMember();
-        //ensure that event is not caused by a bot and the emote is a standard emoji
-        if (member != null && !member.getUser().isBot() && emote.isEmoji()) {
-            MessageChannel channel = event.getChannel();
-            //retrieve the message which is being reacted to
-            Message message = channel.retrieveMessageById(event.getMessageId()).complete();
-            IReactionCommand command = reactionCommands.get(emote.getEmoji());
-            //join any threads automatically
-            if (channel instanceof ThreadChannel) {
-                ThreadChannel thread = ((ThreadChannel) channel);
-                if (!thread.isJoined()) {
-                    thread.join().queue();
-                }
-            }
-            User user = userManager.getUser(member.getUser().getId());
-            boolean isPrivateMessage = channel instanceof PrivateChannel;
-            Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
-            //ensure that user and server has permission to use the bot
-            if (!user.isBanned() && (isPrivateMessage || !server.isBanned())) {
-                Integer numRecentCommandsObj = rateLimitRecord.get(user.getId());
-                int numRecentCommands = numRecentCommandsObj == null ? 0 : numRecentCommandsObj;
-                //make sure that rate limit has not been reached
-                if (numRecentCommands < Utilities.getRateLimitMax()) {
-                    List<MessageReaction> reactions = message.getReactions();
-                    for (MessageReaction reaction : reactions) {
-                        if (reaction.getReactionEmote().getEmoji().equals(emote.getEmoji())) {
-                            if (reaction.hasCount() && reaction.getCount() < 2) {
-                                rateLimitRecord.put(user.getId(), numRecentCommands + 1);
-                                command.run(event, member.getUser());
-                                break;
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        incomingMessageService.submit(() -> {
+            MessageReaction.ReactionEmote emote = event.getReaction().getReactionEmote();
+            Member member = event.getMember();
+            //ensure that event is not caused by a bot and the emote is a standard emoji
+            if (member != null && !member.getUser().isBot() && emote.isEmoji()) {
+                MessageChannel channel = event.getChannel();
+                //retrieve the message which is being reacted to
+                Message message = channel.retrieveMessageById(event.getMessageId()).complete();
+                IReactionCommand command = reactionCommands.get(emote.getEmoji());
+                //ensure that this emoji has a corresponding command
+                if (command != null) {
+                    //join any threads automatically
+                    if (channel instanceof ThreadChannel) {
+                        ThreadChannel thread = ((ThreadChannel) channel);
+                        if (!thread.isJoined()) {
+                            thread.join().queue();
+                        }
+                    }
+                    User user = userManager.getUser(member.getUser().getId());
+                    boolean isPrivateMessage = channel instanceof PrivateChannel;
+                    Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
+                    //ensure that user and server has permission to use the bot
+                    if (!user.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                        Integer numRecentCommandsObj = rateLimitRecord.get(user.getId());
+                        int numRecentCommands = numRecentCommandsObj == null ? 0 : numRecentCommandsObj;
+                        //make sure that rate limit has not been reached
+                        if (numRecentCommands < Utilities.getRateLimitMax()) {
+                            List<MessageReaction> reactions = message.getReactions();
+                            for (MessageReaction reaction : reactions) {
+                                if (reaction.getReactionEmote().getEmoji().equals(emote.getEmoji())) {
+                                    if (reaction.hasCount() && reaction.getCount() < 2) {
+                                        rateLimitRecord.put(user.getId(), numRecentCommands + 1);
+                                        command.run(event, member.getUser());
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     @Override
