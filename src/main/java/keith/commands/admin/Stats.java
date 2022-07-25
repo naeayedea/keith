@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Stats extends AdminCommand {
 
-    private static final String VERSION = "3.0.6 \"DM HOTFIX\"";
+    private static final String VERSION = "3.1.1 \"PIN HOTFIX\"";
 
     public Stats() {
         super("stats");
