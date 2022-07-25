@@ -247,7 +247,7 @@ public class EventHandler extends ListenerAdapter {
                                 if (reaction.getReactionEmote().getEmoji().equals(emote.getEmoji())) {
                                     if (reaction.hasCount() && reaction.getCount() < 2) {
                                         rateLimitRecord.put(user.getId(), numRecentCommands + 1);
-                                        command.run(event, member.getUser());
+                                        message.addReaction(emote.getEmoji()).queue(e -> command.run(event, member.getUser()));
                                         break;
                                     }
                                 }
