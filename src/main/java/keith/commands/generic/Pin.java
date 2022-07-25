@@ -36,19 +36,20 @@ public class Pin extends UserCommand implements IReactionCommand {
     @Override
     public void run(MessageReactionAddEvent event, User user) {
         MessageChannel channel = event.getChannel();
-        Message message = channel.retrieveMessageById(event.getMessageId()).complete();
-        String messageContent = message.getContentRaw().trim();
-        List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
-        Guild guild = event.getGuild();
-        Server server = ServerManager.getInstance().getServer(guild.getId());
-        MessageChannel pinChannel = getPinChannel(server, guild);
-        if (pinChannel == null) {
-            //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
-            event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
-        } else {
-            //pin command found, send pin
-            sendEmbed(message.getAuthor(), user, message, message, pinChannel, message.getChannel(), guild, MessageType.DEFAULT, tokens);
-        }
+        channel.retrieveMessageById(event.getMessageId()).queue(message -> {
+            String messageContent = message.getContentRaw().trim();
+            List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+            Guild guild = event.getGuild();
+            Server server = ServerManager.getInstance().getServer(guild.getId());
+            MessageChannel pinChannel = getPinChannel(server, guild);
+            if (pinChannel == null) {
+                //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
+                event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
+            } else {
+                //pin command found, send pin
+                sendEmbed(message.getAuthor(), user, message, message, pinChannel, message.getChannel(), guild, MessageType.DEFAULT, tokens);
+            }
+        });
     }
 
     @Override
