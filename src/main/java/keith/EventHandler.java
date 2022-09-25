@@ -99,6 +99,7 @@ public class EventHandler extends ListenerAdapter {
         commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
         commands.put("invite", new Invite());
         commands.put("feedback", new Feedback());
+        commands.put("interpret", new Interpret());
 
         //reaction commands
         reactionCommands = new MultiMap<>();
