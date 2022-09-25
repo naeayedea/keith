@@ -165,6 +165,8 @@ public class EventHandler extends ListenerAdapter {
                                             Utilities.Messages.sendError(channel,"Insufficient Permissions to do that!", e.getMessage());
                                         } catch (IllegalArgumentException e) {
                                             Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
+                                        } catch (TimeoutException e) {
+                                            Utilities.Messages.sendError(channel, "Timout","Execution of command took too long.");
                                         } catch (Exception e) {
                                             Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
                                         }
