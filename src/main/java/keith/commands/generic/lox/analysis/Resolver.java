@@ -1,5 +1,6 @@
 package keith.commands.generic.lox.analysis;
 
+import keith.commands.generic.lox.Interpreter.lib.Globals;
 import keith.commands.generic.lox.Parser.Expr;
 import keith.commands.generic.lox.Interpreter.Interpreter;
 import keith.commands.generic.lox.Lexer.Token;
@@ -48,6 +49,10 @@ public class Resolver implements Expr.Visitor<String>, Stmt.Visitor<Void> {
         this.interpreter = interpreter;
         this.lox = lox;
         beginScope(); //define a base scope for all things e.g. global scope
+        for (Token global : Globals.globals.keySet()) {
+            declare(global);
+            define(global);
+        }
     }
 
     public void reportErrors() {

@@ -1,5 +1,6 @@
 package keith.commands.generic.lox.Interpreter;
 
+import keith.commands.generic.lox.Interpreter.lib.Globals;
 import keith.commands.generic.lox.Parser.Expr;
 import keith.commands.generic.lox.Lexer.Token;
 import keith.commands.generic.lox.Lexer.TokenType;
@@ -24,22 +25,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     public Interpreter(Lox lox) {
         this.lox = lox;
-        globals.define(new Token(TokenType.IDENTIFIER, "clock", null, -1), new LoxCallable() {
-            @Override
-            public int arity() {
-                return 0;
-            }
-
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                return (double) System.currentTimeMillis() / 1000.0;
-            }
-
-            @Override
-            public String toString() {
-                return "<native fn>";
-            }
-        });
+        for (Map.Entry<Token, LoxCallable> entry : Globals.globals.entrySet()) {
+            globals.define(entry.getKey(), entry.getValue());
+        }
     }
 
     public List<String> interpret(List<Stmt> statements) {
