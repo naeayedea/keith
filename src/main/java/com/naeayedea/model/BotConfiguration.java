@@ -10,11 +10,11 @@ public class BotConfiguration {
 
     private String restartChannel;
 
-    private DataSource database;
+    private DataSource dataSource;
 
-    public BotConfiguration(String token, DataSource database, String restartMessage, String restartChannel) {
+    public BotConfiguration(String token, DataSource dataSource, String restartMessage, String restartChannel) {
         this.token = token;
-        this.database = database;
+        this.dataSource = dataSource;
         this.restartMessage = restartMessage;
         this.restartChannel = restartChannel;
     }
@@ -43,11 +43,11 @@ public class BotConfiguration {
         this.restartChannel = restartChannel;
     }
 
-    public DataSource getDatabase() {
-        return database;
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
-    public void setDatabase(DataSource database) {
-        this.database = database;
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 }

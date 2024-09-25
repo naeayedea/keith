@@ -1,6 +1,7 @@
 package com.naeayedea.keith.commands.admin;
 
 import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.IMessageCommand;
 import com.naeayedea.keith.commands.info.Help;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.managers.UserManager;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class Admin extends AdminCommand {
 
-    MultiMap<String, Command> commands;
+    MultiMap<String, IMessageCommand> commands;
     ServerManager serverManager;
     UserManager userManager;
 
@@ -36,7 +37,7 @@ public class Admin extends AdminCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
-        Command command = findCommand(tokens);
+        IMessageCommand command = findCommand(tokens);
         if (command != null) {
             command.run(event, tokens);
         }
@@ -60,7 +61,7 @@ public class Admin extends AdminCommand {
         commands.put("send", new SendMessage());
     }
 
-    private Command findCommand(List<String> list) {
+    private IMessageCommand findCommand(List<String> list) {
         String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }

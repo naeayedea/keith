@@ -2,6 +2,7 @@ package com.naeayedea.keith.commands.admin;
 
 import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.IMessageCommand;
 import com.naeayedea.keith.commands.admin.utilities.Shutdown;
 import com.naeayedea.keith.commands.admin.utilities.*;
 import com.naeayedea.keith.commands.info.Help;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class AdminUtilities extends AdminCommand {
 
-    MultiMap<String, Command> commands;
+    MultiMap<String, IMessageCommand> commands;
 
     public AdminUtilities() {
         super("utils");
@@ -49,7 +50,7 @@ public class AdminUtilities extends AdminCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        Command command = findCommand(tokens);
+        IMessageCommand command = findCommand(tokens);
         if (command != null) {
             if (UserManager.getInstance().getUser(event.getAuthor().getId()).hasPermission(command.getAccessLevel())) {
                 command.run(event, tokens);
@@ -59,7 +60,7 @@ public class AdminUtilities extends AdminCommand {
         }
     }
 
-    private Command findCommand(List<String> list) {
+    private IMessageCommand findCommand(List<String> list) {
         String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }

@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.info;
 
-import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.IMessageCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -11,9 +11,9 @@ import java.util.Map;
 
 public class Help extends InfoCommand {
 
-    private final Map<String, Command> commands;
+    private final Map<String, IMessageCommand> commands;
 
-    public Help (Map<String, Command> commandMap) {
+    public Help (Map<String, IMessageCommand> commandMap) {
         super("help");
         this.commands = commandMap;
     }
@@ -46,7 +46,7 @@ public class Help extends InfoCommand {
         eb.setColor(Utilities.getBotColor());
         eb.setDescription("For information on specific commands do \""+prefix+"help [command]\"");
         StringBuilder helpString = new StringBuilder("```cs\n");
-        for (Command command : commands.values()) {
+        for (IMessageCommand command : commands.values()) {
             String description = command.getShortDescription(prefix);
             //only add description if not duplicate (need to look into improving multimap, maybe have two maps?
             if (helpString.indexOf(description) == -1 && !command.isHidden()) {
@@ -61,7 +61,7 @@ public class Help extends InfoCommand {
     public void sendSingleCommandHelp(MessageChannel channel, String commandString) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Utilities.getBotColor());
-        Command command = commands.get(commandString);
+        IMessageCommand command = commands.get(commandString);
         if (command != null) {
             eb.setTitle("Command: "+command.getDefaultName());
             StringBuilder knownAliases = new StringBuilder();

@@ -1,9 +1,12 @@
-package com.naeayedea.config.jda;
+package com.naeayedea.config.discord;
 
 import com.github.ygimenez.model.PaginatorBuilder;
+import com.naeayedea.keith.util.Database;
+import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.model.BotConfiguration;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -84,6 +87,11 @@ public class JDAConfig {
                     channel.retrieveMessageById( botConfiguration.getRestartMessage()).queue(message -> message.editMessage("Restarted").queue());
                 }
             }
+
+            Utilities.setJDA(jda);
+            Database.setSource(botConfiguration.getDataSource());
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+
 
             return jda;
         } catch (Throwable e) {

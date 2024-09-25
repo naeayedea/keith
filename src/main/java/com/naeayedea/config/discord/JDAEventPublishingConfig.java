@@ -1,4 +1,4 @@
-package com.naeayedea.config.jda;
+package com.naeayedea.config.discord;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.GenericEvent;
