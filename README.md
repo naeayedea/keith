@@ -1,19 +1,19 @@
 # Keith, Discord Bot
 
-Third major version of keith, the bot has been rebuilt from the ground up. V3 has the same functionality as V2 and more
+Third major version of keith, the botConfiguration has been rebuilt from the ground up. V3 has the same functionality as V2 and more
 but with significantly tidier codebase, greatly improved database and user/server manager code. A list of improvements
 and additions can be found below: 
 
-[Add Me](https://discord.com/oauth2/authorize?client_id=624702573064224803&scope=bot&permissions=8)
+[Add Me](https://discord.com/oauth2/authorize?client_id=624702573064224803&scope=botConfiguration&permissions=8)
 ## User Facing Changes
 
 ### Command Aliases
     commands can now easily be aliased thanks to the new MultiMap class, not yet usable through commands
 
 ### New Commands
-    echo: bot will repeat anything passed to it via the command - only for users with higher access level
+    echo: botConfiguration will repeat anything passed to it via the command - only for users with higher access level
 
-    invite: command to create bot invite now added - don't know why it was left so late
+    invite: command to create botConfiguration invite now added - don't know why it was left so late
 
     servericon: similar to avatar but for servers
 
@@ -33,7 +33,7 @@ and additions can be found below:
     give more in depth information such as aliases and use cases for a command e.g. ?help guess. 
     
     guess: the number guess game now utilises the brand new channel command interface which means that 
-    users no longer have to type ?guess [guess] to have the bot evaluate their input. Now users can 
+    users no longer have to type ?guess [guess] to have the botConfiguration evaluate their input. Now users can 
     simply type their guess and keith will automatically evaluate it and respond with a success message
     or a reaction for higher/lower
 
@@ -42,8 +42,8 @@ and additions can be found below:
     that users do not accidentally go to a channel they do not want to with the hyperlink. 
 
     the major improvement with pin is that it will automatically create a pin channel if one does not 
-    exist, previously the database would need to be updated by the bot owner personally which was less
-    than ideal, the bot requires manage channel permission for this which will be communicated to users
+    exist, previously the database would need to be updated by the botConfiguration owner personally which was less
+    than ideal, the botConfiguration requires manage channel permission for this which will be communicated to users
     in the event that it does not. 
 
     remind: reminders now support the long needed feature of "on date at time" e.g. remind on 21/03/2021
@@ -67,13 +67,13 @@ and additions can be found below:
     keep prefixes practical such as 10-20 characters. 
 
 ### Assorted Changes
-    the bot now sends a typing signal to discord when responding to commands so that the user knows their
+    the botConfiguration now sends a typing signal to discord when responding to commands so that the user knows their
     command is being processed if it happens to take longer than usual. 
 
-    users can now be rate limited from using the bot - separate from discord rate limiting - if their use 
+    users can now be rate limited from using the botConfiguration - separate from discord rate limiting - if their use 
     exceeds a given value in a short time.
 
-    commands now use embeds where appropriate to provide a much cleaner look to bot responses. 
+    commands now use embeds where appropriate to provide a much cleaner look to botConfiguration responses. 
 
 ### Discord Interactions
     TODO
@@ -88,7 +88,7 @@ and additions can be found below:
 
 ### Resource Usage
     Steps have been taken to reduce overall resource usage such as repeated calls to the database to 
-    retrieve the same information, the bot now caches server/user objects for a short period of time
+    retrieve the same information, the botConfiguration now caches server/user objects for a short period of time
     so that if the same user/server is required over a short period the database is not unnecessarily
     loaded.
 
