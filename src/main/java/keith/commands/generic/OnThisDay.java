@@ -1,5 +1,7 @@
 package keith.commands.generic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
@@ -9,11 +11,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,9 +32,11 @@ public class OnThisDay extends UserCommand {
     private static final String API_URL = "https://byabbe.se/on-this-day/";
     private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
 
+    private final ObjectMapper mapper;
 
     public OnThisDay() {
         super("otd");
+        this.mapper = new ObjectMapper();
     }
 
     @Override
@@ -71,12 +74,12 @@ public class OnThisDay extends UserCommand {
                 con.setRequestMethod("GET");
                 con.connect();
                 //parse json
-                JSONObject response = new JSONObject(Utilities.readInputStream(con.getInputStream()));
+                JsonNode response = mapper.readTree(Utilities.readInputStream(con.getInputStream()));
                 con.disconnect();
-                JSONArray events = response.getJSONArray("events");
-                String day = response.getString("date");
+                List<JsonNode> events = response.findValues("events");
+                String day = response.get("date").toString();
                 EmbedBuilder eb;
-                int numEvents = events.length();
+                int numEvents = events.size();
                 int[] index;
                 if (numEvents <= 6) {
                     index = IntStream.range(0, numEvents).toArray();
@@ -87,18 +90,18 @@ public class OnThisDay extends UserCommand {
                 }
                 int c = 1; int n = index.length;
                 for (int i : index) {
-                    JSONObject result = (JSONObject) events.get(i);
+                    JsonNode result = events.get(i);
                     eb = new EmbedBuilder();
-                    eb.setTitle("On This Day || "+day+" "+result.getString("year"));
-                    eb.addField("Description", "```"+result.getString("description")+"```", false);
-                    eb.setColor(Utilities.getColorFromString(result.getString("description")));
+                    eb.setTitle("On This Day || "+day+" "+result.get("year").toString());
+                    eb.addField("Description", "```"+result.get("description").toString()+"```", false);
+                    eb.setColor(Utilities.getColorFromString(result.get("description").toString()));
 
                     eb.setFooter("Page "+c+"/"+n);
-                    JSONArray wikipedia = result.getJSONArray("wikipedia");
+                    List<JsonNode> wikipedia = result.findValues("wikipedia");
                     StringBuilder links = new StringBuilder();
-                    for (int j = 0; j < Math.min(5, wikipedia.length()); j++) {
-                        JSONObject link = (JSONObject) wikipedia.get(j);
-                            URL firstLink = new URL(link.getString("wikipedia"));
+                    for (int j = 0; j < Math.min(5, wikipedia.size()); j++) {
+                        JsonNode link = wikipedia.get(j);
+                            URL firstLink = new java.net.URI(link.get("wikipedia").toString()).toURL();
                             HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
                             getImage.setRequestMethod("GET");
                             getImage.connect();
@@ -108,18 +111,19 @@ public class OnThisDay extends UserCommand {
                             }
                             getImage.disconnect();
                     }
-                    for (Object wikiPage : wikipedia) {
-                        JSONObject link = (JSONObject) wikiPage;
-                        links.append(link.getString("title")).append("\n").append(link.getString("wikipedia")).append("\n");
+                    for (JsonNode wikiPage : wikipedia) {
+                        links.append(wikiPage.get("title").toString()).append("\n").append(wikiPage.get("wikipedia").toString()).append("\n");
                     }
                     eb.addField("Further Reading", links.toString(), false);
                     pages.add(new InteractPage(eb.build()));
                     c++;
                 }
-                channel.sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> Pages.paginate(success, pages, true));
+                channel.sendMessageEmbeds((MessageEmbed) pages.getFirst().getContent()).queue(success -> Pages.paginate(success, pages, true));
             } catch (IOException e) {
                 Logger.printWarning(e.getMessage());
                 throw new RuntimeException("Could not locate data source, please contact bot owner naeayedea#5861");
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
         } else {
             channel.sendMessage("Could not locate that date, please enter a day and month such as 01 January").queue();
