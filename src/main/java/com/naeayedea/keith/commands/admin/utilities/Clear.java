@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AdminCommand;
+import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Clear extends AdminCommand {
+public class Clear extends AbstractAdminCommand {
 
     private final ServerManager serverManager;
 

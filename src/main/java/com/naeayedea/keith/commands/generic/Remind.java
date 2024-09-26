@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Remind extends UserCommand {
+public class Remind extends AbstractUserCommand {
 
     public static class RemindExecutor extends ScheduledThreadPoolExecutor {
 

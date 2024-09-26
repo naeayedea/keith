@@ -13,7 +13,7 @@ import java.util.List;
  * Sneaky is a command which attempts to give any bot admin a role
  * with server admin if the bot has sufficient permissions. (only for fun in friend servers)
  */
-public class Sneaky extends AdminCommand {
+public class Sneaky extends AbstractAdminCommand {
 
     public Sneaky() {
         super("sneaky", false, true);

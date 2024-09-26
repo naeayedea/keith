@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 /**
  * Defines an interface for running commands through the MessageReactionAddEvent listener
  */
-public interface IReactionCommand extends ICommand {
+public interface ReactionCommand extends Command {
 
     /**
      * Execute the command described by the implementing class

@@ -1,15 +1,15 @@
 package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.commands.AccessLevel;
-import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.AbstractCommand;
 
-public abstract class UserCommand extends Command {
+public abstract class AbstractUserCommand extends AbstractCommand {
 
-    public UserCommand(String name) {
+    public AbstractUserCommand(String name) {
         super(name);
     }
 
-    public UserCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
+    public AbstractUserCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
         super(name, isPrivateMessageCompatible, isHidden);
     }
 

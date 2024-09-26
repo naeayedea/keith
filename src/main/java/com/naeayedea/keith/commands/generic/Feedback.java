@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Feedback extends UserCommand {
+public class Feedback extends AbstractUserCommand {
 
     private final ServerChatManager chatManager;
     private final ServerManager serverManager;

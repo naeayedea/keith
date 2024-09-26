@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Guess extends UserCommand {
+public class Guess extends AbstractUserCommand {
 
     private final ServerManager serverManager;
 

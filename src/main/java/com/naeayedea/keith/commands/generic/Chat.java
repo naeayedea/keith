@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Chat extends UserCommand {
+public class Chat extends AbstractUserCommand {
 
     private final ServerChatManager chatManager;
 

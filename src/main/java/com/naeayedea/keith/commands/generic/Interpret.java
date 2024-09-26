@@ -4,7 +4,7 @@ import com.naeayedea.keith.commands.generic.lox.Lox;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
-public class Interpret extends UserCommand {
+public class Interpret extends AbstractUserCommand {
 
     public Interpret() {
         super("interpret");

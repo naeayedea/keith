@@ -1,17 +1,16 @@
 package com.naeayedea.keith.commands.info;
 import com.naeayedea.keith.commands.AccessLevel;
-import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.AbstractCommand;
 
-public abstract class InfoCommand extends Command {
+public abstract class AbstractInfoCommand extends AbstractCommand {
 
-    public InfoCommand(String name) {
+    public AbstractInfoCommand(String name) {
         super(name);
     }
 
-    public InfoCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
+    public AbstractInfoCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
         super(name, isPrivateMessageCompatible, isHidden);
     }
-
 
     @Override
     public AccessLevel getAccessLevel() {

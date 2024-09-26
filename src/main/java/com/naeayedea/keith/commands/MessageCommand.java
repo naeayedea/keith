@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public interface IMessageCommand extends ICommand {
+public interface MessageCommand extends Command {
 
     /**
      * Returns a short description of the command, used when help is used to show all commands in a category

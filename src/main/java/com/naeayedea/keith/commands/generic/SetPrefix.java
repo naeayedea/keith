@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class SetPrefix extends UserCommand {
+public class SetPrefix extends AbstractUserCommand {
 
     int limit;
 

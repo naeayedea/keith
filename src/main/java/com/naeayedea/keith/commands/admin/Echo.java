@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Echo extends AdminCommand {
+public class Echo extends AbstractAdminCommand {
 
     public Echo() {
         super("echo");

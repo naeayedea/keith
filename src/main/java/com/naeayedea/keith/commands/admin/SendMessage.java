@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.List;
 
-public class SendMessage extends AdminCommand {
+public class SendMessage extends AbstractAdminCommand {
 
     public SendMessage() {
         super("send");

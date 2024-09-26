@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class DatabaseSearch extends OwnerCommand {
+public class DatabaseSearch extends AbstractOwnerCommand {
 
     public DatabaseSearch() {
         super("database");

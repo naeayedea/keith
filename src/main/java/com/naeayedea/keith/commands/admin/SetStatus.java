@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class SetStatus extends AdminCommand {
+public class SetStatus extends AbstractAdminCommand {
 
     public SetStatus() {
         super("setstatus");

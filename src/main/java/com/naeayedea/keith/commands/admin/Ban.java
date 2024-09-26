@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Ban extends AdminCommand {
+public class Ban extends AbstractAdminCommand {
 
     private final ServerManager serverManager;
 

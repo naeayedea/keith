@@ -14,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Stats extends AdminCommand {
+public class Stats extends AbstractAdminCommand {
 
     private static final String VERSION = "3.1.1 \"PIN HOTFIX\"";
 

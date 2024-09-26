@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AdminCommand;
+import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Locate extends AdminCommand {
+public class Locate extends AbstractAdminCommand {
 
     public Locate() {
         super("locate");

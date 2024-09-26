@@ -1,7 +1,7 @@
 package com.naeayedea.keith.listener;
 
 
-import com.naeayedea.keith.commands.IReactionCommand;
+import com.naeayedea.keith.commands.ReactionCommand;
 import com.naeayedea.keith.commands.generic.Pin;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.managers.CandidateManager;
@@ -37,7 +37,7 @@ public class MessageReactionAddEventListener {
 
     private final ExecutorService reactionHandlingService;
 
-    private Map<String, IReactionCommand> reactionCommands;
+    private Map<String, ReactionCommand> reactionCommands;
 
     private final ServerManager serverManager;
 
@@ -76,7 +76,7 @@ public class MessageReactionAddEventListener {
                 MessageChannel channel = event.getChannel();
                 //retrieve the message which is being reacted to
                 Message message = channel.retrieveMessageById(event.getMessageId()).complete();
-                IReactionCommand command = reactionCommands.get(emote.getAsReactionCode());
+                ReactionCommand command = reactionCommands.get(emote.getAsReactionCode());
                 //ensure that this emoji has a corresponding command
                 if (command != null) {
 

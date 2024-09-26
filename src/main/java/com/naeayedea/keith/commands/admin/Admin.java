@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.admin;
 
-import com.naeayedea.keith.commands.IMessageCommand;
+import com.naeayedea.keith.commands.MessageCommand;
 import com.naeayedea.keith.commands.info.Help;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.managers.CandidateManager;
@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.Arrays;
 import java.util.List;
 
-public class Admin extends AdminCommand {
+public class Admin extends AbstractAdminCommand {
 
-    private MultiMap<String, IMessageCommand> commands;
+    private MultiMap<String, MessageCommand> commands;
     private final ServerManager serverManager;
     private final CandidateManager candidateManager;
 
@@ -38,7 +38,7 @@ public class Admin extends AdminCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
-        IMessageCommand command = findCommand(tokens);
+        MessageCommand command = findCommand(tokens);
         if (command != null) {
             command.run(event, tokens);
         }
@@ -54,7 +54,7 @@ public class Admin extends AdminCommand {
 
         commands.putAll(Arrays.asList("echo", "repeat"), new Echo());
         commands.putAll(Arrays.asList("setlevel", "updatelevel"), new SetCandidateLevel(candidateManager));
-        commands.putAll(Arrays.asList("utils", "util", "utilities"), new AdminUtilities(serverManager, candidateManager));
+        commands.putAll(Arrays.asList("utils", "util", "utilities"), new UtilitiesAdmin(serverManager, candidateManager));
         commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats(candidateManager));
         commands.putAll(Arrays.asList("setstatus", "newstatus"), new SetStatus());
         commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands, serverManager));
@@ -63,7 +63,7 @@ public class Admin extends AdminCommand {
         commands.put("send", new SendMessage());
     }
 
-    private IMessageCommand findCommand(List<String> list) {
+    private MessageCommand findCommand(List<String> list) {
         String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }

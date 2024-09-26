@@ -1,15 +1,15 @@
 package com.naeayedea.keith.commands.admin;
 
 import com.naeayedea.keith.commands.AccessLevel;
-import com.naeayedea.keith.commands.Command;
+import com.naeayedea.keith.commands.AbstractCommand;
 
-public abstract class AdminCommand extends Command {
+public abstract class AbstractAdminCommand extends AbstractCommand {
 
-    public AdminCommand(String name) {
+    public AbstractAdminCommand(String name) {
         super(name);
     }
 
-    public AdminCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
+    public AbstractAdminCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
         super(name, isPrivateMessageCompatible, isHidden);
     }
 

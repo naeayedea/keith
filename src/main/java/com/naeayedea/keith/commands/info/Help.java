@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.info;
 
-import com.naeayedea.keith.commands.IMessageCommand;
+import com.naeayedea.keith.commands.MessageCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -10,13 +10,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.List;
 import java.util.Map;
 
-public class Help extends InfoCommand {
+public class Help extends AbstractInfoCommand {
 
-    private final Map<String, IMessageCommand> commands;
+    private final Map<String, MessageCommand> commands;
 
     private final ServerManager serverManager;
 
-    public Help (Map<String, IMessageCommand> commandMap, ServerManager serverManager) {
+    public Help (Map<String, MessageCommand> commandMap, ServerManager serverManager) {
         super("help");
 
         this.commands = commandMap;
@@ -52,7 +52,7 @@ public class Help extends InfoCommand {
         eb.setColor(Utilities.getBotColor());
         eb.setDescription("For information on specific commands do \""+prefix+"help [command]\"");
         StringBuilder helpString = new StringBuilder("```cs\n");
-        for (IMessageCommand command : commands.values()) {
+        for (MessageCommand command : commands.values()) {
             String description = command.getShortDescription(prefix);
             //only add description if not duplicate (need to look into improving multimap, maybe have two maps?
             if (helpString.indexOf(description) == -1 && !command.isHidden()) {
@@ -67,7 +67,7 @@ public class Help extends InfoCommand {
     public void sendSingleCommandHelp(MessageChannel channel, String commandString) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Utilities.getBotColor());
-        IMessageCommand command = commands.get(commandString);
+        MessageCommand command = commands.get(commandString);
         if (command != null) {
             eb.setTitle("Command: "+command.getDefaultName());
             StringBuilder knownAliases = new StringBuilder();

@@ -1,107 +1,37 @@
 package com.naeayedea.keith.commands;
 
-public abstract class Command implements IMessageCommand {
-
-    private final String defaultName;
-    private final boolean isPrivateMessageCompatible;
-    private final boolean isHidden;
-    private final int cost;
+/**
+ * Defines universal properties of commands regardless of source
+ */
+public interface Command {
 
     /**
-     * Default command constructor that only requires name
-     * @param name the defaultName of the command
-     * default properties:
-     * isPrivateMessageCompatible: true
-     * isHidden: true
-     * cost: 1
+     * Determine if a command is usable in private messages
+     * @return true if compatible, false otherwise.
      */
-    public Command(String name) {
-        defaultName = name;
-        this.isPrivateMessageCompatible = true;
-        this.isHidden = false;
-        this.cost = 1;
-    }
+    boolean isPrivateMessageCompatible();
 
     /**
-     * command constructor to specify the name and private message compatibility
-     * @param name the defaultName of the command
-     * @param isPrivateMessageCompatible set false if command will not work in private message
-     * default values:
-     * isHidden: true
-     * cost: 1
+     * Retrieve the {@link AccessLevel AccessLevel} of the command
+     * @return an {@link AccessLevel AccessLevel} object representing the permissions required for a command
+     * @see AccessLevel
      */
-    public Command(String name, boolean isPrivateMessageCompatible) {
-        defaultName = name;
-        this.isPrivateMessageCompatible = isPrivateMessageCompatible;
-        isHidden = false;
-        this.cost = 1;
-    }
+    AccessLevel getAccessLevel();
 
     /**
-     * command constructor to specify the name, private message compatibility and the hidden property
-     * @param name the default name of the command
-     * @param isPrivateMessageCompatible set false if command will not work in private message
-     * @param isHidden set true if command shouldn't show up in help
-     * default properties:
-     * cost: 1
+     * Get the message timeout of a command
+     * @return the timeout period of a command in seconds
      */
-    public Command(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
-        defaultName = name;
-        this.isPrivateMessageCompatible = isPrivateMessageCompatible;
-        this.isHidden = isHidden;
-        this.cost = 1;
-    }
+    int getTimeOut();
 
     /**
-     * command constructor to specify all values of a command
-     * @param name the default name of the command
-     * @param isPrivateMessageCompatible set false if command will not work in private message
-     * @param isHidden set true if command shouldn't show up in help
-     * @param cost the cost of a command with respect to rate limiting
+     * Determine if this command should send a typing message to discord when the command is run
+     * @return true if the command should send a typing signal, false otherwise
      */
-    public Command(String name, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
-        defaultName = name;
-        this.isPrivateMessageCompatible = isPrivateMessageCompatible;
-        this.isHidden = isHidden;
-        this.cost = cost;
-    }
+    boolean sendTyping();
 
-    @Override
-    public String getShortDescription(String prefix) {
-        return "[DEFAULT SHORT DESCRIPTION]";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "[DEFAULT LONG DESCRIPTION]";
-    }
-
-    //Hidden commands won't be displayed to users but can still be accessed by people with sufficient level who know of them
-    @Override
-    public boolean isHidden() {
-        return isHidden;
-    }
-
-    @Override
-    public int getTimeOut(){
-        return 10;
-    }
-
-    @Override
-    public boolean isPrivateMessageCompatible() {
-        return isPrivateMessageCompatible;
-    }
-
-    @Override
-    public boolean sendTyping() {return true;}
-
-    @Override
-    public String getDefaultName() {
-        return defaultName;
-    }
-
-    @Override
-    public int getCost() {
-        return cost;
-    }
+    /**
+     * Returns the cost of running this command with respect to rate limiting
+     */
+    int getCost();
 }

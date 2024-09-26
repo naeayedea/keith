@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class ServerIcon extends UserCommand {
+public class ServerIcon extends AbstractUserCommand {
 
     public ServerIcon() {
         super("servericon");

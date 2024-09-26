@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Avatar extends UserCommand {
+public class Avatar extends AbstractUserCommand {
 
     public Avatar() {
         super("avatar");

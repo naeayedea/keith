@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class SetCandidateLevel extends AdminCommand {
+public class SetCandidateLevel extends AbstractAdminCommand {
 
     private final CandidateManager candidateManager;
 

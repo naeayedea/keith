@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.generic;
 
-import com.naeayedea.keith.commands.IReactionCommand;
+import com.naeayedea.keith.commands.ReactionCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.model.Server;
@@ -17,7 +17,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-public class Pin extends UserCommand implements IReactionCommand {
+public class Pin extends AbstractUserCommand implements ReactionCommand {
 
     private final ServerManager serverManager;
 

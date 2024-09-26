@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-public class Calculator extends UserCommand {
+public class Calculator extends AbstractUserCommand {
 
     public Calculator() {
         super("calculate");

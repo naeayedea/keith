@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-public class OnThisDay extends UserCommand {
+public class OnThisDay extends AbstractUserCommand {
 
     private static final String API_URL = "https://byabbe.se/on-this-day/";
     private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};

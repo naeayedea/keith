@@ -1,6 +1,6 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.IMessageCommand;
+import com.naeayedea.keith.commands.MessageCommand;
 import com.naeayedea.keith.commands.admin.Admin;
 import com.naeayedea.keith.commands.channel_commands.IChannelCommand;
 import com.naeayedea.keith.commands.generic.*;
@@ -41,7 +41,7 @@ public class MessageReceivedEventListener {
 
     private final Logger logger = LoggerFactory.getLogger(MessageReceivedEventListener.class);
 
-    private MultiMap<String, IMessageCommand> commands;
+    private MultiMap<String, MessageCommand> commands;
 
     private final ExecutorService messageService;
     private final ExecutorService commandService;
@@ -120,7 +120,7 @@ public class MessageReceivedEventListener {
                         //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
                         tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
 
-                        IMessageCommand command = findCommand(tokens);
+                        MessageCommand command = findCommand(tokens);
 
                         //Check if command was found and that user isn't rate limited
                         if (command != null ) {
@@ -183,7 +183,7 @@ public class MessageReceivedEventListener {
         return message.length() > prefix.length() && message.toLowerCase().startsWith(prefix);
     }
 
-    private IMessageCommand findCommand(List<String> list) {
+    private MessageCommand findCommand(List<String> list) {
         String commandString = list.remove(0).toLowerCase();
         return commands.get(commandString);
     }
