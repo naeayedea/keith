@@ -1,0 +1,31 @@
+<Configuration>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{HH:mm:ss.SSS}}{cyan} [ %highlight{%-5level}{FATAL=red,ERROR=red,WARN=yellow,INFO=none,DEBUG=green,TRACE=magenta} ] [%style{%logger{36}}{white}]: %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <Logger name="com.naeayedea" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+
+        </Logger>
+
+        <Logger name="net.dv8tion.jda" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="net.dv8tion.jda.internal" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="org.springframework" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+    </Loggers>
+</Configuration>
