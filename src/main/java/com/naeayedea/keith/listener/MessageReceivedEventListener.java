@@ -9,10 +9,12 @@ import com.naeayedea.keith.commands.info.Invite;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.util.MultiMap;
 import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.model.Candidate;
+import com.naeayedea.model.Server;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -44,15 +46,15 @@ public class MessageReceivedEventListener {
     private final ExecutorService messageService;
     private final ExecutorService commandService;
 
-    private final UserManager userManager;
+    private final CandidateManager candidateManager;
     private final ServerManager serverManager;
     private final ChannelCommandManager channelCommandManager;
     private final ServerChatManager chatManager;
     private final CommandRateLimiter rateLimiter;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, UserManager userManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter) {
         this.messageService = messageService;
-        this.userManager = userManager;
+        this.candidateManager = candidateManager;
         this.serverManager = serverManager;
         this.channelCommandManager = channelCommandManager;
         this.chatManager = chatManager;
@@ -66,20 +68,20 @@ public class MessageReceivedEventListener {
 
         //message commands
         commands = new MultiMap<>();
-        commands.putAll(Arrays.asList("help", "hlep", "commands"), new Help(commands));
-        commands.putAll(Arrays.asList("guess", "numguess"), new Guess());
+        commands.putAll(Arrays.asList("help", "hlep", "commands"), new Help(commands, serverManager));
+        commands.putAll(Arrays.asList("guess", "numguess"), new Guess(serverManager, channelCommandManager));
         commands.putAll(Arrays.asList("avatar", "picture", "pfp"), new Avatar());
-        commands.putAll(Arrays.asList("pin", "sticky"), new Pin());
+        commands.putAll(Arrays.asList("pin", "sticky"), new Pin(serverManager));
         commands.putAll(Arrays.asList("remind", "remindme"), new Remind());
         commands.putAll(Arrays.asList("calculator", "calc", "calculate", "evaluate"), new Calculator());
         commands.putAll(Arrays.asList("servericon", "guildicon", "icon", "serveravatar", "guildavatar"), new ServerIcon());
         commands.putAll(Arrays.asList("otd", "onthisday", "events", "history"), new OnThisDay());
         commands.putAll(Arrays.asList("banner", "getbanner", "header"), new Banner());
-        commands.putAll(Arrays.asList("chat", "serverchat"), new Chat());
-        commands.put("setprefix", new SetPrefix());
-        commands.putAll(Arrays.asList("admin", "sudo"), new Admin());
+        commands.putAll(Arrays.asList("chat", "serverchat"), new Chat(chatManager));
+        commands.put("setprefix", new SetPrefix(serverManager));
+        commands.putAll(Arrays.asList("admin", "sudo"), new Admin(serverManager, candidateManager));
         commands.put("invite", new Invite());
-        commands.put("feedback", new Feedback());
+        commands.put("feedback", new Feedback(chatManager, serverManager));
         commands.put("interpret", new Interpret());
 
         logger.info("Loaded {} message commmands", commands.size());
@@ -97,9 +99,9 @@ public class MessageReceivedEventListener {
                 }
 
                 String messageContent = message.getContentRaw();
-                UserManager.User user = userManager.getUser(event.getAuthor().getId());
+                Candidate candidate = candidateManager.getCandidate(event.getAuthor().getId());
                 String prefix;
-                ServerManager.Server server = null;
+                Server server = null;
                 boolean isPrivateMessage = channel instanceof PrivateChannel;
                 if (isPrivateMessage) {
                     prefix = "?";
@@ -109,7 +111,7 @@ public class MessageReceivedEventListener {
                 }
                 List<String> tokens;
                 //check first if user is banned, if not check for server ban or private message
-                if (!user.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                if (!candidate.isBanned() && (isPrivateMessage || !server.isBanned())) {
                     //check for prefix
                     if (findPrefix(messageContent, prefix)) {
                         //trim prefix and trailing spaces from command
@@ -125,10 +127,10 @@ public class MessageReceivedEventListener {
                             /*
                              * command was found, check that user is not rate limited and that they have permission
                              */
-                            rateLimiter.incrementOrInsertRecord(user.getId(), command.getCost());
+                            rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
 
-                            if (rateLimiter.userPermitted(user.getId())) {
-                                if (user.hasPermission(command.getAccessLevel())) {
+                            if (rateLimiter.userPermitted(candidate.getId())) {
+                                if (candidate.hasPermission(command.getAccessLevel())) {
                                     if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
                                         //all checks passed, execute command
                                         try {
@@ -137,7 +139,7 @@ public class MessageReceivedEventListener {
                                                     channel.sendTyping().queue();
                                                 }
                                                 command.run(event, tokens);
-                                                user.incrementCommandCount();
+                                                candidate.incrementCommandCount();
                                             };
                                             commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                         } catch (PermissionException e) {
@@ -167,7 +169,7 @@ public class MessageReceivedEventListener {
                     } else if (channelCommandManager.gameInProgress(channel.getId())) {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
                         IChannelCommand cc = channelCommandManager.getGame(channel.getId());
-                        cc.evaluate(message, tokens, user);
+                        cc.evaluate(message, tokens, candidate);
                     } else if (chatManager.hasActiveChat(channel.getId())) {
                         chatManager.sendMessage(channel.getId(), event);
                     }

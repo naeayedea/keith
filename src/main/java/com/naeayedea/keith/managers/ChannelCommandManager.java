@@ -7,11 +7,9 @@ import java.util.Map;
 
 public class ChannelCommandManager {
 
-    private static ChannelCommandManager instance;
-
     private final Map<String, IChannelCommand> gamesInProgress;
 
-    private ChannelCommandManager() {
+    public ChannelCommandManager() {
         gamesInProgress = new HashMap<>();
     }
 
@@ -35,14 +33,5 @@ public class ChannelCommandManager {
     public IChannelCommand getGame(String channelId) {
         return gamesInProgress.get(channelId);
     }
-
-    public static ChannelCommandManager getInstance() {
-        if (instance == null) {
-            instance = new ChannelCommandManager();
-        }
-        return instance;
-    }
-
-
 
 }

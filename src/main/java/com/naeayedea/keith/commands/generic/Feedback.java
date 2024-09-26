@@ -14,10 +14,13 @@ import java.util.List;
 public class Feedback extends UserCommand {
 
     private final ServerChatManager chatManager;
+    private final ServerManager serverManager;
 
-    public Feedback() {
+    public Feedback(ServerChatManager chatManager, ServerManager serverManager) {
         super("feedback");
-        chatManager = ServerChatManager.getInstance();
+
+        this.chatManager = chatManager;
+        this.serverManager = serverManager;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class Feedback extends UserCommand {
                         prefix = "?";
                     } else {
                         Guild guild = event.getGuild();
-                        prefix = ServerManager.getInstance().getServer(guild.getId()).getPrefix();
+                        prefix = serverManager.getServer(guild.getId()).getPrefix();
                         name = event.getGuild().getName();
                     }
                     User author = event.getAuthor();

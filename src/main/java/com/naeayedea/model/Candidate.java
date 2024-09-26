@@ -1,28 +1,18 @@
-package com.naeayedea.keith.managers;
+package com.naeayedea.model;
 
 import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
 
 import java.sql.PreparedStatement;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class UserManager {
-
-
-    /*
-     * Internal class user
-     */
-    public static class User {
+public class Candidate {
         private final String discordID;
         private AccessLevel accessLevel;
         private final String firstSeen;
         private long commandCount;
 
-        public User(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
+        public Candidate(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
             this.discordID = discordID;
             this.accessLevel = accessLevel;
             this.firstSeen = firstSeen;
@@ -94,53 +84,3 @@ public class UserManager {
         }
 
     }
-
-    /*
-     * UserManager code, above is internal class User
-     */
-
-    private static UserManager instance;
-    private final Map<String, User> userCache;
-
-    private UserManager(){
-        userCache = new HashMap<>();
-    }
-
-    public static UserManager getInstance() {
-        if (instance == null) {
-            instance = new UserManager();
-        }
-        return instance;
-    }
-
-    private PreparedStatement getUser() {
-        return Database.prepareStatement("SELECT FirstSeen, UserLevel, CommandCount FROM users WHERE DiscordID = ?");
-    }
-
-    private PreparedStatement createUser() {
-        return Database.prepareStatement("INSERT INTO users (DiscordID) VALUES (?) ");
-    }
-
-    public User getUser(String discordID) {
-        User user = userCache.get(discordID);
-        if(user == null) {
-            //user not in cache, attempt to retrieve from database
-            ArrayList<String> results = Database.getStringResult(getUser(), discordID);
-            if (results.size() > 1) {
-                String[] result = results.get(1).split("\\s+");
-                user = new User(discordID, AccessLevel.getLevel(result[2]), result[1], Long.parseLong(result[3]));
-            } else {
-                //user doesn't exist, need to create
-                Database.executeUpdate(createUser(), discordID);
-                user =  new User(discordID, AccessLevel.USER , Instant.now().toString(), 0);
-            }
-            userCache.put(discordID, user);
-        }
-        return user;
-    }
-
-    public void clear() {
-        userCache.clear();
-    }
-
-}

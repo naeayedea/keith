@@ -1,8 +1,9 @@
 package com.naeayedea.keith.commands.admin;
 
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.model.Candidate;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,8 +18,11 @@ public class Stats extends AdminCommand {
 
     private static final String VERSION = "3.1.1 \"PIN HOTFIX\"";
 
-    public Stats() {
+    private final CandidateManager candidateManager;
+
+    public Stats(CandidateManager candidateManager) {
         super("stats");
+        this.candidateManager = candidateManager;
     }
 
     @Override
@@ -47,8 +51,8 @@ public class Stats extends AdminCommand {
                     StringBuilder adminList = new StringBuilder();
                     for(int i = 1 ; i < results.size(); i++){
                         String discordId = results.get(i).trim();
-                        UserManager.User user = UserManager.getInstance().getUser(discordId);
-                        adminList.append("> ").append(user.getDescription()).append("\n");
+                        Candidate candidate = candidateManager.getCandidate(discordId);
+                        adminList.append("> ").append(candidate.getDescription()).append("\n");
                     }
                     channel.sendMessage("Admin Users:\n"+adminList).queue();
                     break;

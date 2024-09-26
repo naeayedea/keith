@@ -2,6 +2,7 @@ package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
@@ -28,7 +29,7 @@ public class GuildJoinEventListener {
     public void onGuildJoin(GuildJoinEvent event) {
         Guild guild = event.getGuild();
 
-        ServerManager.Server server = serverManager.getServer(event.getGuild().getId());
+        Server server = serverManager.getServer(event.getGuild().getId());
 
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
 

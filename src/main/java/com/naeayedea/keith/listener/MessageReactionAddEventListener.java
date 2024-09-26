@@ -4,9 +4,11 @@ package com.naeayedea.keith.listener;
 import com.naeayedea.keith.commands.IReactionCommand;
 import com.naeayedea.keith.commands.generic.Pin;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.util.MultiMap;
+import com.naeayedea.model.Candidate;
+import com.naeayedea.model.Server;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -39,14 +41,14 @@ public class MessageReactionAddEventListener {
 
     private final ServerManager serverManager;
 
-    private final UserManager userManager;
+    private final CandidateManager candidateManager;
 
     private final CommandRateLimiter rateLimiter;
 
-    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, UserManager userManager, CommandRateLimiter rateLimiter) {
+    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter) {
         this.reactionHandlingService = reactionHandlingService;
         this.serverManager = serverManager;
-        this.userManager = userManager;
+        this.candidateManager = candidateManager;
         this.rateLimiter = rateLimiter;
     }
 
@@ -56,7 +58,7 @@ public class MessageReactionAddEventListener {
 
         //reaction commands
         reactionCommands = new MultiMap<>();
-        reactionCommands.put("📌", new Pin());
+        reactionCommands.put("\uD83D\uDCCC", new Pin(serverManager));
 
         logger.info("Loaded {} reaction commands.", reactionCommands.size());
 
@@ -82,22 +84,22 @@ public class MessageReactionAddEventListener {
                     if (channel instanceof ThreadChannel thread && !thread.isJoined()) {
                         thread.join().queue();
                     }
-                    UserManager.User user = userManager.getUser(member.getUser().getId());
+                    Candidate candidate = candidateManager.getCandidate(member.getUser().getId());
 
                     boolean isPrivateMessage = channel instanceof PrivateChannel;
 
-                    ServerManager.Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
+                    Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
 
                     //ensure that user and server has permission to use the bot
-                    if (!user.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                    if (!candidate.isBanned() && (isPrivateMessage || !server.isBanned())) {
 
                         //make sure that rate limit has not been reached
-                        if (rateLimiter.userPermitted(user.getId())) {
+                        if (rateLimiter.userPermitted(candidate.getId())) {
                             List<MessageReaction> reactions = message.getReactions();
                             for (MessageReaction reaction : reactions) {
                                 if (reaction.getEmoji().equals(emote)) {
                                     if (reaction.hasCount() && reaction.getCount() < 2) {
-                                        rateLimiter.incrementOrInsertRecord(user.getId(), 1);
+                                        rateLimiter.incrementOrInsertRecord(candidate.getId(), 1);
                                         message.addReaction(emote).queue(e -> command.run(event, member.getUser()));
                                         break;
                                     }

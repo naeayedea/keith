@@ -2,8 +2,8 @@ package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.commands.IReactionCommand;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.ServerManager.Server;
 import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -19,8 +19,11 @@ import java.util.*;
 
 public class Pin extends UserCommand implements IReactionCommand {
 
-    public Pin() {
+    private final ServerManager serverManager;
+
+    public Pin(ServerManager serverManager) {
         super("pin");
+        this.serverManager = serverManager;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class Pin extends UserCommand implements IReactionCommand {
             String messageContent = message.getContentRaw().trim();
             List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
             Guild guild = event.getGuild();
-            Server server = ServerManager.getInstance().getServer(guild.getId());
+            Server server = serverManager.getServer(guild.getId());
             MessageChannel pinChannel = getPinChannel(server, guild);
             if (pinChannel == null) {
                 //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
@@ -65,7 +68,7 @@ public class Pin extends UserCommand implements IReactionCommand {
         MessageChannel channel = event.getChannel();
         Message message = event.getMessage();
         Guild guild = event.getGuild();
-        Server server = ServerManager.getInstance().getServer(guild.getId());
+        Server server = serverManager.getServer(guild.getId());
         MessageChannel pinChannel = getPinChannel(server, guild);
         if (pinChannel == null) {
             //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it

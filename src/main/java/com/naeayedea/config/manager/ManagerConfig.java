@@ -3,7 +3,7 @@ package com.naeayedea.config.manager;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,26 +11,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ManagerConfig {
 
-
     @Bean
     public ServerManager serverManager() {
-        return ServerManager.getInstance();
+        return new ServerManager();
     }
 
     @Bean
-    public UserManager userManager() {
-        return UserManager.getInstance();
+    public CandidateManager candidateManager() {
+        return new CandidateManager();
     }
 
     @Bean
     public ChannelCommandManager channelCommandManager() {
-        return ChannelCommandManager.getInstance();
+        return new ChannelCommandManager();
     }
 
     @Bean
-    public ServerChatManager serverChatManager() {
-        return ServerChatManager.getInstance();
+    public ServerChatManager serverChatManager(ServerManager serverManager) {
+        return new ServerChatManager(serverManager);
     }
-
 
 }

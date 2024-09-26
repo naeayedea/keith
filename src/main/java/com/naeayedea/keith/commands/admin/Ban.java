@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.admin;
 
 import com.naeayedea.keith.commands.AccessLevel;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -12,8 +12,14 @@ import java.util.List;
 
 public class Ban extends AdminCommand {
 
-    public Ban() {
+    private final ServerManager serverManager;
+
+    private final CandidateManager candidateManager;
+
+    public Ban(ServerManager serverManager, CandidateManager candidateManager) {
         super("ban");
+        this.serverManager = serverManager;
+        this.candidateManager = candidateManager;
     }
 
     @Override
@@ -37,15 +43,15 @@ public class Ban extends AdminCommand {
             else
                 id = tokens.get(1);
             if (type.equals("user")) {
-                if (UserManager.getInstance().getUser(id).setAccessLevel(AccessLevel.ALL)) {
+                if (candidateManager.getCandidate(id).setAccessLevel(AccessLevel.ALL)) {
                     event.getChannel().sendMessage("User banned").queue();
                 } else {
                     event.getChannel().sendMessage("couldn't ban user").queue();
                 }
-            } else if(type.equals("server") && UserManager.getInstance().getUser(event.getAuthor().getId()).getAccessLevel().num > 2){
+            } else if(type.equals("server") && candidateManager.getCandidate(event.getAuthor().getId()).getAccessLevel().num > 2){
                 Guild guild = Utilities.getJDAInstance().getGuildById(id);
                 if (guild != null) {
-                    if (ServerManager.getInstance().getServer(guild.getId()).setBanned(true)) {
+                    if (serverManager.getServer(guild.getId()).setBanned(true)) {
                         event.getAuthor().openPrivateChannel().flatMap(channel -> channel.sendMessage("Successfully banned server id "+id+" contact succ to undo")).queue();
                     }
                 }

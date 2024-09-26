@@ -167,11 +167,12 @@ public class Utilities {
         return response;
     }
 
-    public static String getPrefix(MessageReceivedEvent event) {
+    public static String getPrefix(ServerManager serverManager, MessageReceivedEvent event) {
         if (event.getChannel() instanceof PrivateChannel) {
             return "?";
         }
-        return ServerManager.getInstance().getServer(event.getGuild().getId()).getPrefix();
+
+        return serverManager.getServer(event.getGuild().getId()).getPrefix();
     }
 
     public static Color getBotColor() {
@@ -247,7 +248,6 @@ public class Utilities {
     }
 
     public static void runShutdownProcedure() {
-        ServerChatManager.getInstance().closeAll();
         System.exit(0);
     }
 

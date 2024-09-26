@@ -10,9 +10,10 @@ public class Chat extends UserCommand {
 
     private final ServerChatManager chatManager;
 
-    public Chat() {
+    public Chat(ServerChatManager chatManager) {
         super("chat");
-        chatManager = ServerChatManager.getInstance();
+
+        this.chatManager = chatManager;
     }
 
     @Override

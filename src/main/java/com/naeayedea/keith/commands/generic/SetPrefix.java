@@ -1,6 +1,7 @@
 package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.managers.ServerManager;
+import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -8,8 +9,13 @@ import java.util.List;
 public class SetPrefix extends UserCommand {
 
     int limit;
-    public SetPrefix() {
+
+    private final ServerManager serverManager;
+
+    public SetPrefix(ServerManager serverManager) {
         super("setprefix");
+
+        this.serverManager = serverManager;
         limit = 10;
     }
 
@@ -38,7 +44,7 @@ public class SetPrefix extends UserCommand {
         if (tokens.size() > 1 || containsInvalidCharacters(newPrefix) || newPrefix.length() > limit) {
             event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
         } else {
-            ServerManager.Server server = ServerManager.getInstance().getServer(event.getGuild().getId());
+            Server server = serverManager.getServer(event.getGuild().getId());
             if (server.setPrefix(newPrefix)) {
                 event.getChannel().sendMessage("Prefix updated successfully to: '"+server.getPrefix()+"'").queue();
             }  else {

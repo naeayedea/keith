@@ -1,10 +1,9 @@
 package com.naeayedea.keith.commands.admin;
 
-import com.naeayedea.keith.commands.Command;
 import com.naeayedea.keith.commands.IMessageCommand;
 import com.naeayedea.keith.commands.info.Help;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -13,14 +12,16 @@ import java.util.List;
 
 public class Admin extends AdminCommand {
 
-    MultiMap<String, IMessageCommand> commands;
-    ServerManager serverManager;
-    UserManager userManager;
+    private MultiMap<String, IMessageCommand> commands;
+    private final ServerManager serverManager;
+    private final CandidateManager candidateManager;
 
-    public Admin() {
+    public Admin(ServerManager serverManager, CandidateManager candidateManager) {
         super("admin", true,  true);
-        serverManager = ServerManager.getInstance();
-        userManager = UserManager.getInstance();
+
+        this.serverManager = serverManager;
+        this.candidateManager = candidateManager;
+
         initialiseCommands();
     }
 
@@ -49,15 +50,16 @@ public class Admin extends AdminCommand {
     }
 
     private void initialiseCommands() {
-        commands = new MultiMap<>();
+        this.commands = new MultiMap<>();
+
         commands.putAll(Arrays.asList("echo", "repeat"), new Echo());
-        commands.putAll(Arrays.asList("setlevel", "updatelevel"), new SetUserLevel());
-        commands.putAll(Arrays.asList("utils", "util", "utilities"), new AdminUtilities());
-        commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats());
+        commands.putAll(Arrays.asList("setlevel", "updatelevel"), new SetCandidateLevel(candidateManager));
+        commands.putAll(Arrays.asList("utils", "util", "utilities"), new AdminUtilities(serverManager, candidateManager));
+        commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats(candidateManager));
         commands.putAll(Arrays.asList("setstatus", "newstatus"), new SetStatus());
-        commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands));
+        commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands, serverManager));
         commands.put("sneaky", new Sneaky());
-        commands.put("ban", new Ban());
+        commands.put("ban", new Ban(serverManager, candidateManager));
         commands.put("send", new SendMessage());
     }
 

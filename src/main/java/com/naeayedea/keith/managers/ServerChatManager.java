@@ -1,12 +1,18 @@
 package com.naeayedea.keith.managers;
 
 import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.model.chat.Chat;
+import com.naeayedea.model.chat.ChatAgent;
+import com.naeayedea.model.chat.ChatCandidate;
+import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.internal.entities.emoji.UnicodeEmojiImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -18,70 +24,22 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerChatManager {
 
-    private static class ChatAgent {
-        public MessageChannel channel;
-        public boolean isFeedback;
-        public ChatAgent(MessageChannel linkedChannel, boolean isFeedback) {
-            this.channel = linkedChannel;
-            this.isFeedback = isFeedback;
-        }
-    }
-
-    private static class ChatCandidate {
-        public Guild guild;
-        public MessageChannel channel;
-        public long connectionTime;
-        public ChatCandidate (MessageChannel channel, Guild guild, long connectionTime) {
-            this.channel = channel;
-            this.guild= guild;
-            this.connectionTime = connectionTime;
-        }
-    }
-
-    private static class Chat {
-
-        ChatAgent agentOne;
-        ChatAgent agentTwo;
-
-        public Chat(ChatAgent one, ChatAgent two) {
-            agentOne = one;
-            agentTwo = two;
-        }
-
-        public MessageChannel getDestination(String id) {
-            return getTarget(id).channel;
-        }
-
-        private ChatAgent getTarget(String id) {
-            if (agentOne.channel.getId().equals(id)) {
-                return agentTwo;
-            } else {
-                return agentOne;
-            }
-        }
-
-        private ChatAgent getSelf(String id) {
-            if (agentOne.channel.getId().equals(id)) {
-                return agentOne;
-            } else {
-                return agentTwo;
-            }
-        }
-
-        public void close() {
-            agentOne.channel.sendMessage("Chat connection closed").queue();
-            agentTwo.channel.sendMessage("Chat connection closed").queue();
-        }
-    }
-
-    private static ServerChatManager instance;
-
     private final Map<Long, Chat> chats;
+
     private final Map<String, Long> identifiers;
+
     private final MessageChannel feedback;
+
     private final Map<String, ChatCandidate> matchmaking;
+
     private final Lock matchmakingLock;
-    public ServerChatManager() {
+
+    private final Logger logger = LoggerFactory.getLogger(ServerChatManager.class);
+
+    private final ServerManager serverManager;
+
+    public ServerChatManager(ServerManager serverManager) {
+        this.serverManager = serverManager;
         chats = new HashMap<>();
         identifiers = new HashMap<>();
         matchmaking = new HashMap<>();
@@ -105,13 +63,12 @@ public class ServerChatManager {
             //get first result
             ChatCandidate connection = matchmaking.remove(matchmaking.keySet().iterator().next());
             matchmakingLock.unlock();
-            ServerManager sm = ServerManager.getInstance();
-            Guild linkedGuild = connection.guild;
-            MessageChannel linkedChannel = connection.channel;
+            Guild linkedGuild = connection.getGuild();
+            MessageChannel linkedChannel = connection.getChannel();
             createChat(channel, linkedChannel, false);
             //inform both channels of the new connection and advise of ability to not  send
-            channel.sendMessage(getConnectionMessage(linkedGuild.getName(), linkedChannel.getName(), sm.getServer(guild.getId()).getPrefix())).queue();
-            linkedChannel.sendMessage(getConnectionMessage(guild.getName(), channel.getName(), sm.getServer(linkedGuild.getId()).getPrefix())).queue();
+            channel.sendMessage(getConnectionMessage(linkedGuild.getName(), linkedChannel.getName(), serverManager.getServer(guild.getId()).getPrefix())).queue();
+            linkedChannel.sendMessage(getConnectionMessage(guild.getName(), channel.getName(), serverManager.getServer(linkedGuild.getId()).getPrefix())).queue();
             return true;
         }
     }
@@ -203,20 +160,15 @@ public class ServerChatManager {
     }
 
     public boolean isFeedback(String id) {
-        return chats.get(identifiers.get(id)).getSelf(id).isFeedback;
+        return chats.get(identifiers.get(id)).getSelf(id).isFeedback();
     }
 
+    @PreDestroy
     public void closeAll() {
+        logger.info("Classing all chat instances");
         for (Chat chat : chats.values()) {
             chat.close();
         }
-    }
-
-    public static ServerChatManager getInstance() {
-        if (instance == null) {
-            instance = new ServerChatManager();
-        }
-        return instance;
     }
 
 }

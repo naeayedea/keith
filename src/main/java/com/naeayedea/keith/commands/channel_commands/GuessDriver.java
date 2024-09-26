@@ -1,8 +1,9 @@
 package com.naeayedea.keith.commands.channel_commands;
 
+import com.naeayedea.keith.commands.generic.Guess;
 import com.naeayedea.keith.managers.ChannelCommandManager;
-import com.naeayedea.keith.managers.ServerManager.Server;
-import com.naeayedea.keith.managers.UserManager.User;
+import com.naeayedea.model.Candidate;
+import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.entities.emoji.UnicodeEmojiImpl;
@@ -13,45 +14,55 @@ import java.util.concurrent.*;
 public class GuessDriver implements IChannelCommand {
 
     private final ScheduledExecutorService timer;
+
     private ScheduledFuture<?> timerTask;
+
     private final ChannelCommandManager manager;
+
     private final MessageChannel channel;
+
     private final Server server;
+
     private int answer;
+
     private int attempts;
+
     private final int maxNum;
 
-    public GuessDriver(Server server, MessageChannel channel, int maxNum) {
+    private GuessDriver(ChannelCommandManager manager, Server server, MessageChannel channel, int maxNum) {
+        this.manager = manager;
         this.channel = channel;
         this.server = server;
         this.maxNum = maxNum;
         attempts = 0;
-        manager = ChannelCommandManager.getInstance();
         timer = Executors.newScheduledThreadPool(1);
-        start();
+    }
+
+    public static GuessDriver driver(ChannelCommandManager manager, Server server, MessageChannel channel, int maxNum) {
+        return new GuessDriver(manager, server, channel, maxNum);
     }
 
     @Override
-    public void evaluate(Message message, List<String> args, User user) {
+    public void evaluate(Message message, List<String> args, Candidate candidate) {
         attempts++;
         try {
             int guess = Integer.parseInt(args.get(0));
             if (guess == answer) {
                 finish();
-                message.addReaction(new UnicodeEmojiImpl("U+1F3C6")).queue();
-                channel.sendMessage("Congratulations! "+user.getAsMention()+" You guessed correctly in "+attempts+" guesses! :tada:").queue();
+                message.addReaction(new UnicodeEmojiImpl("\uD83C\uDF89")).queue();
+                channel.sendMessage("Congratulations! "+ candidate.getAsMention()+" You guessed correctly in "+attempts+" guesses! :tada:").queue();
                 timerTask.cancel(true);
             } else if (guess < answer) {
-                message.addReaction(new UnicodeEmojiImpl("U+2B06")).queue();
+                message.addReaction(new UnicodeEmojiImpl("\u2B06")).queue();
             } else {
-                message.addReaction(new UnicodeEmojiImpl("U+2B07")).queue();
+                message.addReaction(new UnicodeEmojiImpl("\u2B07")).queue();
             }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             //No need to respond
         }
     }
 
-    private void start() {
+    public void start() {
         if (manager.gameInProgress(channel.getId())) {
             channel.sendMessage("There is already a game running in this channel! Simply type your guess into chat to play!").queue();
         } else {

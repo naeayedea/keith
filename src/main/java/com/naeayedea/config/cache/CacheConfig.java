@@ -1,7 +1,7 @@
 package com.naeayedea.config.cache;
 
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.UserManager;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,17 +18,17 @@ public class CacheConfig {
 
     private final ServerManager serverManager;
 
-    private final UserManager userManager;
+    private final CandidateManager candidateManager;
 
     private final CommandRateLimiter rateLimiter;
 
     @Value("${keith.manager.cache.refresh}")
     private int cacheRefreshIntervalInSeconds;
 
-    public CacheConfig(@Qualifier("scheduler")ScheduledExecutorService scheduledExecutorService, ServerManager serverManager, UserManager userManager, CommandRateLimiter rateLimiter) {
+    public CacheConfig(@Qualifier("scheduler")ScheduledExecutorService scheduledExecutorService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.serverManager = serverManager;
-        this.userManager = userManager;
+        this.candidateManager = candidateManager;
         this.rateLimiter = rateLimiter;
     }
 
@@ -37,7 +37,7 @@ public class CacheConfig {
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             rateLimiter.clearEntries();
             serverManager.clear();
-            userManager.clear();
+            candidateManager.clear();
         }, cacheRefreshIntervalInSeconds, cacheRefreshIntervalInSeconds, TimeUnit.SECONDS);
     }
 }

@@ -1,6 +1,7 @@
 package com.naeayedea.keith.commands.info;
 
 import com.naeayedea.keith.commands.IMessageCommand;
+import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -13,11 +14,14 @@ public class Help extends InfoCommand {
 
     private final Map<String, IMessageCommand> commands;
 
-    public Help (Map<String, IMessageCommand> commandMap) {
-        super("help");
-        this.commands = commandMap;
-    }
+    private final ServerManager serverManager;
 
+    public Help (Map<String, IMessageCommand> commandMap, ServerManager serverManager) {
+        super("help");
+
+        this.commands = commandMap;
+        this.serverManager = serverManager;
+    }
 
     @Override
     public String getShortDescription(String prefix) {
@@ -32,7 +36,9 @@ public class Help extends InfoCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        String prefix = Utilities.getPrefix(event);
+        String prefix = Utilities.getPrefix(serverManager, event);
+
+
         if(tokens.isEmpty()){
             sendAllCommandHelp(event.getChannel(), prefix);
         } else {
