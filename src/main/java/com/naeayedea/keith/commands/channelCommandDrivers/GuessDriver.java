@@ -1,6 +1,5 @@
-package com.naeayedea.keith.commands.channel_commands;
+package com.naeayedea.keith.commands.channelCommandDrivers;
 
-import com.naeayedea.keith.commands.generic.Guess;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.model.Candidate;
 import com.naeayedea.model.Server;
@@ -11,7 +10,7 @@ import net.dv8tion.jda.internal.entities.emoji.UnicodeEmojiImpl;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class GuessDriver implements IChannelCommand {
+public class GuessDriver implements ChannelCommandDriver {
 
     private final ScheduledExecutorService timer;
 

@@ -2,7 +2,7 @@ package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.commands.MessageCommand;
 import com.naeayedea.keith.commands.admin.Admin;
-import com.naeayedea.keith.commands.channel_commands.IChannelCommand;
+import com.naeayedea.keith.commands.channelCommandDrivers.ChannelCommandDriver;
 import com.naeayedea.keith.commands.generic.*;
 import com.naeayedea.keith.commands.info.Help;
 import com.naeayedea.keith.commands.info.Invite;
@@ -168,7 +168,7 @@ public class MessageReceivedEventListener {
                         //else ignore
                     } else if (channelCommandManager.gameInProgress(channel.getId())) {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
-                        IChannelCommand cc = channelCommandManager.getGame(channel.getId());
+                        ChannelCommandDriver cc = channelCommandManager.getGame(channel.getId());
                         cc.evaluate(message, tokens, candidate);
                     } else if (chatManager.hasActiveChat(channel.getId())) {
                         chatManager.sendMessage(channel.getId(), event);

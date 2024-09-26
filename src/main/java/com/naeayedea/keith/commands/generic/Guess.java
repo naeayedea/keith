@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.generic;
 
-import com.naeayedea.keith.commands.channel_commands.GuessDriver;
+import com.naeayedea.keith.commands.channelCommandDrivers.GuessDriver;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.model.Server;

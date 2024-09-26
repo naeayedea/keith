@@ -1,13 +1,13 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.channel_commands.IChannelCommand;
+import com.naeayedea.keith.commands.channelCommandDrivers.ChannelCommandDriver;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ChannelCommandManager {
 
-    private final Map<String, IChannelCommand> gamesInProgress;
+    private final Map<String, ChannelCommandDriver> gamesInProgress;
 
     public ChannelCommandManager() {
         gamesInProgress = new HashMap<>();
@@ -17,7 +17,7 @@ public class ChannelCommandManager {
         return gamesInProgress.get(channelId) != null;
     }
 
-    public boolean addGame(String channelId, IChannelCommand newGame) {
+    public boolean addGame(String channelId, ChannelCommandDriver newGame) {
         if (gameInProgress(channelId)) {
             return false;
         } else {
@@ -30,7 +30,7 @@ public class ChannelCommandManager {
         gamesInProgress.remove(channelId);
     }
 
-    public IChannelCommand getGame(String channelId) {
+    public ChannelCommandDriver getGame(String channelId) {
         return gamesInProgress.get(channelId);
     }
 
