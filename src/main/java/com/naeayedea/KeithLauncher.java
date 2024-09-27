@@ -19,6 +19,10 @@ public class KeithLauncher implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        logger.info("Starting program, received args {}", (Object[]) args.getSourceArgs());
+        if (args.getSourceArgs() != null && args.getSourceArgs().length != 0) {
+            logger.info("Keith initialized, received args {}", (Object[]) args.getSourceArgs());
+        } else {
+            logger.info("Keith initialized");
+        }
     }
 }

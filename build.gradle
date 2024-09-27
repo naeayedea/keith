@@ -1,13 +1,16 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '3.3.4'
 }
 
-mainClassName = 'com.example.jda.Bot'
+apply plugin: 'io.spring.dependency-management'
+
 version 'v3.00'
+
 sourceCompatibility = 21
 targetCompatibility = 21
-def springVersion = "3.3.4"
+
 def jacksonVersion = "2.17.2"
 
 repositories {
@@ -16,18 +19,18 @@ repositories {
 
 jar {
     manifest {
-        attributes "Main-Class": "Main"
+        attributes "Main-Class": "com.naeayedea.KeithLauncher"
     }
 }
 
 dependencies {
     //spring
-    implementation ("org.springframework.boot:spring-boot-starter:$springVersion") {
+    implementation ("org.springframework.boot:spring-boot-starter") {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 
     //replace logback with log4j2
-    implementation "org.springframework.boot:spring-boot-starter-log4j2:$springVersion"
+    implementation "org.springframework.boot:spring-boot-starter-log4j2"
 
     //jackson
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
@@ -43,5 +46,5 @@ dependencies {
 compileJava.options.encoding = 'UTF-8'
 
 application {
-    mainClassName = 'Main'
+    mainClassName = 'com.naeayedea.KeithLauncher'
 }

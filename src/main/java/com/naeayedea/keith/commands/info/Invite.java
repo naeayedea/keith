@@ -26,6 +26,6 @@ public class Invite extends AbstractInfoCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        Utilities.Messages.sendEmbed(event.getChannel(), "Invite Me!", "[https://keithbot.com/invite](https://discord.com/oauth2/authorize?client_id=624702573064224803&scope=bot&permissions=381648628854)", event);
+        Utilities.Messages.sendEmbed(event.getChannel(), "Invite Me!", "[https://keithbot.com/invite](https://discord.com/oauth2/authorize?client_id=624702573064224803&scope=bot&permissions=1126899292376176)", event);
     }
 }

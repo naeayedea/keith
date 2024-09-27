@@ -1,0 +1,83 @@
+[
+  {
+    "name": "say",
+    "description": "I'll repeat whatever you say!",
+    "isNSFW": false,
+    "type": "SLASH",
+    "defaultPermission": "ENABLED",
+    "options": [
+      {
+        "name": "message",
+        "description": "The message to repeat",
+        "isOptional": false,
+        "type": "STRING",
+        "choices": []
+      }
+    ],
+    "subCommands": [],
+    "subCommandGroups": []
+  },
+  {
+    "name": "testwithgroups",
+    "description": "I have two command groups",
+    "isNSFW": false,
+    "type": "SLASH",
+    "defaultPermission": "ENABLED",
+    "options": [],
+    "subCommands": [],
+    "subCommandGroups": [
+      {
+        "name": "groupone",
+        "description": "A group of sub commands",
+        "subCommands": [
+          {
+            "name": "say",
+            "description": "I say but in a sub command",
+            "options": [
+              {
+                "name": "message",
+                "description": "the messagee",
+                "isOptional": false,
+                "type": "STRING",
+                "choices": []
+              }
+            ]
+          },
+          {
+            "name": "saywithoptions",
+            "description": "I say but in a sub command and with options",
+            "options": [
+              {
+                "name": "message",
+                "description": "the messagee",
+                "isOptional": false,
+                "type": "STRING",
+                "choices": [
+                  {
+                    "name": "a",
+                    "value": "Choice A"
+                  },
+                  {
+                    "name": "b",
+                    "value": "Choice B"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "grouptwo",
+        "description": "I do a thing",
+        "subCommands": [
+          {
+            "name": "sayhello",
+            "description": "I say hello",
+            "options": []
+          }
+        ]
+      }
+    ]
+  }
+]

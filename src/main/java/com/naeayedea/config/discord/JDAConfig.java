@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Configuration
 public class JDAConfig {
@@ -44,7 +46,7 @@ public class JDAConfig {
     }
 
     @Bean
-    public JDA jda(BotConfiguration botConfiguration) throws Exception {
+    public JDA jda(BotConfiguration botConfiguration, List<CommandData> commands) throws Exception {
         logger.info("Initialising JPA");
 
         JDABuilder builder = JDABuilder.create(botConfiguration.getToken(),
@@ -64,20 +66,19 @@ public class JDAConfig {
                 .build()
                 .awaitReady();
 
-            logger.info("JPA ready. Preparing pagination.");
+            logger.info("Adding commands. Count {}", commands.size());
 
-            //configure pagination library
-            PaginatorBuilder.createPaginator()
-                .setHandler(jda)
-                .shouldRemoveOnReact(false)
-                .shouldEventLock(true)
-                .activate();
+            jda.updateCommands()
+                .addCommands(commands)
+                .queue();
+
+            logger.info("JDA ready. Preparing pagination.");
 
             PaginatorBuilder.createPaginator(jda)
                 .shouldRemoveOnReact(false)
                 .shouldEventLock(true)
                 .setDeleteOnCancel(true)
-                .build();
+                .activate();
 
             if(!botConfiguration.getRestartMessage().isEmpty()) {
                 logger.info("Restart message \"{}\" received for channel \"{}\"", botConfiguration.getRestartMessage(), botConfiguration.getRestartChannel());
@@ -90,8 +91,8 @@ public class JDAConfig {
 
             Utilities.setJDA(jda);
             Database.setSource(botConfiguration.getDataSource());
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
 
+            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
 
             return jda;
         } catch (Throwable e) {

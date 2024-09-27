@@ -1,0 +1,69 @@
+[
+  {
+    "name": "",
+    "description": "",
+    "isNSFW": true,
+    "type": "SLASH|USER|MESSAGE",
+    "defaultPermission": "ENABLED|DISABLED",
+    "options": [
+      {
+        "name": "",
+        "description": "",
+        "isOptional": false,
+        "type": "STRING|INTEGER|BOOLEAN",
+        "choices": [
+          {
+            "name": "",
+            "value": ""
+          }
+        ]
+      }
+    ],
+    "subCommandGroups": [
+      {
+        "name": "",
+        "description": "",
+        "subCommands": [
+          {
+            "name": "",
+            "description": "",
+            "options": [
+              {
+                "name": "",
+                "description": "",
+                "isOptional": false,
+                "type": "STRING|INTEGER|BOOLEAN",
+                "choices": [
+                  {
+                    "name": "",
+                    "value": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "subCommands": [
+      {
+        "name": "",
+        "description": "",
+        "options": [
+          {
+            "name": "",
+            "description": "",
+            "isOptional": false,
+            "type": "STRING|INTEGER|BOOLEAN",
+            "choices": [
+              {
+                "name": "",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
