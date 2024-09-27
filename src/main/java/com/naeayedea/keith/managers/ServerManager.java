@@ -1,7 +1,7 @@
 package com.naeayedea.keith.managers;
 
 import com.naeayedea.keith.util.Database;
-import com.naeayedea.model.Server;
+import com.naeayedea.keith.model.Server;
 
 import java.sql.PreparedStatement;
 import java.time.Instant;

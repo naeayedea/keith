@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.generic;
 import com.naeayedea.keith.commands.ReactionCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
-import com.naeayedea.model.Server;
+import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;

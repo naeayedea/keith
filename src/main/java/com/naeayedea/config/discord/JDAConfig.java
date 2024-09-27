@@ -3,7 +3,7 @@ package com.naeayedea.config.discord;
 import com.github.ygimenez.model.PaginatorBuilder;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
-import com.naeayedea.model.BotConfiguration;
+import com.naeayedea.keith.model.BotConfiguration;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;

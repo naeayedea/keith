@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.channelCommandDrivers;
 
 import com.naeayedea.keith.managers.ChannelCommandManager;
-import com.naeayedea.model.Candidate;
-import com.naeayedea.model.Server;
+import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.entities.emoji.UnicodeEmojiImpl;

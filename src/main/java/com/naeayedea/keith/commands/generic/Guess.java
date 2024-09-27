@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.generic;
 import com.naeayedea.keith.commands.channelCommandDrivers.GuessDriver;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.model.Server;
+import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Value;

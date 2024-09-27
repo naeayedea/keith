@@ -1,9 +1,9 @@
 package com.naeayedea.keith.managers;
 
 import com.naeayedea.keith.util.Utilities;
-import com.naeayedea.model.chat.Chat;
-import com.naeayedea.model.chat.ChatAgent;
-import com.naeayedea.model.chat.ChatCandidate;
+import com.naeayedea.keith.model.chat.Chat;
+import com.naeayedea.keith.model.chat.ChatAgent;
+import com.naeayedea.keith.model.chat.ChatCandidate;
 import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;

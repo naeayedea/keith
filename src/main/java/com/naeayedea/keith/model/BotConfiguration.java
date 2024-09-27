@@ -1,4 +1,4 @@
-package com.naeayedea.model;
+package com.naeayedea.keith.model;
 
 import javax.sql.DataSource;
 

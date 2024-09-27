@@ -1,7 +1,7 @@
 package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.model.Server;
+import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

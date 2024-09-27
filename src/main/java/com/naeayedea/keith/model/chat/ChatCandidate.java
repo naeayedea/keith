@@ -1,4 +1,4 @@
-package com.naeayedea.model.chat;
+package com.naeayedea.keith.model.chat;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;

@@ -3,7 +3,7 @@ package com.naeayedea.keith.managers;
 import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.util.Database;
 
-import com.naeayedea.model.Candidate;
+import com.naeayedea.keith.model.Candidate;
 
 import java.sql.PreparedStatement;
 import java.time.Instant;

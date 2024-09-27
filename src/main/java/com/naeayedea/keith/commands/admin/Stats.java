@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.admin;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
-import com.naeayedea.model.Candidate;
+import com.naeayedea.keith.model.Candidate;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

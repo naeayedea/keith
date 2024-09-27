@@ -1,4 +1,4 @@
-package com.naeayedea.model;
+package com.naeayedea.keith.model;
 
 import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.util.Database;
