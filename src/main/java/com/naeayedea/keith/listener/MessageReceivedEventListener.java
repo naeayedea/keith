@@ -1,12 +1,12 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.config.commands.CommandConfig;
-import com.naeayedea.keith.commands.MessageCommand;
-import com.naeayedea.keith.commands.admin.Admin;
-import com.naeayedea.keith.commands.channelCommandDrivers.ChannelCommandDriver;
-import com.naeayedea.keith.commands.generic.*;
-import com.naeayedea.keith.commands.info.AbstractInfoCommand;
-import com.naeayedea.keith.commands.info.Help;
+import com.naeayedea.config.commands.MessageCommandConfig;
+import com.naeayedea.keith.commands.message.MessageCommand;
+import com.naeayedea.keith.commands.message.admin.Admin;
+import com.naeayedea.keith.commands.message.channelCommandDrivers.ChannelCommandDriver;
+import com.naeayedea.keith.commands.message.generic.*;
+import com.naeayedea.keith.commands.message.info.AbstractInfoCommand;
+import com.naeayedea.keith.commands.message.info.Help;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
@@ -87,7 +87,7 @@ public class MessageReceivedEventListener {
 
         commands = new MultiMap<>();
 
-        CommandConfig.populateCommandMap(commands, messageCommands, List.of(baseHelp.getDefaultName()));
+        MessageCommandConfig.populateCommandMap(commands, messageCommands, List.of(baseHelp.getDefaultName()));
 
         commands.putAll(baseHelp.getAliases(), baseHelp);
         commands.putAll(admin.getAliases(), admin);

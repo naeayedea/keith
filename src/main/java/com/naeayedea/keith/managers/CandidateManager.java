@@ -1,6 +1,6 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.AccessLevel;
+import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.util.Database;
 
 import com.naeayedea.keith.model.Candidate;

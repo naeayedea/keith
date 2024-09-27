@@ -21,7 +21,6 @@ public class SlashCommandListener {
             case "testwithgroups" -> {
                 String chosenGroup = event.getSubcommandGroup();
 
-
                 if ("groupone".equals(chosenGroup)) {
                     String chosenSubCommand = event.getSubcommandName();
 

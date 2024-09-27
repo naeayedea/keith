@@ -1,6 +1,6 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.channelCommandDrivers.ChannelCommandDriver;
+import com.naeayedea.keith.commands.message.channelCommandDrivers.ChannelCommandDriver;
 
 import java.util.HashMap;
 import java.util.Map;
