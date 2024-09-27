@@ -2,12 +2,16 @@ package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.commands.generic.lox.Lox;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+@Component
 public class Interpret extends AbstractUserCommand {
 
-    public Interpret() {
-        super("interpret");
+    public Interpret(@Value("${keith.commands.interpret.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.interpret.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

@@ -8,16 +8,20 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Feedback extends AbstractUserCommand {
 
     private final ServerChatManager chatManager;
+
     private final ServerManager serverManager;
 
-    public Feedback(ServerChatManager chatManager, ServerManager serverManager) {
-        super("feedback");
+    public Feedback(ServerChatManager chatManager, ServerManager serverManager, @Value("${keith.commands.feedback.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.feedback.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
 
         this.chatManager = chatManager;
         this.serverManager = serverManager;

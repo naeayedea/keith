@@ -7,6 +7,12 @@ import java.util.List;
 public interface MessageCommand extends Command {
 
     /**
+     * Returns all aliases that can be used to trigger the command
+     * @return a list of aliases as String.
+     */
+    List<String> getAliases();
+
+    /**
      * Returns a short description of the command, used when help is used to show all commands in a category
      * @param prefix the prefix of the server/channel
      * @return a String containing the description

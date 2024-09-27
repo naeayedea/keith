@@ -9,20 +9,28 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+@Component
 public class Pin extends AbstractUserCommand implements ReactionCommand {
 
     private final ServerManager serverManager;
 
-    public Pin(ServerManager serverManager) {
-        super("pin");
+    @Value("#{T(com.naeayedea.converter.StringToEmojiConverter).convertList('${keith.commands.pin.reactionTriggers}', ',')}")
+    private List<Emoji> reactionTriggers;
+
+    public Pin(ServerManager serverManager, @Value("${keith.commands.pin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.pin.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
+
         this.serverManager = serverManager;
     }
 
@@ -37,6 +45,17 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         return "Pin allows users to 'pin' messages to a separate read only channel. They can pin a message by replying, with the message"
                 +"id or by using 'pin [text]' to pin the text entered in the message.";
     }
+
+    @Override
+    public List<Emoji> getReactionTriggers() {
+        return reactionTriggers;
+    }
+
+    @Override
+    public boolean triggeredBy(Emoji emoji) {
+        return reactionTriggers.contains(emoji);
+    }
+
 
     @Override
     public void run(MessageReactionAddEvent event, User user) {

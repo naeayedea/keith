@@ -1,17 +1,19 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public class Locate extends AbstractAdminCommand {
+@Component
+public class Locate extends AbstractAdminUtilsCommand {
 
-    public Locate() {
-        super("locate");
+    public Locate(@Value("${keith.commands.admin.utilities.locate.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.locate.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override
@@ -44,6 +46,8 @@ public class Locate extends AbstractAdminCommand {
                 } else {
                     channel.sendMessage("Could not find user").queue();
                 }
+            } else {
+                channel.sendMessage("No search param provided, usage: server <id> or user <id>").queue();
             }
         }
     }

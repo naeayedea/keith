@@ -8,15 +8,18 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class SetCandidateLevel extends AbstractAdminCommand {
 
     private final CandidateManager candidateManager;
 
-    public SetCandidateLevel(CandidateManager candidateManager) {
-        super("setlevel");
+    public SetCandidateLevel(CandidateManager candidateManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
     }
 

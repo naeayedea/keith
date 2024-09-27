@@ -1,26 +1,44 @@
 package com.naeayedea.keith.commands.admin;
 
+import com.naeayedea.config.commands.CommandConfig;
+import com.naeayedea.keith.commands.AbstractCommandPortal;
+import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.commands.MessageCommand;
 import com.naeayedea.keith.commands.info.Help;
-import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Admin extends AbstractAdminCommand {
+@Component
+public class Admin extends AbstractCommandPortal {
+
+    private final Logger logger = LoggerFactory.getLogger(Admin.class);
 
     private MultiMap<String, MessageCommand> commands;
-    private final ServerManager serverManager;
-    private final CandidateManager candidateManager;
 
-    public Admin(ServerManager serverManager, CandidateManager candidateManager) {
-        super("admin", true,  true);
+    private final List<AbstractAdminCommand> adminCommandHandlers;
 
-        this.serverManager = serverManager;
-        this.candidateManager = candidateManager;
+    private final Help adminHelp;
+
+    private final AdminUtilities adminUtilities;
+
+    @Override
+    public AccessLevel getAccessLevel() {
+        return AccessLevel.ADMIN;
+    }
+
+    public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
+        super(defaultName, commandAliases, true,  true);
+
+        this.adminCommandHandlers = adminCommandHandlers;
+        this.adminHelp = adminHelp;
+        this.adminUtilities = adminUtilities;
 
         initialiseCommands();
     }
@@ -39,6 +57,7 @@ public class Admin extends AbstractAdminCommand {
     public void run(MessageReceivedEvent event, List<String> tokens) {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
         MessageCommand command = findCommand(tokens);
+
         if (command != null) {
             command.run(event, tokens);
         }
@@ -50,22 +69,23 @@ public class Admin extends AbstractAdminCommand {
     }
 
     private void initialiseCommands() {
-        this.commands = new MultiMap<>();
+        logger.info("Initializing admin commands.");
 
-        commands.putAll(Arrays.asList("echo", "repeat"), new Echo());
-        commands.putAll(Arrays.asList("setlevel", "updatelevel"), new SetCandidateLevel(candidateManager));
-        commands.putAll(Arrays.asList("utils", "util", "utilities"), new UtilitiesAdmin(serverManager, candidateManager));
-        commands.putAll(Arrays.asList("stats", "stat", "statistics"), new Stats(candidateManager));
-        commands.putAll(Arrays.asList("setstatus", "newstatus"), new SetStatus());
-        commands.putAll(Arrays.asList("help", "hlep", "dumb", "commands"), new Help(commands, serverManager));
-        commands.put("sneaky", new Sneaky());
-        commands.put("ban", new Ban(serverManager, candidateManager));
-        commands.put("send", new SendMessage());
+        commands = new MultiMap<>();
+
+        CommandConfig.populateCommandMap(commands, adminCommandHandlers, List.of(adminHelp.getDefaultName()));
+
+        commands.putAll(adminHelp.getAliases(), adminHelp);
+        commands.putAll(adminUtilities.getAliases(), adminUtilities);
+
+        logger.info("Loaded {} admin message command aliases", commands.size());
     }
 
     private MessageCommand findCommand(List<String> list) {
-        String commandString = list.remove(0).toLowerCase();
-        return commands.get(commandString);
+        if (list == null || list.isEmpty())
+            return null;
+
+        return commands.get(list.removeFirst().toLowerCase());
     }
 
 }

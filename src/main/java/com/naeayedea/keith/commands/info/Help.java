@@ -16,8 +16,8 @@ public class Help extends AbstractInfoCommand {
 
     private final ServerManager serverManager;
 
-    public Help (Map<String, MessageCommand> commandMap, ServerManager serverManager) {
-        super("help");
+    public Help (Map<String, MessageCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases) {
+        super(defaultName, commandAliases);
 
         this.commands = commandMap;
         this.serverManager = serverManager;

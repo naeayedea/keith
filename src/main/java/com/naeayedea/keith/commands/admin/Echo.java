@@ -1,13 +1,16 @@
 package com.naeayedea.keith.commands.admin;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Echo extends AbstractAdminCommand {
 
-    public Echo() {
-        super("echo");
+    public Echo(@Value("${keith.commands.admin.echo.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.echo.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

@@ -2,13 +2,16 @@ package com.naeayedea.keith.commands.admin;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class SetStatus extends AbstractAdminCommand {
 
-    public SetStatus() {
-        super("setstatus");
+    public SetStatus(@Value("${keith.commands.admin.setStatus.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.setStatus.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

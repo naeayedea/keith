@@ -1,21 +1,23 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public class Clear extends AbstractAdminCommand {
+@Component
+public class Clear extends AbstractAdminUtilsCommand {
 
     private final ServerManager serverManager;
 
     private final CandidateManager candidateManager;
 
-    public Clear(ServerManager serverManager, CandidateManager candidateManager) {
-        super("clear");
+    public Clear(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.clear.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.clear.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
         this.serverManager = serverManager;
         this.candidateManager = candidateManager;
     }

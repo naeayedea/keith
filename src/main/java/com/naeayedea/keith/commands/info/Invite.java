@@ -2,13 +2,16 @@ package com.naeayedea.keith.commands.info;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Invite extends AbstractInfoCommand {
 
-    public Invite() {
-        super("invite");
+    public Invite(@Value("${keith.commands.invite.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.invite.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

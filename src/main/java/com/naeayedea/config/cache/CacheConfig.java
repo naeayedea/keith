@@ -33,7 +33,7 @@ public class CacheConfig {
     }
 
     @PostConstruct
-    public void configureManagerCleanup() {
+    private void configureManagerCleanup() {
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             rateLimiter.clearEntries();
             serverManager.clear();

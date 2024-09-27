@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.List;
@@ -13,10 +15,11 @@ import java.util.List;
  * Sneaky is a command which attempts to give any bot admin a role
  * with server admin if the bot has sufficient permissions. (only for fun in friend servers)
  */
+@Component
 public class Sneaky extends AbstractAdminCommand {
 
-    public Sneaky() {
-        super("sneaky", false, true);
+    public Sneaky(@Value("${keith.commands.admin.sneaky.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.sneaky.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases, false, true);
     }
 
     @Override

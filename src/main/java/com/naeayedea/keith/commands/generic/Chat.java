@@ -3,15 +3,19 @@ package com.naeayedea.keith.commands.generic;
 import com.naeayedea.keith.managers.ServerChatManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Chat extends AbstractUserCommand {
+
 
     private final ServerChatManager chatManager;
 
-    public Chat(ServerChatManager chatManager) {
-        super("chat");
+    public Chat(ServerChatManager chatManager, @Value("${keith.commands.chat.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.chat.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
 
         this.chatManager = chatManager;
     }

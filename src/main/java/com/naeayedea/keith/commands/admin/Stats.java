@@ -9,19 +9,22 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class Stats extends AbstractAdminCommand {
 
     private static final String VERSION = "3.1.1 \"PIN HOTFIX\"";
 
     private final CandidateManager candidateManager;
 
-    public Stats(CandidateManager candidateManager) {
-        super("stats");
+    public Stats(CandidateManager candidateManager, @Value("${keith.commands.admin.stats.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.stats.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
     }
 

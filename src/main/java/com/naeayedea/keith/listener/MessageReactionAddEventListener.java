@@ -2,7 +2,6 @@ package com.naeayedea.keith.listener;
 
 
 import com.naeayedea.keith.commands.ReactionCommand;
-import com.naeayedea.keith.commands.generic.Pin;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
@@ -25,9 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 @Component
@@ -37,7 +34,7 @@ public class MessageReactionAddEventListener {
 
     private final ExecutorService reactionHandlingService;
 
-    private Map<String, ReactionCommand> reactionCommands;
+    private MultiMap<String, ReactionCommand> reactionCommands;
 
     private final ServerManager serverManager;
 
@@ -45,22 +42,25 @@ public class MessageReactionAddEventListener {
 
     private final CommandRateLimiter rateLimiter;
 
-    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter) {
+    private final List<ReactionCommand> reactionCommandHandlers;
+
+    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter, List<ReactionCommand> reactionCommandHandlers) {
         this.reactionHandlingService = reactionHandlingService;
         this.serverManager = serverManager;
         this.candidateManager = candidateManager;
         this.rateLimiter = rateLimiter;
+        this.reactionCommandHandlers = reactionCommandHandlers;
     }
 
     @PostConstruct
     private void init() {
-        this.reactionCommands = new HashMap<>();
+        this.reactionCommands = new MultiMap<>();
 
-        //reaction commands
-        reactionCommands = new MultiMap<>();
-        reactionCommands.put("\uD83D\uDCCC", new Pin(serverManager));
+        for (ReactionCommand command : reactionCommandHandlers) {
+            reactionCommands.putAll(command.getReactionTriggers().stream().map(Emoji::getAsReactionCode).toList(), command);
+        }
 
-        logger.info("Loaded {} reaction commands.", reactionCommands.size());
+        logger.info("Loaded {} reaction aliases.", reactionCommands.size());
 
     }
 
@@ -96,15 +96,16 @@ public class MessageReactionAddEventListener {
                         //make sure that rate limit has not been reached
                         if (rateLimiter.userPermitted(candidate.getId())) {
                             List<MessageReaction> reactions = message.getReactions();
+
+                            //check if any of our aliases have been fired before
                             for (MessageReaction reaction : reactions) {
-                                if (reaction.getEmoji().equals(emote)) {
-                                    if (reaction.hasCount() && reaction.getCount() < 2) {
-                                        rateLimiter.incrementOrInsertRecord(candidate.getId(), 1);
-                                        message.addReaction(emote).queue(e -> command.run(event, member.getUser()));
-                                        break;
-                                    }
+                                if (reaction.isSelf() && command.triggeredBy(reaction.getEmoji())) {
+                                    return;
                                 }
                             }
+
+                            rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
+                            message.addReaction(emote).queue(e -> command.run(event, member.getUser()));
                         }
                     }
                 }

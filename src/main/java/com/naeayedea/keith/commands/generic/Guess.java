@@ -6,17 +6,20 @@ import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Guess extends AbstractUserCommand {
 
     private final ServerManager serverManager;
 
     private final ChannelCommandManager channelCommandManager;
 
-    public Guess(ServerManager serverManager, ChannelCommandManager channelCommandManager) {
-        super("guess");
+    public Guess(ServerManager serverManager, ChannelCommandManager channelCommandManager, @Value("${keith.commands.guess.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.guess.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
 
         this.serverManager = serverManager;
         this.channelCommandManager = channelCommandManager;

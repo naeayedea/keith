@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.text.ParseException;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class Remind extends AbstractUserCommand {
 
     public static class RemindExecutor extends ScheduledThreadPoolExecutor {
@@ -42,6 +45,7 @@ public class Remind extends AbstractUserCommand {
             tasks = new ArrayList<>();
         }
 
+        @NotNull
         @Override
         public ScheduledFuture<?> schedule(@NotNull Runnable command, long delay, @NotNull TimeUnit unit) {
             ScheduledFuture<?> future = super.schedule(command, delay, unit);
@@ -69,10 +73,13 @@ public class Remind extends AbstractUserCommand {
 
     private final Logger logger = LoggerFactory.getLogger(Remind.class);
 
-    public Remind() {
-        super("remind");
-        executor = new RemindExecutor(200);
+    public Remind(@Value("${keith.commands.remind.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.remind.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
+
+        this.executor = new RemindExecutor(200);
+
         executor.scheduleAtFixedRate(executor::cleanup, 12, 12, TimeUnit.HOURS);
+
         loadReminders();
     }
 

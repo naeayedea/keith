@@ -2,15 +2,19 @@ package com.naeayedea.keith.commands.generic;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+@Component
 public class Calculator extends AbstractUserCommand {
 
-    public Calculator() {
-        super("calculate");
+    public Calculator(@Value("${keith.commands.calculator.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.calculator.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
+
     }
 
     @Override

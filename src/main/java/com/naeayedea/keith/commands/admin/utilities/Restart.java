@@ -1,15 +1,17 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public class Restart extends AbstractAdminCommand {
+@Component
+public class Restart extends AbstractAdminUtilsCommand {
 
-    public Restart() {
-        super("restart");
+    public Restart(@Value("${keith.commands.admin.utilities.restart.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.restart.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

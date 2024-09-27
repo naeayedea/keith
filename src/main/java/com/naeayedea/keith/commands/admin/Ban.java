@@ -7,17 +7,20 @@ import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class Ban extends AbstractAdminCommand {
 
     private final ServerManager serverManager;
 
     private final CandidateManager candidateManager;
 
-    public Ban(ServerManager serverManager, CandidateManager candidateManager) {
-        super("ban");
+    public Ban(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.ban.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.ban.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
         this.serverManager = serverManager;
         this.candidateManager = candidateManager;
     }

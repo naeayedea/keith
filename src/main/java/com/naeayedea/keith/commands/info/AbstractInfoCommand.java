@@ -2,14 +2,16 @@ package com.naeayedea.keith.commands.info;
 import com.naeayedea.keith.commands.AccessLevel;
 import com.naeayedea.keith.commands.AbstractCommand;
 
+import java.util.List;
+
 public abstract class AbstractInfoCommand extends AbstractCommand {
 
-    public AbstractInfoCommand(String name) {
-        super(name);
+    public AbstractInfoCommand(String name, List<String> commandAliases) {
+        super(name, commandAliases);
     }
 
-    public AbstractInfoCommand(String name, boolean isPrivateMessageCompatible, boolean isHidden) {
-        super(name, isPrivateMessageCompatible, isHidden);
+    public AbstractInfoCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
+        super(name, commandAliases, isPrivateMessageCompatible, isHidden);
     }
 
     @Override

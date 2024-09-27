@@ -3,21 +3,26 @@ package com.naeayedea.keith.commands.generic;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.model.Server;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class SetPrefix extends AbstractUserCommand {
 
-    int limit;
+    private final int limit;
 
     private final ServerManager serverManager;
 
-    public SetPrefix(ServerManager serverManager) {
-        super("setprefix");
+    public SetPrefix(ServerManager serverManager, @Value("${keith.commands.setPrefix.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.setPrefix.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
 
         this.serverManager = serverManager;
-        limit = 10;
+
+        this.limit = 10;
     }
+
 
     @Override
     public String getShortDescription(String prefix) {
@@ -40,11 +45,14 @@ public class SetPrefix extends AbstractUserCommand {
             event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
             return;
         }
-        String newPrefix = tokens.get(0).trim().toLowerCase();
+
+        String newPrefix = tokens.getFirst().trim().toLowerCase();
+
         if (tokens.size() > 1 || containsInvalidCharacters(newPrefix) || newPrefix.length() > limit) {
             event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
         } else {
             Server server = serverManager.getServer(event.getGuild().getId());
+
             if (server.setPrefix(newPrefix)) {
                 event.getChannel().sendMessage("Prefix updated successfully to: '"+server.getPrefix()+"'").queue();
             }  else {

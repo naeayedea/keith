@@ -1,15 +1,17 @@
 package com.naeayedea.keith.commands.admin.utilities;
 
-import com.naeayedea.keith.commands.admin.AbstractAdminCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public class Uptime extends AbstractAdminCommand {
+@Component
+public class Uptime extends AbstractAdminUtilsCommand {
 
-    public Uptime() {
-        super("uptime");
+    public Uptime(@Value("${keith.commands.admin.utilities.uptime.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.uptime.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
     }
 
     @Override

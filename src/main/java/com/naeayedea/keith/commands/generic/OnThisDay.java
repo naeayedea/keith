@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -29,17 +31,21 @@ import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+@Component
 public class OnThisDay extends AbstractUserCommand {
 
     private static final String API_URL = "https://byabbe.se/on-this-day/";
+
     private static final String[] formatList = {"d LLLL", "dd LLLL", "d LLL", "dd LLL", "dd/MM/", "dd MM", "dd-MM", "dd/MM/yyyy", "dd MM yyyy", "dd-MM-yyyy"};
+
 
     private final ObjectMapper mapper;
 
     private final Logger logger = LoggerFactory.getLogger(OnThisDay.class);
 
-    public OnThisDay() {
-        super("otd");
+    public OnThisDay(@Value("${keith.commands.onThisDay.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.onThisDay.aliases}', ',')}") List<String> commandAliases) {
+        super(defaultName, commandAliases);
+
         this.mapper = new ObjectMapper();
     }
 
