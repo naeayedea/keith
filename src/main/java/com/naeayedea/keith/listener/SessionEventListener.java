@@ -1,7 +1,7 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.session.SessionRecreateEvent;

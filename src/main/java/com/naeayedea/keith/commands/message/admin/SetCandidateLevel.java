@@ -2,21 +2,26 @@ package com.naeayedea.keith.commands.message.admin;
 
 import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
 public class SetCandidateLevel extends AbstractAdminCommand {
 
     private final CandidateManager candidateManager;
+
+    private final Logger logger = LoggerFactory.getLogger(SetCandidateLevel.class);
 
     public SetCandidateLevel(CandidateManager candidateManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
@@ -60,26 +65,45 @@ public class SetCandidateLevel extends AbstractAdminCommand {
                 } catch (NumberFormatException e) {
                     channel.sendMessage("Invalid user id format").queue();
                     return;
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+
+                    channel.sendMessage("Could not locate user").queue();
+
+                    return;
                 }
             }
         } else {
-            mentionedCandidate = candidateManager.getCandidate(mentionedUsers.get(0).getId());
+            try {
+                mentionedCandidate = candidateManager.getCandidate(mentionedUsers.getFirst().getId());
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+
+                channel.sendMessage("Could not locate user").queue();
+
+                return;
+            }
         }
 
-        Candidate author = candidateManager.getCandidate(event.getAuthor().getId());
-
         try {
+            Candidate author = candidateManager.getCandidate(event.getAuthor().getId());
+
             int newLevel = Integer.parseInt(tokens.get(1));
+
             if (newLevel < 0 || newLevel > 3) {
                 event.getChannel().sendMessage("Invalid level! Use values between 0 (Banned) and 3 (Admin)!").queue();
             } else if (author.getAccessLevel().num > newLevel && author.getAccessLevel().num > mentionedCandidate.getAccessLevel().num) {
-                mentionedCandidate.setAccessLevel(AccessLevel.getLevel("" + newLevel));
+                candidateManager.setAccessLevel(mentionedCandidate.getId(), AccessLevel.getLevel("" + newLevel));
                 channel.sendMessage("AccessLevel set to " + AccessLevel.getLevel("" + newLevel)).queue();
             } else {
                 channel.sendMessage("You do not have the necessary permissions to set this access level!").queue();
             }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             event.getChannel().sendMessage("Incorrect Formatting! Use format: admin updatelevel [user] [newlevel]").queue();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+
+            channel.sendMessage("Could not update access level!").queue();
         }
     }
 }

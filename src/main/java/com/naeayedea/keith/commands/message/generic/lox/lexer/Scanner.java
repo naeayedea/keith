@@ -1,4 +1,4 @@
-package com.naeayedea.keith.commands.message.generic.lox.Lexer;
+package com.naeayedea.keith.commands.message.generic.lox.lexer;
 
 import com.naeayedea.keith.commands.message.generic.lox.Lox;
 
@@ -7,31 +7,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType.*;
+import static com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType.*;
 
 public class Scanner {
 
     //static fields
     private static final Map<String, TokenType> keywords;
+
     static {
         keywords = new HashMap<>();
-        keywords.put("and",    AND);
-        keywords.put("class",  CLASS);
-        keywords.put("else",   ELSE);
-        keywords.put("false",  FALSE);
-        keywords.put("for",    FOR);
-        keywords.put("fun",    FUN);
-        keywords.put("if",     IF);
-        keywords.put("nil",    NIL);
-        keywords.put("or",     OR);
-        keywords.put("print",  PRINT);
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
         keywords.put("return", RETURN);
         keywords.put("static", STATIC);
-        keywords.put("super",  SUPER);
-        keywords.put("this",   THIS);
-        keywords.put("true",   TRUE);
-        keywords.put("var",    VAR);
-        keywords.put("while",  WHILE);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
         keywords.put("break", BREAK);
     }
 
@@ -53,7 +54,7 @@ public class Scanner {
     }
 
     public List<Token> scanTokens() {
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             start = current;
             scanToken();
         }
@@ -65,44 +66,76 @@ public class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '`': break;
-            case '(': addToken(LEFT_PAREN); break;
-            case ')': addToken(RIGHT_PAREN); break;
-            case '{': addToken(LEFT_BRACE); break;
-            case '}': addToken(RIGHT_BRACE); break;
-            case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
-            case '-': addToken(MINUS); break;
-            case '+': addToken(PLUS); break;
-            case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
-            case '%': addToken(MODULO); break;
-            case '!': addToken(match('=') ? BANG_EQUAL: BANG); break;
-            case '=': addToken(match('=') ? EQUAL_EQUAL : EQUAL); break;
-            case '<': addToken(match('=') ? LESS_EQUAL: LESS); break;
-            case '>': addToken(match('=') ? GREATER_EQUAL: GREATER); break;
+            case '`', ' ', '\r', '\t':
+                break;
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
+            case '%':
+                addToken(MODULO);
+                break;
+            case '!':
+                addToken(match('=') ? BANG_EQUAL : BANG);
+                break;
+            case '=':
+                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+                break;
+            case '<':
+                addToken(match('=') ? LESS_EQUAL : LESS);
+                break;
+            case '>':
+                addToken(match('=') ? GREATER_EQUAL : GREATER);
+                break;
             case '/':
                 if (match('/')) {
                     //double slash is comment which continues until a new line.
-                    while(peek() != '\n' && !isAtEnd()) advance();
+                    while (peek() != '\n' && !isAtEnd()) advance();
                 } else if (match('*')) {
                     comment();
                 } else {
                     addToken(SLASH);
                 }
                 break;
-            case ' ': case '\r': case '\t': break;
             case '\n':
                 line++;
                 break;
-            case '"': string(); break;
+            case '"':
+                string();
+                break;
             default:
                 if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    lox.error(line, "Unexpected character: "+c);
+                    lox.error(line, "Unexpected character: " + c);
                 }
                 break;
         }
@@ -127,7 +160,7 @@ public class Scanner {
             //consume the "."
             advance();
 
-            while(isDigit(peek())) {
+            while (isDigit(peek())) {
                 advance();
             }
         }
@@ -147,7 +180,7 @@ public class Scanner {
             lox.error(line, "Unterminated string.");
             return;
         }
-        //the closing ";
+        //the closing \";
         advance();
         //trim the surrounding quotes
         String value = source.substring(start + 1, current - 1);
@@ -169,7 +202,7 @@ public class Scanner {
 
     private boolean match(char expected) {
         if (isAtEnd()) return false;
-        if(peek() != expected) return false;
+        if (peek() != expected) return false;
         current++;
         return true;
     }

@@ -4,18 +4,20 @@ import com.naeayedea.config.commands.MessageCommandConfig;
 import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.admin.Admin;
 import com.naeayedea.keith.commands.message.channelCommandDrivers.ChannelCommandDriver;
-import com.naeayedea.keith.commands.message.generic.*;
+import com.naeayedea.keith.commands.message.generic.AbstractUserCommand;
 import com.naeayedea.keith.commands.message.info.AbstractInfoCommand;
 import com.naeayedea.keith.commands.message.info.Help;
+import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithPermissionException;
+import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.Server;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.util.MultiMap;
 import com.naeayedea.keith.util.Utilities;
-import com.naeayedea.keith.model.Candidate;
-import com.naeayedea.keith.model.Server;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -116,11 +118,11 @@ public class MessageReceivedEventListener {
                         prefix = "?";
                     } else {
                         server = serverManager.getServer(event.getGuild().getId());
-                        prefix = server.getPrefix();
+                        prefix = server.prefix();
                     }
                     List<String> tokens;
                     //check first if user is banned, if not check for server ban or private message
-                    if (!candidate.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                    if (!candidate.isBanned() && (isPrivateMessage || !server.banned())) {
                         //check for prefix
                         if (findPrefix(messageContent, prefix)) {
                             //trim prefix and trailing spaces from command
@@ -152,15 +154,28 @@ public class MessageReceivedEventListener {
                                             //all checks passed, execute command
                                             try {
                                                 Runnable execution = () -> {
+
                                                     if (command.sendTyping()) {
                                                         channel.sendTyping().queue();
                                                     }
-                                                    command.run(event, tokens);
-                                                    candidate.incrementCommandCount();
+
+                                                    try {
+                                                        command.run(event, tokens);
+                                                    } catch (KeithExecutionException e) {
+                                                        Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                                                    } catch (KeithPermissionException e) {
+                                                        sendMessage(channel, "You do not have access to this command");
+                                                    }
+
+                                                    try {
+                                                        candidateManager.incrementCommandCount(candidate.getId());
+                                                    } catch (Exception e) {
+                                                        logger.error("Could not increment command count for user {}", candidate.getId(), e);
+                                                    }
                                                 };
                                                 commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                             } catch (PermissionException e) {
-                                                Utilities.Messages.sendError(channel, "Insufficient Permissions to do that!", e.getMessage());
+                                                Utilities.Messages.sendError(channel, "I need more permissions to do that!", e.getMessage());
                                             } catch (IllegalArgumentException e) {
                                                 Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
                                             } catch (TimeoutException e) {
@@ -207,7 +222,7 @@ public class MessageReceivedEventListener {
     }
 
     private MessageCommand findCommand(List<String> list) {
-        String commandString = list.remove(0).toLowerCase();
+        String commandString = list.removeFirst().toLowerCase();
         return commands.get(commandString);
     }
 

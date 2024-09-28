@@ -1,14 +1,11 @@
 package com.naeayedea.keith.ratelimiter;
 
-import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class CommandRateLimiter {
 
-    private int rateLimitMax;
+    private final int rateLimitMax;
 
     private final Map<String, Integer> rateLimitRecord;
 

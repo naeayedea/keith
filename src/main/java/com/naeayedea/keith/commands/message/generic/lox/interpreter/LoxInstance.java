@@ -1,6 +1,6 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter;
 
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 import com.naeayedea.keith.commands.message.generic.lox.errors.RuntimeError;
 
 import java.util.HashMap;

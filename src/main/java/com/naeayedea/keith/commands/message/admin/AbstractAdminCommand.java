@@ -1,7 +1,7 @@
 package com.naeayedea.keith.commands.message.admin;
 
-import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.commands.message.AbstractCommand;
+import com.naeayedea.keith.commands.message.AccessLevel;
 
 import java.util.List;
 

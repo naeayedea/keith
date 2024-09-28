@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class MultiMap <E, K> extends HashMap<E,K> {
+public class MultiMap<E, K> extends HashMap<E, K> {
 
     /*
      * This is a wrapper class for easily adding multiple keys corresponding to the same value in a map
@@ -37,7 +37,7 @@ public class MultiMap <E, K> extends HashMap<E,K> {
      */
     public void removeWithKey(E key) {
         K value = this.get(key);
-        if(value != null) {
+        if (value != null) {
             removeWithValue(value);
         }
     }

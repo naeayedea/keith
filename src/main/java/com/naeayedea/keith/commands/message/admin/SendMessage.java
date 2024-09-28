@@ -1,7 +1,6 @@
 package com.naeayedea.keith.commands.message.admin;
 
 import com.naeayedea.keith.util.Utilities;
-
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,7 +19,7 @@ public class SendMessage extends AbstractAdminCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"lets you send a message to another channel\"";
+        return prefix + getDefaultName() + ": \"lets you send a message to another channel\"";
     }
 
     @Override
@@ -31,18 +30,18 @@ public class SendMessage extends AbstractAdminCommand {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
-        try{
-            String type = tokens.remove(0);
+        try {
+            String type = tokens.removeFirst();
             switch (type) {
                 case "message": {
-                    String channelId = tokens.remove(0);
+                    String channelId = tokens.removeFirst();
                     String message = Utilities.stringListToString(tokens);
                     Utilities.Messages.sendMessage(channelId, message, event);
                     break;
                 }
                 case "embed": {
-                    String channelId = tokens.remove(0);
-                    String title = tokens.remove(0);
+                    String channelId = tokens.removeFirst();
+                    String title = tokens.removeFirst();
                     String message = Utilities.stringListToString(tokens);
                     Utilities.Messages.sendEmbed(channelId, title, message, event);
                     break;
@@ -62,7 +61,7 @@ public class SendMessage extends AbstractAdminCommand {
                     break;
                 }
             }
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             channel.sendMessage("Insufficient arguments, see help").queue();
         }
     }

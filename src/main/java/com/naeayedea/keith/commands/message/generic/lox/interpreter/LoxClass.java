@@ -1,4 +1,4 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter;
 
 import java.util.List;
 import java.util.Map;

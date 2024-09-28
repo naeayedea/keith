@@ -1,26 +1,17 @@
 package com.naeayedea.keith.commands.message.generic.lox.analysis;
 
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.lib.Globals;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Expr;
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.Interpreter;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.Interpreter;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.lib.Globals;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 import com.naeayedea.keith.commands.message.generic.lox.Lox;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Stmt;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Expr;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Stmt;
 
 import java.util.*;
 
 public class Resolver implements Expr.Visitor<String>, Stmt.Visitor<Void> {
 
-    private static class Error {
-
-        public final Token token;
-        public final String message;
-
-        public Error(Token token, String message) {
-            this.token = token;
-            this.message = message;
-        }
-    }
+    private record Error(Token token, String message) {}
 
     private enum FunctionType {
         NONE,
@@ -76,10 +67,9 @@ public class Resolver implements Expr.Visitor<String>, Stmt.Visitor<Void> {
         }
         //after all statements have been resolved, do one more sweep and make sure all variables are used.
         for (Stmt statement : statements) {
-            if (statement instanceof Stmt.Var) {
-                Stmt.Var var = (Stmt.Var) statement;
+            if (statement instanceof Stmt.Var var) {
                 if (!scopes.isEmpty() && notSet(scopes.peek().get(var.name.lexeme), (short) 0x0010)) {
-                        errors.add(new Error(var.name, "unused variable: "+var.name.lexeme));
+                    errors.add(new Error(var.name, "unused variable: " + var.name.lexeme));
                 }
             }
         }

@@ -1,11 +1,11 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter;
 
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.lib.Globals;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Expr;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.lib.Globals;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType;
 import com.naeayedea.keith.commands.message.generic.lox.Lox;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Stmt;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Expr;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Stmt;
 import com.naeayedea.keith.commands.message.generic.lox.errors.Return;
 import com.naeayedea.keith.commands.message.generic.lox.errors.RuntimeError;
 import com.naeayedea.keith.commands.message.generic.lox.utils.Utilities;
@@ -36,7 +36,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 execute(statement);
             }
             return result;
-        } catch (RuntimeError error ){
+        } catch (RuntimeError error) {
             lox.runtimeError(error);
             return result;
         }
@@ -63,7 +63,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
 
-        switch(expr.operator.type) {
+        switch (expr.operator.type) {
             case PLUS:
                 if (left instanceof Double && right instanceof Double) {
                     return (double) left + (double) right;
@@ -79,12 +79,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
                 if ((double) right == 0) {
-                 throw new RuntimeError(expr.operator, "Cannot divide by 0.");
+                    throw new RuntimeError(expr.operator, "Cannot divide by 0.");
                 }
                 return (double) left / (double) right;
             case MODULO:
                 checkWholeNumbers(expr.operator, left, right);
-                return (double) (((Double) left).intValue() % ((Double) right).intValue()) ;
+                return (double) (((Double) left).intValue() % ((Double) right).intValue());
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
                 return (double) left * (double) right;
@@ -119,10 +119,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             arguments.add(evaluate(argument));
         }
 
-        if (callee instanceof LoxCallable) {
-            LoxCallable function = (LoxCallable) callee;
+        if (callee instanceof LoxCallable function) {
             if (arguments.size() != function.arity()) {
-                throw new RuntimeError(expr.paren, "Expected "+ function.arity() + " arguments but got " + arguments.size() + ".");
+                throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
             }
             return function.call(this, arguments);
         } else {
@@ -184,15 +183,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Object visitUnaryExpr(Expr.Unary expr) {
         Object right = evaluate(expr.right);
 
-        switch (expr.operator.type) {
-            case BANG:
-                return !isTruthy(right);
-            case MINUS:
+        return switch (expr.operator.type) {
+            case BANG -> !isTruthy(right);
+            case MINUS -> {
                 checkNumberOperand(expr.operator, right);
-                return -(double)right;
-        }
-        //unreachable
-        return null;
+
+                yield -(double) right;
+            }
+            default ->
+                //unreachable
+                null;
+        };
     }
 
     @Override
@@ -294,7 +295,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             while (isTruthy(evaluate(stmt.condition))) {
                 execute(stmt.body);
             }
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException ignored) {
+        }
         return null;
     }
 
@@ -303,7 +305,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         throw new RuntimeException();
     }
 
-    public Object evaluate (Expr expr) {
+    public Object evaluate(Expr expr) {
         return expr.accept(this);
     }
 
@@ -324,12 +326,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private boolean isTruthy(Object object) {
-        if(object == null) return false;
+        if (object == null) return false;
         if (object instanceof Boolean) return (boolean) object;
         return true;
     }
 
-    private boolean isEqual(Object a, Object b){
+    private boolean isEqual(Object a, Object b) {
         if (a == null & b == null) return true;
         if (a == null) return false;
         return a.equals(b);

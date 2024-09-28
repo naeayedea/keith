@@ -16,18 +16,18 @@ public class SetStatus extends AbstractAdminCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"sets the bots status to the specified message\"";
+        return prefix + getDefaultName() + ": \"sets the bots status to the specified message\"";
     }
 
     @Override
     public String getLongDescription() {
         return "sets the bot status to the specified message, can also do \"" +
-                "setstatus default\" to return the bot status to the default setting";
+            "setstatus default\" to return the bot status to the default setting";
     }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        if (tokens.size() == 1 && tokens.get(0).equalsIgnoreCase("default")){
+        if (tokens.size() == 1 && tokens.getFirst().equalsIgnoreCase("default")) {
             Utilities.forceDefaultStatus();
         } else {
             Utilities.setStatus(Utilities.stringListToString(tokens));

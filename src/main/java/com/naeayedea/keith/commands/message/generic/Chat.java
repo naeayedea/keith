@@ -22,13 +22,13 @@ public class Chat extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"Use '"+prefix+"chat start' to connect to another server for a quick chat!\"";
+        return prefix + getDefaultName() + ": \"Use '" + prefix + "chat start' to connect to another server for a quick chat!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Creates a connection between two guilds so that messages can be sent in between. " +
-                "Use your servers prefix before a message to avoid the message being sent!";
+            "Use your servers prefix before a message to avoid the message being sent!";
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Chat extends AbstractUserCommand {
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);
         //check if the user is looking to close the chat session
-        if (!tokens.isEmpty() && tokens.get(0).equalsIgnoreCase("start")) {
+        if (!tokens.isEmpty() && tokens.getFirst().equalsIgnoreCase("start")) {
             if (active) {
                 channel.sendMessage("Chat already in progress, please use another channel or end the previous session").queue();
             } else {
@@ -53,11 +53,11 @@ public class Chat extends AbstractUserCommand {
             return;
         }
 
-        if (active && !tokens.isEmpty() && tokens.get(0).equalsIgnoreCase("close")) {
+        if (active && !tokens.isEmpty() && tokens.getFirst().equalsIgnoreCase("close")) {
             chatManager.closeChat(channel.getId());
             return;
         }
-        if (!tokens.isEmpty() && tokens.get(0).equalsIgnoreCase("cancel")) {
+        if (!tokens.isEmpty() && tokens.getFirst().equalsIgnoreCase("cancel")) {
             if (chatManager.stopMatchmaking(channel.getId())) {
                 channel.sendMessage("Stopped matchmaking").queue();
             } else {

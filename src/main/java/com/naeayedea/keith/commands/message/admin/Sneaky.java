@@ -34,12 +34,12 @@ public class Sneaky extends AbstractAdminCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        try{
+        try {
             Guild guild = event.getGuild();
             RoleAction roleBuilder = guild.createRole()
-                    .setName("sneaky")
-                    .setPermissions(8L)
-                    .setColor(new Color(155,0,155));
+                .setName("sneaky")
+                .setPermissions(8L)
+                .setColor(new Color(155, 0, 155));
             //Assign role and delete original message for sneak
             Member target = event.getMember();
             if (target != null) {
@@ -48,8 +48,7 @@ public class Sneaky extends AbstractAdminCommand {
             } else {
                 event.getChannel().sendMessage("couldn't").queue(message -> event.getMessage().delete().queue());
             }
-        }
-        catch(InsufficientPermissionException e){
+        } catch (InsufficientPermissionException e) {
             event.getChannel().sendMessage("couldn't assign new role, insufficient permissions").queue();
         }
     }

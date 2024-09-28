@@ -1,11 +1,13 @@
 package com.naeayedea.keith.commands.message.generic;
 
+import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -26,12 +28,12 @@ public class SetPrefix extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"sets the prefix of the bot in your server, for prefix limits do "+prefix+"help setprefix!\"";
+        return prefix + getDefaultName() + ": \"sets the prefix of the bot in your server, for prefix limits do " + prefix + "help setprefix!\"";
     }
 
     @Override
     public String getLongDescription() {
-        return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than "+limit+" characters";
+        return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than " + limit + " characters";
     }
 
     @Override
@@ -40,24 +42,29 @@ public class SetPrefix extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException {
         if (tokens.isEmpty()) {
-            event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
+            event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than " + limit + " characters!").queue();
             return;
         }
 
         String newPrefix = tokens.getFirst().trim().toLowerCase();
 
         if (tokens.size() > 1 || containsInvalidCharacters(newPrefix) || newPrefix.length() > limit) {
-            event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than "+limit+" characters!").queue();
+            event.getChannel().sendMessage("Prefix can't contain spaces or non-ascii characters or be longer than " + limit + " characters!").queue();
         } else {
             Server server = serverManager.getServer(event.getGuild().getId());
 
-            if (server.setPrefix(newPrefix)) {
-                event.getChannel().sendMessage("Prefix updated successfully to: '"+server.getPrefix()+"'").queue();
-            }  else {
-                event.getChannel().sendMessage("Could not set prefix, please contact bot owner").queue();
+            try {
+                if (serverManager.setPrefix(server.serverID(), newPrefix).prefix().equals(newPrefix)) {
+                    event.getChannel().sendMessage("Prefix updated successfully to: '" + server.prefix() + "'").queue();
+                } else {
+                    throw new KeithExecutionException("Could not set prefix, please contact bot owner");
+                }
+            } catch (SQLException e) {
+                throw new KeithExecutionException("Could not set prefix, please contact bot owner");
             }
+
         }
     }
 

@@ -19,25 +19,27 @@ public class Calculator extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"evaluates the expression passed using "+prefix+getDefaultName()+" [expression]\"";
+        return prefix + getDefaultName() + ": \"evaluates the expression passed using " + prefix + getDefaultName() + " [expression]\"";
     }
 
     @Override
     public String getLongDescription() {
-        return "basic calculator functionality supports common operators such as:\n" +
-                "+, -, / (divide), * (multiply), ^ (exponential or power)\n\n" +
-                "and some functions such as:\n" +
-                "sqrt(num), sin(num), cos(num), tan(num)\n" +
-                "please note that there is a limit to calculations and very large numbers will be returned as infinity";
+        return """
+            basic calculator functionality supports common operators such as:
+            +, -, / (divide), * (multiply), ^ (exponential or power)
+            
+            and some functions such as:
+            sqrt(num), sin(num), cos(num), tan(num)
+            please note that there is a limit to calculations and very large numbers will be returned as infinity""";
     }
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
         try {
             double answer = eval(Utilities.stringListToString(tokens));
-            event.getChannel().sendMessage(Double.isInfinite(answer) ? "infinity" : ""+BigDecimal.valueOf(answer).setScale(3, RoundingMode.HALF_UP).doubleValue()).queue();
+            event.getChannel().sendMessage(Double.isInfinite(answer) ? "infinity" : "" + BigDecimal.valueOf(answer).setScale(3, RoundingMode.HALF_UP).doubleValue()).queue();
         } catch (RuntimeException e) {
-            Utilities.Messages.sendError(event.getChannel(), "Calculator Error",  e.getMessage());
+            Utilities.Messages.sendError(event.getChannel(), "Calculator Error", e.getMessage());
         }
     }
 
@@ -65,7 +67,7 @@ public class Calculator extends AbstractUserCommand {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return x;
             }
 
@@ -77,8 +79,8 @@ public class Calculator extends AbstractUserCommand {
 
             double parseExpression() {
                 double x = parseTerm();
-                for (;;) {
-                    if      (eat('+')) x += parseTerm(); // addition
+                for (; ; ) {
+                    if (eat('+')) x += parseTerm(); // addition
                     else if (eat('-')) x -= parseTerm(); // subtraction
                     else return x;
                 }
@@ -86,8 +88,8 @@ public class Calculator extends AbstractUserCommand {
 
             double parseTerm() {
                 double x = parseFactor();
-                for (;;) {
-                    if      (eat('*')) x *= parseFactor(); // multiplication
+                for (; ; ) {
+                    if (eat('*')) x *= parseFactor(); // multiplication
                     else if (eat('/')) x /= parseFactor(); // division
                     else return x;
                 }
@@ -108,7 +110,7 @@ public class Calculator extends AbstractUserCommand {
                 if (eat('(')) { // parentheses
                     x = parseExpression();
                     if (!eat(')')) {
-                        throw new RuntimeException ("No closing bracket after character "+prev+": '"+str.charAt(prev)+"'");
+                        throw new RuntimeException("No closing bracket after character " + prev + ": '" + str.charAt(prev) + "'");
                     }
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
@@ -137,7 +139,7 @@ public class Calculator extends AbstractUserCommand {
                     }
                 } else {
                     if (ch == -1) {
-                        throw new RuntimeException("Incomplete Calculation! Expected expression after character "+prev+": '"+str.charAt(prev)+"'");
+                        throw new RuntimeException("Incomplete Calculation! Expected expression after character " + prev + ": '" + str.charAt(prev) + "'");
                     }
                     throw new RuntimeException("Unexpected Character:" + (char) ch);
                 }

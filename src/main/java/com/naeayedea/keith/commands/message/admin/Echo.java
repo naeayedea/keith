@@ -15,7 +15,7 @@ public class Echo extends AbstractAdminCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"bot simply returns the text included in the command minus the prefix/command\"";
+        return prefix + getDefaultName() + ": \"bot simply returns the text included in the command minus the prefix/command\"";
     }
 
     @Override
@@ -27,8 +27,6 @@ public class Echo extends AbstractAdminCommand {
     public void run(MessageReceivedEvent event, List<String> tokens) {
         StringBuilder response = new StringBuilder();
         tokens.forEach(string -> response.append(string).append(" "));
-        event.getChannel().sendMessage(response).queue(success -> {
-            event.getMessage().delete().queue();
-        });
+        event.getChannel().sendMessage(response).queue(success -> event.getMessage().delete().queue());
     }
 }

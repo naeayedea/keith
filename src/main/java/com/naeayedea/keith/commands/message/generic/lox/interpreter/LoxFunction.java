@@ -1,8 +1,8 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter;
 
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Stmt;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Stmt;
 import com.naeayedea.keith.commands.message.generic.lox.errors.Return;
 
 import java.util.List;
@@ -50,6 +50,6 @@ public class LoxFunction implements LoxCallable {
 
     @Override
     public String toString() {
-        return "<fn " +declaration.name.lexeme + ">";
+        return "<fn " + declaration.name.lexeme + ">";
     }
 }

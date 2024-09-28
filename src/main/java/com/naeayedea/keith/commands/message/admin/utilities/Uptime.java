@@ -16,7 +16,7 @@ public class Uptime extends AbstractAdminUtilsCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"get uptime\"";
+        return prefix + getDefaultName() + ": \"get uptime\"";
     }
 
     @Override
@@ -26,6 +26,6 @@ public class Uptime extends AbstractAdminUtilsCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-       event.getChannel().sendMessage(Utilities.getUptimeString()).queue();
+        event.getChannel().sendMessage(Utilities.getUptimeString()).queue();
     }
 }

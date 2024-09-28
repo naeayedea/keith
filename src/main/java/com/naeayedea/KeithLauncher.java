@@ -18,7 +18,7 @@ public class KeithLauncher implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         if (args.getSourceArgs() != null && args.getSourceArgs().length != 0) {
             logger.info("Keith initialized, received args {}", (Object[]) args.getSourceArgs());
         } else {

@@ -16,7 +16,7 @@ public class Invite extends AbstractInfoCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"Invite me to your other servers!\"";
+        return prefix + getDefaultName() + ": \"Invite me to your other servers!\"";
     }
 
     @Override

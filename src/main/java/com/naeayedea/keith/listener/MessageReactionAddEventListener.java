@@ -1,13 +1,14 @@
 package com.naeayedea.keith.listener;
 
-
 import com.naeayedea.keith.commands.message.ReactionCommand;
-import com.naeayedea.keith.managers.ServerManager;
+import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
-import com.naeayedea.keith.util.MultiMap;
+import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Candidate;
 import com.naeayedea.keith.model.Server;
+import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.util.MultiMap;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -69,8 +71,11 @@ public class MessageReactionAddEventListener {
         logger.info("Received reaction, starting thread, id: {}", Thread.currentThread().threadId());
         reactionHandlingService.submit(() -> {
             logger.info("Reaction thread started, id: {}", Thread.currentThread().threadId());
+
             Emoji emote = event.getReaction().getEmoji();
+
             Member member = event.getMember();
+
             //ensure that event is not caused by a bot and the emote is a standard emoji
             if (member != null && !member.getUser().isBot()) {
                 MessageChannel channel = event.getChannel();
@@ -84,29 +89,43 @@ public class MessageReactionAddEventListener {
                     if (channel instanceof ThreadChannel thread && !thread.isJoined()) {
                         thread.join().queue();
                     }
-                    Candidate candidate = candidateManager.getCandidate(member.getUser().getId());
 
-                    boolean isPrivateMessage = channel instanceof PrivateChannel;
+                    try {
+                        Candidate candidate = candidateManager.getCandidate(member.getUser().getId());
 
-                    Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
+                        boolean isPrivateMessage = channel instanceof PrivateChannel;
 
-                    //ensure that user and server has permission to use the bot
-                    if (!candidate.isBanned() && (isPrivateMessage || !server.isBanned())) {
+                        Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
 
-                        //make sure that rate limit has not been reached
-                        if (rateLimiter.userPermitted(candidate.getId())) {
-                            List<MessageReaction> reactions = message.getReactions();
+                        //ensure that user and server has permission to use the bot
+                        if (!candidate.isBanned() && (isPrivateMessage || !server.banned())) {
 
-                            //check if any of our aliases have been fired before
-                            for (MessageReaction reaction : reactions) {
-                                if (reaction.isSelf() && command.triggeredBy(reaction.getEmoji())) {
-                                    return;
+                            //make sure that rate limit has not been reached
+                            if (rateLimiter.userPermitted(candidate.getId())) {
+                                List<MessageReaction> reactions = message.getReactions();
+
+                                //check if any of our aliases have been fired before
+                                for (MessageReaction reaction : reactions) {
+                                    if (reaction.isSelf() && command.triggeredBy(reaction.getEmoji())) {
+                                        return;
+                                    }
                                 }
-                            }
 
-                            rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
-                            message.addReaction(emote).queue(e -> command.run(event, member.getUser()));
+                                rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
+
+                                message.addReaction(emote).queue(success -> {
+                                    try {
+                                        command.run(event, member.getUser());
+                                    } catch (KeithPermissionException | KeithExecutionException e) {
+                                        logger.error(e.getMessage(), e);
+
+                                        message.removeReaction(emote).queue();
+                                    }
+                                });
+                            }
                         }
+                    } catch (SQLException e) {
+                        logger.error(e.getMessage(), e);
                     }
                 }
             }

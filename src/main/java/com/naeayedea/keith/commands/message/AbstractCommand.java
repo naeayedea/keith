@@ -17,10 +17,11 @@ public abstract class AbstractCommand implements MessageCommand {
 
     /**
      * command constructor to specify all values of a command
-     * @param name the default name of the command
+     *
+     * @param name                       the default name of the command
      * @param isPrivateMessageCompatible set false if command will not work in private message
-     * @param isHidden set true if command shouldn't show up in help
-     * @param cost the cost of a command with respect to rate limiting
+     * @param isHidden                   set true if command shouldn't show up in help
+     * @param cost                       the cost of a command with respect to rate limiting
      */
     public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
         this.defaultName = name;
@@ -35,11 +36,12 @@ public abstract class AbstractCommand implements MessageCommand {
 
     /**
      * Default command constructor that only requires name
+     *
      * @param name the defaultName of the command
-     * default properties:
-     * isPrivateMessageCompatible: true
-     * isHidden: true
-     * cost: 1
+     *             default properties:
+     *             isPrivateMessageCompatible: true
+     *             isHidden: true
+     *             cost: 1
      */
     public AbstractCommand(String name, List<String> commandAliases) {
         this(name, commandAliases, true, false, 1);
@@ -47,11 +49,12 @@ public abstract class AbstractCommand implements MessageCommand {
 
     /**
      * command constructor to specify the name and private message compatibility
-     * @param name the defaultName of the command
+     *
+     * @param name                       the defaultName of the command
      * @param isPrivateMessageCompatible set false if command will not work in private message
-     * default values:
-     * isHidden: true
-     * cost: 1
+     *                                   default values:
+     *                                   isHidden: true
+     *                                   cost: 1
      */
     public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible) {
         this(name, commandAliases, isPrivateMessageCompatible, false, 1);
@@ -59,11 +62,12 @@ public abstract class AbstractCommand implements MessageCommand {
 
     /**
      * command constructor to specify the name, private message compatibility and the hidden property
-     * @param name the default name of the command
+     *
+     * @param name                       the default name of the command
      * @param isPrivateMessageCompatible set false if command will not work in private message
-     * @param isHidden set true if command shouldn't show up in help
-     * default properties:
-     * cost: 1
+     * @param isHidden                   set true if command shouldn't show up in help
+     *                                   default properties:
+     *                                   cost: 1
      */
     public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
         this(name, commandAliases, isPrivateMessageCompatible, isHidden, 1);
@@ -91,7 +95,7 @@ public abstract class AbstractCommand implements MessageCommand {
     }
 
     @Override
-    public int getTimeOut(){
+    public int getTimeOut() {
         return 10;
     }
 
@@ -101,7 +105,9 @@ public abstract class AbstractCommand implements MessageCommand {
     }
 
     @Override
-    public boolean sendTyping() {return true;}
+    public boolean sendTyping() {
+        return true;
+    }
 
     @Override
     public String getDefaultName() {

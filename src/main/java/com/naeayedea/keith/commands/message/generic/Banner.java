@@ -2,8 +2,8 @@ package com.naeayedea.keith.commands.message.generic;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,13 +20,13 @@ public class Banner extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"Retrieve the profile banner of a user!\"";
+        return prefix + getDefaultName() + ": \"Retrieve the profile banner of a user!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "banner retrieves the profile banner of the user doing the command, alternatively banner can "
-                +"retrieve the banner of another user that has been tagged such as ?banner @Succ would return succs banner";
+            + "retrieve the banner of another user that has been tagged such as ?banner @Succ would return succs banner";
     }
 
     @Override
@@ -34,7 +34,7 @@ public class Banner extends AbstractUserCommand {
         List<User> mentionedUsers = event.getMessage().getMentions().getUsers();
         User user;
         if (!mentionedUsers.isEmpty()) {
-            user = mentionedUsers.get(0);
+            user = mentionedUsers.getFirst();
         } else {
             user = event.getAuthor();
         }
@@ -48,8 +48,8 @@ public class Banner extends AbstractUserCommand {
                     embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
                 }
                 //Build embed and send
-                embed.setTitle(user.getName()+"'s Banner");
-                embed.setImage(banner+"?size=4096");
+                embed.setTitle(user.getName() + "'s Banner");
+                embed.setImage(banner + "?size=4096");
                 event.getChannel().sendMessageEmbeds(embed.build()).queue();
             } else {
                 event.getChannel().sendMessage("User has no banner!").queue();

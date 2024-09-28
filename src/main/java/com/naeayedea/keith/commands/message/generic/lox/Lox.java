@@ -1,11 +1,11 @@
 package com.naeayedea.keith.commands.message.generic.lox;
 
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.Interpreter;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Scanner;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Parser;
-import com.naeayedea.keith.commands.message.generic.lox.Parser.Stmt;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.Interpreter;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Scanner;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Parser;
+import com.naeayedea.keith.commands.message.generic.lox.parser.Stmt;
 import com.naeayedea.keith.commands.message.generic.lox.analysis.Resolver;
 import com.naeayedea.keith.commands.message.generic.lox.errors.RuntimeError;
 
@@ -19,14 +19,18 @@ public class Lox {
 
     public List<String> run(String source) {
         Interpreter interpreter = new Interpreter(this);
+
         errors = new ArrayList<>();
         hadError = false;
+
         //Scan file and separate into tokens
         Scanner scanner = new Scanner(source, this);
+
         List<Token> tokens = scanner.scanTokens();
 
         //Parse tokens into an executable list of statements
         Parser parser = new Parser(tokens, this);
+
         List<Stmt> statements = parser.parse();
 
         //stop if there's a syntax error
@@ -34,7 +38,9 @@ public class Lox {
 
         //resolve variables
         Resolver resolver = new Resolver(interpreter, this);
+
         resolver.resolve(statements);
+
         resolver.reportErrors();
 
         //stop if there's a resolution error
@@ -61,8 +67,8 @@ public class Lox {
     }
 
     public void runtimeError(RuntimeError error) {
-        errors.add("Runtime Error: "+error.getMessage() + "\n[line " + error.token.line + "]");
-        hadError=true;
+        errors.add("Runtime Error: " + error.getMessage() + "\n[line " + error.token.line + "]");
+        hadError = true;
     }
 
 }

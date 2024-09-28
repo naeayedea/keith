@@ -1,22 +1,32 @@
-package com.naeayedea.keith.commands.message.generic.lox.Parser;
+package com.naeayedea.keith.commands.message.generic.lox.parser;
+
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 
 import java.util.List;
-
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
 
 public abstract class Expr {
 
     public interface Visitor<R> {
         R visitAssignExpr(Assign expr);
+
         R visitBinaryExpr(Binary expr);
+
         R visitCallExpr(Call expr);
+
         R visitGetExpr(Get expr);
+
         R visitSetExpr(Set expr);
+
         R visitThisExpr(This expr);
+
         R visitGroupingExpr(Grouping expr);
+
         R visitLiteralExpr(Literal expr);
+
         R visitLogicalExpr(Logical expr);
+
         R visitUnaryExpr(Unary expr);
+
         R visitVariableExpr(Variable expr);
     }
 
@@ -33,7 +43,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitAssignExpr(this);
         }
-   }
+    }
 
     public static class Binary extends Expr {
         public final Expr left;
@@ -50,7 +60,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitBinaryExpr(this);
         }
-   }
+    }
 
     public static class Call extends Expr {
         public final Expr callee;
@@ -67,7 +77,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitCallExpr(this);
         }
-   }
+    }
 
     public static class Get extends Expr {
         public final Expr object;
@@ -82,7 +92,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitGetExpr(this);
         }
-   }
+    }
 
     public static class Set extends Expr {
         public final Expr object;
@@ -99,7 +109,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitSetExpr(this);
         }
-   }
+    }
 
     public static class This extends Expr {
         public final Token keyword;
@@ -112,7 +122,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitThisExpr(this);
         }
-   }
+    }
 
     public static class Grouping extends Expr {
         public final Expr expression;
@@ -125,7 +135,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitGroupingExpr(this);
         }
-   }
+    }
 
     public static class Literal extends Expr {
         public final Object value;
@@ -138,7 +148,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitLiteralExpr(this);
         }
-   }
+    }
 
     public static class Logical extends Expr {
         public final Expr left;
@@ -155,7 +165,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitLogicalExpr(this);
         }
-   }
+    }
 
     public static class Unary extends Expr {
         public final Token operator;
@@ -170,7 +180,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitUnaryExpr(this);
         }
-   }
+    }
 
     public static class Variable extends Expr {
         public final Token name;
@@ -183,6 +193,7 @@ public abstract class Expr {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitVariableExpr(this);
         }
-   }
+    }
+
     public abstract <R> R accept(Visitor<R> visitor);
 }

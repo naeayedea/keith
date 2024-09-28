@@ -1,9 +1,8 @@
 package com.naeayedea.config.discord;
 
 import com.github.ygimenez.model.PaginatorBuilder;
-import com.naeayedea.keith.util.Database;
-import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.keith.model.BotConfiguration;
+import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -28,7 +27,7 @@ public class JDAConfig {
     @Value("${keith.configuration.token}")
     private String token;
 
-    Logger logger = LoggerFactory.getLogger(JDAConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(JDAConfig.class);
 
     @Bean
     public BotConfiguration keith(DataSource dataSource, ApplicationArguments arguments) {
@@ -80,19 +79,18 @@ public class JDAConfig {
                 .setDeleteOnCancel(true)
                 .activate();
 
-            if(!botConfiguration.getRestartMessage().isEmpty()) {
+            if (!botConfiguration.getRestartMessage().isEmpty()) {
                 logger.info("Restart message \"{}\" received for channel \"{}\"", botConfiguration.getRestartMessage(), botConfiguration.getRestartChannel());
 
                 TextChannel channel = jda.getTextChannelById(botConfiguration.getRestartChannel());
                 if (channel != null) {
-                    channel.retrieveMessageById( botConfiguration.getRestartMessage()).queue(message -> message.editMessage("Restarted").queue());
+                    channel.retrieveMessageById(botConfiguration.getRestartMessage()).queue(message -> message.editMessage("Restarted").queue());
                 }
             }
 
             Utilities.setJDA(jda);
-            Database.setSource(botConfiguration.getDataSource());
 
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+            jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));
 
             return jda;
         } catch (Throwable e) {

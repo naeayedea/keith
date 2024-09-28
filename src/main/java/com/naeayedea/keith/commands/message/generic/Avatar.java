@@ -2,8 +2,8 @@ package com.naeayedea.keith.commands.message.generic;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,13 +19,13 @@ public class Avatar extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"displays avatar of a user\"";
+        return prefix + getDefaultName() + ": \"displays avatar of a user\"";
     }
 
     @Override
     public String getLongDescription() {
         return "avatar retrieves the current discord avatar of the user doing the command, alternatively avatar can "
-                +" retrieve the avatar of another user that has been tagged such as ?avatar @Succ would return succ's avatar";
+            + " retrieve the avatar of another user that has been tagged such as ?avatar @Succ would return succ's avatar";
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Avatar extends AbstractUserCommand {
         User user;
         //Determine if we should return avatar of user or avatar of a tagged user
         if (!mentionedUsers.isEmpty()) {
-            user = mentionedUsers.get(0);
+            user = mentionedUsers.getFirst();
         } else {
             user = event.getAuthor();
         }
@@ -45,9 +45,10 @@ public class Avatar extends AbstractUserCommand {
         } else {
             embed.setColor(Utilities.getMemberColor(event.getGuild(), user));
         }
+
         //Build embed and send
-        embed.setTitle(user.getName()+"'s Avatar");
-        embed.setImage(user.getAvatarUrl()+"?size=4096");
+        embed.setTitle(user.getName() + "'s Avatar");
+        embed.setImage(user.getAvatarUrl() + "?size=4096");
         event.getChannel().sendMessageEmbeds(embed.build()).queue();
     }
 

@@ -1,10 +1,12 @@
 package com.naeayedea.keith.managers;
 
 import com.naeayedea.keith.commands.message.channelCommandDrivers.ChannelCommandDriver;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class ChannelCommandManager {
 
     private final Map<String, ChannelCommandDriver> gamesInProgress;

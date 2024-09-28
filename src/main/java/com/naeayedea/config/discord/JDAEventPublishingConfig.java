@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JDAEventPublishingConfig {
 
-    Logger logger = LoggerFactory.getLogger(JDAEventPublishingConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(JDAEventPublishingConfig.class);
 
     public JDAEventPublishingConfig(ApplicationEventPublisher publisher, JDA jda) {
         logger.info("Adding base JDA event publisher");

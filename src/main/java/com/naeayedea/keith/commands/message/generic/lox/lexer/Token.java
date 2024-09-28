@@ -1,4 +1,4 @@
-package com.naeayedea.keith.commands.message.generic.lox.Lexer;
+package com.naeayedea.keith.commands.message.generic.lox.lexer;
 
 public class Token {
     public final TokenType type;

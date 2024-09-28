@@ -1,18 +1,20 @@
-package com.naeayedea.keith.commands.message.generic.lox.Parser;
+package com.naeayedea.keith.commands.message.generic.lox.parser;
 
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType;
 import com.naeayedea.keith.commands.message.generic.lox.Lox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType.*;
+import static com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType.*;
 
 public class Parser {
 
-    private static class ParseError extends RuntimeException {}
+    private static class ParseError extends RuntimeException {
+    }
+
     private final List<Token> tokens;
     private final Lox lox;
     private int current = 0;
@@ -93,7 +95,7 @@ public class Parser {
     }
 
     private Stmt forStatement() {
-        consume (LEFT_PAREN, "Expect '(' after 'for'. ");
+        consume(LEFT_PAREN, "Expect '(' after 'for'. ");
 
         //general format of for statement: for (initializer; condition; increment);
         //attempt to match initializer
@@ -123,7 +125,7 @@ public class Parser {
         Stmt body = statement();
 
         //if increment present, execute immediately after the main body
-        if (increment != null ){
+        if (increment != null) {
             body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
         }
 
@@ -222,7 +224,7 @@ public class Parser {
     private List<Stmt> block() {
         List<Stmt> statements = new ArrayList<>();
 
-        while(!check(RIGHT_BRACE) && !isAtEnd()) {
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
             statements.add(declaration());
         }
         consume(RIGHT_BRACE, "Expect '}' after block.");
@@ -243,8 +245,7 @@ public class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable) expr).name;
                 return new Expr.Assign(name, value);
-            } else if (expr instanceof Expr.Get) {
-                Expr.Get get = (Expr.Get) expr;
+            } else if (expr instanceof Expr.Get get) {
                 return new Expr.Set(get.object, get.name, value);
             }
 
@@ -263,7 +264,7 @@ public class Parser {
     }
 
     private Expr equality() {
-        return parseLeftAssoc(this::comparison,BANG_EQUAL, EQUAL_EQUAL);
+        return parseLeftAssoc(this::comparison, BANG_EQUAL, EQUAL_EQUAL);
     }
 
     private Expr comparison() {

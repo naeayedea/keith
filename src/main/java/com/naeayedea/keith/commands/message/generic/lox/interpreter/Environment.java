@@ -1,6 +1,6 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter;
 
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 import com.naeayedea.keith.commands.message.generic.lox.errors.RuntimeError;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class Environment {
 
     private Environment ancestor(int distance) {
         Environment environment = this;
-        for (int i = 0; i <  distance; i++) {
+        for (int i = 0; i < distance; i++) {
             if (environment.enclosing != null) {
                 environment = environment.enclosing;
             }
@@ -60,7 +60,7 @@ public class Environment {
     public void assign(Token name, Object value) {
         if (values.containsKey(name.lexeme)) {
             values.put(name.lexeme, value);
-        } else if (enclosing != null)  {
+        } else if (enclosing != null) {
             enclosing.assign(name, value);
         } else {
             throw new RuntimeError(name, "Undefined variable: '" + name.lexeme + "'.");
@@ -72,6 +72,6 @@ public class Environment {
     }
 
     public String toString() {
-        return values + " " +enclosing;
+        return values + " " + enclosing;
     }
 }

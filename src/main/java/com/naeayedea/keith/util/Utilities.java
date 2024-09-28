@@ -44,34 +44,33 @@ public class Utilities {
                 eb.setTitle("ERROR");
                 eb.setDescription(header);
                 eb.addField("Information", text, false);
-                eb.setColor(new Color (155,0,0));
+                eb.setColor(new Color(155, 0, 0));
                 return eb;
             }
 
         }
 
-        public static void sendEmbed(String channelID, String title, String message, MessageReceivedEvent event){
+        public static void sendEmbed(String channelID, String title, String message, MessageReceivedEvent event) {
             sendEmbed(jda.getTextChannelById(channelID), title, message, event);
         }
 
-        public static void sendEmbed(MessageChannel channel, String title, String message, MessageReceivedEvent event){
-            try{
+        public static void sendEmbed(MessageChannel channel, String title, String message, MessageReceivedEvent event) {
+            try {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle(title);
                 eb.setDescription(message);
-                eb.setColor(new Color(155,0,155));
+                eb.setColor(new Color(155, 0, 155));
                 if (channel != null) {
                     channel.sendMessageEmbeds(eb.build()).queue();
                 } else {
                     event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
                 }
-            }
-            catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 event.getChannel().sendMessage("Message send error").queue();
             }
         }
 
-        public static void sendMessage(String channelID, String message, MessageReceivedEvent event ){
+        public static void sendMessage(String channelID, String message, MessageReceivedEvent event) {
             try {
                 TextChannel channel = jda.getTextChannelById(channelID);
                 if (channel != null) {
@@ -79,7 +78,7 @@ public class Utilities {
                 } else {
                     event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
                 }
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 event.getChannel().sendMessage("Message send error").queue();
             }
         }
@@ -115,13 +114,13 @@ public class Utilities {
 
     //set status to default by force
     public static void forceDefaultStatus() {
-        jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));
+        jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));
     }
 
     //update default status if it is already set, otherwise leave current status alone
     public static void updateDefaultStatus() {
-        if(Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")){
-            jda.getPresence().setActivity(Activity.playing("?help for commands | "+jda.getGuilds().size()+ " servers"));  //Default discord status
+        if (Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")) {
+            jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));  //Default discord status
         }
     }
 
@@ -155,13 +154,13 @@ public class Utilities {
         //Format response, only include larger measurement if relevant.
         String response = "";
         if (days > 0)
-            response += (days == 1) ? days+" day, " : days+" days, ";
+            response += (days == 1) ? days + " day, " : days + " days, ";
         if (hours > 0)
-            response += (hours == 1) ? hours+" hour, " : hours+" hours, ";
+            response += (hours == 1) ? hours + " hour, " : hours + " hours, ";
         if (minutes > 0)
-            response += (minutes == 1) ? minutes+" minute, " : minutes+" minutes, ";
+            response += (minutes == 1) ? minutes + " minute, " : minutes + " minutes, ";
         if (seconds > 0)
-            response += (seconds == 1) ? seconds+" second" : seconds+" seconds";
+            response += (seconds == 1) ? seconds + " second" : seconds + " seconds";
 
         return response;
     }
@@ -171,29 +170,29 @@ public class Utilities {
             return "?";
         }
 
-        return serverManager.getServer(event.getGuild().getId()).getPrefix();
+        return serverManager.getServer(event.getGuild().getId()).prefix();
     }
 
     public static Color getBotColor() {
-        return new Color(155,0,155);
+        return new Color(155, 0, 155);
     }
 
     public static Color getDefaultColor() {
-        return new Color(44,47,51);
+        return new Color(44, 47, 51);
     }
 
     public static Color getMemberColor(Guild guild, User user) {
-            Member member = guild.getMember(user);
-            if (member != null) {
-                List<Role> roles = member.getRoles();
-                for (Role role : roles) {
-                    Color color = role.getColor();
-                    if(color != null) {
-                        return color;
-                    }
+        Member member = guild.getMember(user);
+        if (member != null) {
+            List<Role> roles = member.getRoles();
+            for (Role role : roles) {
+                Color color = role.getColor();
+                if (color != null) {
+                    return color;
                 }
             }
-            return new Color(44,47,51);
+        }
+        return new Color(44, 47, 51);
     }
 
     public static Color getColorFromString(String string) {
@@ -209,13 +208,15 @@ public class Utilities {
         }
         int pv = 0xFFFFFF & stringHash.hashCode();
         int R, G, B;
-        R = pv & 255; G = (pv >> 8) & 255; B = (pv >> 16) & 255;
-        return new Color(R,G,B);
+        R = pv & 255;
+        G = (pv >> 8) & 255;
+        B = (pv >> 16) & 255;
+        return new Color(R, G, B);
     }
 
     public static Color getRandomColor() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        return new Color(random.nextInt(0, 255+1), random.nextInt(0, 255+1), random.nextInt(0, 255+1));
+        return new Color(random.nextInt(0, 255 + 1), random.nextInt(0, 255 + 1), random.nextInt(0, 255 + 1));
     }
 
     //rebuilds a string list into a "sentence" by appending spaces
@@ -230,15 +231,18 @@ public class Utilities {
     public static void restart(MessageReceivedEvent event) {
         try {
             Message message = event.getChannel().sendMessage("Restarting...").complete();
-            Process p = Runtime.getRuntime().exec("screen -dm  java -jar /home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar " + message.getId() + " " + message.getChannel().getId());
+            Process p = Runtime.getRuntime().exec(new String[]{"screen", "-dm", "java", "-jar", "/home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar", message.getId(), message.getChannelId()});
+
             setStatus("Restarting...");
+
             try {
                 if (p.waitFor(10, TimeUnit.SECONDS)) {
                     runShutdownProcedure();
                 } else {
                     event.getChannel().sendMessage("Restart failed...").queue();
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
 
         } catch (IOException e) {
             event.getChannel().sendMessage("Restart failed badly...").queue();
@@ -252,7 +256,7 @@ public class Utilities {
 
     public static String truncateString(String string, int length) {
         if (length > 0) {
-            String format = "%-"+ length+"s";
+            String format = "%-" + length + "s";
             String result = String.format(format, string);
             if (string.length() > length) {
                 result = result.substring(0, length - 2) + "..";

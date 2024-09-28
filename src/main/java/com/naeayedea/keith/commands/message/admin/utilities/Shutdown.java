@@ -16,7 +16,7 @@ public class Shutdown extends AbstractOwnerCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"shut down the bot completely\"";
+        return prefix + getDefaultName() + ": \"shut down the bot completely\"";
     }
 
     @Override

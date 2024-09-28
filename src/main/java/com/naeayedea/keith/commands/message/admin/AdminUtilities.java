@@ -7,6 +7,8 @@ import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.admin.utilities.AbstractAdminUtilsCommand;
 import com.naeayedea.keith.commands.message.admin.utilities.AbstractOwnerCommand;
 import com.naeayedea.keith.commands.message.info.Help;
+import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.MultiMap;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -65,7 +68,7 @@ public class AdminUtilities extends AbstractCommandPortal {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \":eyes:\"";
+        return prefix + getDefaultName() + ": \":eyes:\"";
     }
 
     @Override
@@ -74,14 +77,19 @@ public class AdminUtilities extends AbstractCommandPortal {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException, KeithPermissionException {
         MessageCommand command = findCommand(tokens);
         if (command != null) {
-            if (candidateManager.getCandidate(event.getAuthor().getId()).hasPermission(command.getAccessLevel())) {
-                command.run(event, tokens);
-            } else {
-                event.getChannel().sendMessage("You do not have access to this command").queue();
+            try {
+                if (candidateManager.getCandidate(event.getAuthor().getId()).hasPermission(command.getAccessLevel())) {
+                    command.run(event, tokens);
+                } else {
+                    throw new KeithPermissionException("You do not have permission to run this command.");
+                }
+            } catch (SQLException e) {
+                throw new KeithExecutionException(e);
             }
+
         }
     }
 

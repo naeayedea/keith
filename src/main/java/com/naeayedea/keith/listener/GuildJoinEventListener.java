@@ -1,8 +1,8 @@
 package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.keith.model.Server;
+import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
@@ -35,10 +35,10 @@ public class GuildJoinEventListener {
 
         if (defaultChannel != null) {
             defaultChannel.asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                .setColor(new Color(155,0,155))
+                .setColor(new Color(155, 0, 155))
                 .setTitle("Hello!")
-                .setFooter("Use "+server.getPrefix()+"feedback if you have any issues!- Succ")
-                .setDescription("Use "+server.getPrefix()+"help to see available commands")
+                .setFooter("Use " + server.prefix() + "feedback if you have any issues!- Succ")
+                .setDescription("Use " + server.prefix() + "help to see available commands")
                 .setThumbnail(Utilities.getJDAInstance().getSelfUser().getAvatarUrl())
                 .build()).queue();
 

@@ -2,8 +2,8 @@ package com.naeayedea.keith.commands.message.generic;
 
 import com.naeayedea.keith.commands.message.ReactionCommand;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.util.Utilities;
 import com.naeayedea.keith.model.Server;
+import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -17,8 +17,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.*;
+
+import static net.dv8tion.jda.api.Permission.*;
 
 @Component
 public class Pin extends AbstractUserCommand implements ReactionCommand {
@@ -36,14 +39,14 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+"pin: \"reply with "+prefix+"pin to a message to 'pin' it in a separate channel - useful when channel pins are full!"
-                +" See "+prefix+"help pin for more usages!\"";
+        return prefix + "pin: \"reply with " + prefix + "pin to a message to 'pin' it in a separate channel - useful when channel pins are full!"
+            + " See " + prefix + "help pin for more usages!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Pin allows users to 'pin' messages to a separate read only channel. They can pin a message by replying, with the message"
-                +"id or by using 'pin [text]' to pin the text entered in the message.";
+            + "id or by using 'pin [text]' to pin the text entered in the message.";
     }
 
     @Override
@@ -62,10 +65,15 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         MessageChannel channel = event.getChannel();
         channel.retrieveMessageById(event.getMessageId()).queue(message -> {
             String messageContent = message.getContentRaw().trim();
+
             List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+
             Guild guild = event.getGuild();
+
             Server server = serverManager.getServer(guild.getId());
+
             MessageChannel pinChannel = getPinChannel(server, guild);
+
             if (pinChannel == null) {
                 //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
                 event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
@@ -95,7 +103,7 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         } else {
             //pin command found, send pin
             Message messageSource = getMessageSource(message, tokens);
-            if (messageSource == null){
+            if (messageSource == null) {
                 return;
             }
             sendEmbed(messageSource.getAuthor(), event.getAuthor(), messageSource, message, pinChannel, channel, guild, message.getType(), tokens);
@@ -103,17 +111,21 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
     }
 
     private MessageChannel getPinChannel(Server server, Guild guild) {
-        String pinChannel = server.getPinChannel();
+        String pinChannel = server.pinChannel();
+
         final TextChannel channel;
+
         Member selfMember = guild.getMember(Utilities.getJDAInstance().getSelfUser());
-        if ((pinChannel.equals("empty") || guild.getTextChannelById(pinChannel) == null ) && selfMember != null) {
+
+        if ((pinChannel.equals("empty") || guild.getTextChannelById(pinChannel) == null) && selfMember != null) {
             try {
                 channel = guild.createTextChannel("pins", null)
-                    .addPermissionOverride(selfMember, Permission.ALL_TEXT_PERMISSIONS, 0L)
-                    .addPermissionOverride(guild.getPublicRole(), Collections.singleton(Permission.VIEW_CHANNEL), Collections.singleton(Permission.MESSAGE_SEND))
+                    .addPermissionOverride(selfMember, getPinChannelPermissions(), 0L)
+                    .addPermissionOverride(guild.getPublicRole(), Collections.singleton(Permission.VIEW_CHANNEL), Collections.singleton(MESSAGE_SEND))
                     .complete();
-            server.setPinChannel(channel.getId());
-            } catch (InsufficientPermissionException e) {
+
+                serverManager.setPinChannel(server.serverID(), channel.getId());
+            } catch (InsufficientPermissionException | SQLException e) {
                 return null;
             }
         } else {
@@ -137,23 +149,23 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
                     channel.sendMessage("Please input text/images to pin or pin a message by replying with pin or using pin [message id]").queue();
                     return null;
                 } else {
-                    return history.getRetrievedHistory().get(0);
+                    return history.getRetrievedHistory().getFirst();
                 }
             } else {
-              //there is some message content to pin therefore return the original message as the source.
-              return message;
+                //there is some message content to pin therefore return the original message as the source.
+                return message;
             }
         }
     }
 
-    private void sendEmbed(User author, User pinner, Message messageSource, Message commandMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens){
+    private void sendEmbed(User author, User pinner, Message messageSource, Message commandMessage, MessageChannel pinChannel, MessageChannel commandChannel, Guild guild, MessageType type, List<String> tokens) {
         List<Message.Attachment> attachments = messageSource.getAttachments();
         EmbedBuilder eb = new EmbedBuilder();
         if (pinChannel.getId().equals(commandChannel.getId())) {
             return;
         }
         String content = messageSource.getContentRaw().trim();
-        if (content.equals("") && attachments.isEmpty()) {
+        if (content.isEmpty() && attachments.isEmpty()) {
             Utilities.Messages.sendError(commandChannel, "No Content", "Message to pin can't be empty");
             return;
         }
@@ -168,37 +180,60 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         }
         eb.setColor(Utilities.getMemberColor(guild, author));
         eb.setThumbnail(author.getAvatarUrl());
-        eb.setFooter("Message Pinned By " + pinner.getName() +" from "+commandChannel.getName());
+        eb.setFooter("Message Pinned By " + pinner.getName() + " from " + commandChannel.getName());
         eb.setTimestamp(new Date().toInstant());
         //Do embed stuff
-        if(attachments.size() > 0) {
-            Message.Attachment attachment = attachments.get(0);
+        if (!attachments.isEmpty()) {
+            Message.Attachment attachment = attachments.getFirst();
             if (attachment.isImage()) {
                 eb.setImage(attachment.getUrl());
             } else {
-                eb.appendDescription("[Attached Video]("+attachment.getUrl()+") - download\n\n");
+                eb.appendDescription("[Attached Video](" + attachment.getUrl() + ") - download\n\n");
             }
         }
         TextChannel channel = guild.getTextChannelById(messageSource.getChannel().getId());
         if (channel != null) {
             if (channel.isNSFW()) {
-                eb.appendDescription("[Message Link (NSFW)]("+messageSource.getJumpUrl()+")");
+                eb.appendDescription("[Message Link (NSFW)](" + messageSource.getJumpUrl() + ")");
             } else {
-                eb.appendDescription("[Message Link]("+messageSource.getJumpUrl()+")");
+                eb.appendDescription("[Message Link](" + messageSource.getJumpUrl() + ")");
             }
-            eb.setTitle("Message From " + author.getName() + "\nSent from "+ channel.getName());
+            eb.setTitle("Message From " + author.getName() + "\nSent from " + channel.getName());
         } else {
             eb.setTitle("Message From " + author.getName());
-            eb.appendDescription("[Message Link]("+messageSource.getJumpUrl()+")");
+            eb.appendDescription("[Message Link](" + messageSource.getJumpUrl() + ")");
         }
         pinChannel.sendMessageEmbeds(eb.build()).queue((message) -> {
             EmbedBuilder reply = new EmbedBuilder();
             reply.setTitle(":pushpin: Message Pinned!");
-            reply.setDescription("[Pinned Message]("+message.getJumpUrl()+")");
-            reply.setColor(new Color(155,0,155));
+            reply.setDescription("[Pinned Message](" + message.getJumpUrl() + ")");
+            reply.setColor(new Color(155, 0, 155));
             messageSource.replyEmbeds(reply.build()).queue();
             //commandChannel.sendMessageEmbeds(reply.build()).queue();
         });
+    }
+
+    private long getPinChannelPermissions() {
+        return Permission.getRaw(MESSAGE_ADD_REACTION,
+            MESSAGE_SEND,
+            MESSAGE_TTS,
+            MESSAGE_MANAGE,
+            MESSAGE_EMBED_LINKS,
+            MESSAGE_ATTACH_FILES,
+            MESSAGE_EXT_EMOJI,
+            MESSAGE_EXT_STICKER,
+            MESSAGE_HISTORY,
+            MESSAGE_MENTION_EVERYONE,
+            USE_APPLICATION_COMMANDS,
+            USE_EXTERNAL_APPLICATIONS,
+            USE_EMBEDDED_ACTIVITIES,
+            MANAGE_THREADS,
+            CREATE_PUBLIC_THREADS,
+            CREATE_PRIVATE_THREADS,
+            MESSAGE_SEND_IN_THREADS,
+            MESSAGE_ATTACH_VOICE_MESSAGE,
+            MESSAGE_SEND_POLLS
+        );
     }
 
 }

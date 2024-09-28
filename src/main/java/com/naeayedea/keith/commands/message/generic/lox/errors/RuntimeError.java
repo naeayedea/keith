@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.message.generic.lox.errors;
 
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 
 public class RuntimeError extends RuntimeException {
 

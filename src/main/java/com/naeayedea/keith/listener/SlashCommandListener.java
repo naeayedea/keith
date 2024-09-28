@@ -61,11 +61,9 @@ public class SlashCommandListener {
                         .queue();
                 }
             }
-            default -> {
-                event.reply("No handler")
-                    .setEphemeral(true)
-                    .queue();
-            }
+            default -> event.reply("No handler")
+                .setEphemeral(true)
+                .queue();
         }
     }
 }

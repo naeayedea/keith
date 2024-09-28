@@ -1,21 +1,30 @@
-package com.naeayedea.keith.commands.message.generic.lox.Parser;
+package com.naeayedea.keith.commands.message.generic.lox.parser;
+
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
 
 import java.util.List;
-
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
 
 public abstract class Stmt {
 
     public interface Visitor<R> {
         R visitBlockStmt(Block stmt);
+
         R visitClassStmt(Class stmt);
+
         R visitExpressionStmt(Expression stmt);
+
         R visitFunctionStmt(Function stmt);
+
         R visitIfStmt(If stmt);
+
         R visitPrintStmt(Print stmt);
+
         R visitReturnStmt(Return stmt);
+
         R visitVarStmt(Var stmt);
+
         R visitWhileStmt(While stmt);
+
         R visitBreakStmt(Break stmt);
     }
 
@@ -30,7 +39,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitBlockStmt(this);
         }
-   }
+    }
 
     public static class Class extends Stmt {
         public final Token name;
@@ -45,7 +54,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitClassStmt(this);
         }
-   }
+    }
 
     public static class Expression extends Stmt {
         public final Expr expression;
@@ -58,7 +67,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitExpressionStmt(this);
         }
-   }
+    }
 
     public static class Function extends Stmt {
         public final Token name;
@@ -77,7 +86,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitFunctionStmt(this);
         }
-   }
+    }
 
     public static class If extends Stmt {
         public final Expr condition;
@@ -94,7 +103,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitIfStmt(this);
         }
-   }
+    }
 
     public static class Print extends Stmt {
         public final Expr expression;
@@ -107,7 +116,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitPrintStmt(this);
         }
-   }
+    }
 
     public static class Return extends Stmt {
         public final Token keyword;
@@ -122,7 +131,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitReturnStmt(this);
         }
-   }
+    }
 
     public static class Var extends Stmt {
         public final Token name;
@@ -137,7 +146,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
         }
-   }
+    }
 
     public static class While extends Stmt {
         public final Expr condition;
@@ -152,7 +161,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitWhileStmt(this);
         }
-   }
+    }
 
     public static class Break extends Stmt {
         public final Token keyword;
@@ -165,6 +174,7 @@ public abstract class Stmt {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitBreakStmt(this);
         }
-   }
+    }
+
     public abstract <R> R accept(Visitor<R> visitor);
 }

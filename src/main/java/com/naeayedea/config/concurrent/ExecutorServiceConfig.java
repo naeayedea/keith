@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 @Configuration
 public class ExecutorServiceConfig {
 
-    private static int THREAD_KEEP_ALIVE_SECONDS = 60;
+    private static final int THREAD_KEEP_ALIVE_SECONDS = 60;
 
     @Value("${keith.executor.messages.poolSize.min}")
     private int messagesMinPoolSize;
@@ -23,10 +23,10 @@ public class ExecutorServiceConfig {
     @Value("${keith.executor.reactions.poolSize.max}")
     private int reactionsMaxPoolSize;
 
-    @Value("${keith.executor.reactions.poolSize.min}")
+    @Value("${keith.executor.commands.poolSize.min}")
     private int commandsMinPoolSize;
 
-    @Value("${keith.executor.reactions.poolSize.max}")
+    @Value("${keith.executor.commands.poolSize.max}")
     private int commandsMaxPoolSize;
 
     @Value("${keith.executor.scheduler.poolSize.core}")

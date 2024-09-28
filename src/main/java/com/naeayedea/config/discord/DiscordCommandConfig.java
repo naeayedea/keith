@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +44,6 @@ public class DiscordCommandConfig {
             for (CommandInformation commandInformation : commandInformationList) {
                 commands.add(processCommandInformation(commandInformation, messageSource));
 
-                System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(getLocalizationFunction(commandInformation).getLocalizationMap()));
             }
         }
 
@@ -63,8 +61,10 @@ public class DiscordCommandConfig {
     private CommandData unpackCommandInformation(CommandInformation commandInformation) throws IOException {
         return switch (commandInformation.getType().toLowerCase()) {
             case "slash" -> processSlashCommand(commandInformation);
-            case "message" -> Commands.message(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
-            case "user" -> Commands.user(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
+            case "message" ->
+                Commands.message(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
+            case "user" ->
+                Commands.user(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
             default -> throw new IOException("Expected slash, message, or user. Got " + commandInformation.getType());
         };
     }
@@ -213,9 +213,7 @@ public class DiscordCommandConfig {
 
         populateLocalizationFunctionFroSubCommandGroups(localizationFunction, commandInformation.getSubCommandGroups(), commandPrefix);
 
-        commandInformation.getSubCommands().forEach(subCommand -> {
-            populateLocalizationFunctionFromSubCommands(localizationFunction, subCommand, commandInformation.getName());
-        });
+        commandInformation.getSubCommands().forEach(subCommand -> populateLocalizationFunctionFromSubCommands(localizationFunction, subCommand, commandInformation.getName()));
 
         populateLocalizationFunctionFromOptions(localizationFunction, commandInformation.getOptions(), commandPrefix);
 

@@ -5,6 +5,8 @@ import com.naeayedea.keith.commands.message.AbstractCommandPortal;
 import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.info.Help;
+import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -34,7 +36,7 @@ public class Admin extends AbstractCommandPortal {
     }
 
     public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
-        super(defaultName, commandAliases, true,  true);
+        super(defaultName, commandAliases, true, true);
 
         this.adminCommandHandlers = adminCommandHandlers;
         this.adminHelp = adminHelp;
@@ -45,7 +47,7 @@ public class Admin extends AbstractCommandPortal {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"admin command portal, for authorised users only\"";
+        return prefix + getDefaultName() + ": \"admin command portal, for authorised users only\"";
     }
 
     @Override
@@ -54,7 +56,7 @@ public class Admin extends AbstractCommandPortal {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithPermissionException, KeithExecutionException {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
         MessageCommand command = findCommand(tokens);
 

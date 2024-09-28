@@ -24,7 +24,7 @@ public class Clear extends AbstractAdminUtilsCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"clear manager caches\"";
+        return prefix + getDefaultName() + ": \"clear manager caches\"";
     }
 
     @Override
@@ -38,7 +38,7 @@ public class Clear extends AbstractAdminUtilsCommand {
         if (tokens.isEmpty()) {
             channel.sendMessage("Clear what cache?").queue();
         } else {
-            String type = tokens.remove(0).toLowerCase();
+            String type = tokens.removeFirst().toLowerCase();
             switch (type) {
                 case "server":
                     serverManager.clear();

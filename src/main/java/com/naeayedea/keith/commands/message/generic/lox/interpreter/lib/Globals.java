@@ -1,9 +1,9 @@
-package com.naeayedea.keith.commands.message.generic.lox.Interpreter.lib;
+package com.naeayedea.keith.commands.message.generic.lox.interpreter.lib;
 
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.Interpreter;
-import com.naeayedea.keith.commands.message.generic.lox.Interpreter.LoxCallable;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.Token;
-import com.naeayedea.keith.commands.message.generic.lox.Lexer.TokenType;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.Interpreter;
+import com.naeayedea.keith.commands.message.generic.lox.interpreter.LoxCallable;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.Token;
+import com.naeayedea.keith.commands.message.generic.lox.lexer.TokenType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class Globals {
     public static final Map<Token, LoxCallable> globals = new HashMap<>();
+
     static {
         globals.put(new Token(TokenType.IDENTIFIER, "clock", null, -1), new LoxCallable() {
             @Override

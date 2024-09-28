@@ -7,8 +7,8 @@ import com.github.ygimenez.model.InteractPage;
 import com.github.ygimenez.model.Page;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +51,13 @@ public class OnThisDay extends AbstractUserCommand {
 
     @Override
     public String getShortDescription(String prefix) {
-        return prefix+getDefaultName()+": \"Find out what happened this day in history!\"";
+        return prefix + getDefaultName() + ": \"Find out what happened this day in history!\"";
     }
 
     @Override
     public String getLongDescription() {
         return "Gives a selection of events that happened on this day in the past, use \"?otd [day] [month]\" for a specific " +
-                "date or just \"?otd\" for today!";
+            "date or just \"?otd\" for today!";
     }
 
     //OTD utilises an external api, so increase cost of command so not to rate limit ourselves
@@ -70,7 +70,7 @@ public class OnThisDay extends AbstractUserCommand {
     public void run(MessageReceivedEvent event, List<String> tokens) {
         MessageChannel channel = event.getChannel();
         LocalDate date;
-        if (tokens.size() > 0) {
+        if (!tokens.isEmpty()) {
             date = parseDate(Utilities.stringListToString(tokens));
         } else {
             date = LocalDate.now();
@@ -79,7 +79,7 @@ public class OnThisDay extends AbstractUserCommand {
         if (date != null) {
             try {
                 //contact api for the information on that day
-                URL api = (new URI(API_URL+date.getMonthValue()+"/"+date.getDayOfMonth()+"/events.json")).toURL();
+                URL api = (new URI(API_URL + date.getMonthValue() + "/" + date.getDayOfMonth() + "/events.json")).toURL();
                 HttpURLConnection con = (HttpURLConnection) api.openConnection();
                 con.setRequestMethod("GET");
                 con.connect();
@@ -98,28 +98,29 @@ public class OnThisDay extends AbstractUserCommand {
                 } else {
                     index = ThreadLocalRandom.current().ints(0, numEvents).distinct().limit(6).toArray();
                 }
-                int c = 1; int n = index.length;
+                int c = 1;
+                int n = index.length;
                 for (int i : index) {
                     JsonNode result = events.get(i);
                     eb = new EmbedBuilder();
-                    eb.setTitle("On This Day || "+day+" "+result.get("year").toString());
-                    eb.addField("Description", "```"+result.get("description").toString()+"```", false);
+                    eb.setTitle("On This Day || " + day + " " + result.get("year").toString());
+                    eb.addField("Description", "```" + result.get("description").toString() + "```", false);
                     eb.setColor(Utilities.getColorFromString(result.get("description").toString()));
 
-                    eb.setFooter("Page "+c+"/"+n);
+                    eb.setFooter("Page " + c + "/" + n);
                     List<JsonNode> wikipedia = result.findValues("wikipedia");
                     StringBuilder links = new StringBuilder();
                     for (int j = 0; j < Math.min(5, wikipedia.size()); j++) {
                         JsonNode link = wikipedia.get(j);
-                            URL firstLink = new java.net.URI(link.get("wikipedia").toString()).toURL();
-                            HttpURLConnection getImage= (HttpURLConnection) firstLink.openConnection();
-                            getImage.setRequestMethod("GET");
-                            getImage.connect();
-                            String imageURL = Utilities.getImageURL(Utilities.readInputStream(getImage.getInputStream()));
-                            if (!imageURL.equals("")) {
-                                eb.setImage(imageURL);
-                            }
-                            getImage.disconnect();
+                        URL firstLink = new java.net.URI(link.get("wikipedia").toString()).toURL();
+                        HttpURLConnection getImage = (HttpURLConnection) firstLink.openConnection();
+                        getImage.setRequestMethod("GET");
+                        getImage.connect();
+                        String imageURL = Utilities.getImageURL(Utilities.readInputStream(getImage.getInputStream()));
+                        if (!imageURL.isEmpty()) {
+                            eb.setImage(imageURL);
+                        }
+                        getImage.disconnect();
                     }
                     for (JsonNode wikiPage : wikipedia) {
                         links.append(wikiPage.get("title").toString()).append("\n").append(wikiPage.get("wikipedia").toString()).append("\n");
@@ -142,15 +143,15 @@ public class OnThisDay extends AbstractUserCommand {
 
     public LocalDate parseDate(String target) {
         for (String format : formatList) {
-            try{
+            try {
                 DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                        .parseCaseInsensitive()
-                        .appendPattern(format)
-                        .parseDefaulting(ChronoField.YEAR, 2020)
-                        .toFormatter(Locale.ENGLISH);
+                    .parseCaseInsensitive()
+                    .appendPattern(format)
+                    .parseDefaulting(ChronoField.YEAR, 2020)
+                    .toFormatter(Locale.ENGLISH);
                 return LocalDate.parse(target, formatter);
+            } catch (DateTimeParseException ignored) {
             }
-            catch (DateTimeParseException ignored) {}
         }
         return null;
     }
