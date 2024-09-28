@@ -1,17 +1,37 @@
 package com.naeayedea.keith.commands.message.admin.utilities;
 
 import com.naeayedea.keith.util.Utilities;
+import jakarta.annotation.PostConstruct;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Restart extends AbstractAdminUtilsCommand {
 
+    private static final Logger logger = LoggerFactory.getLogger(Restart.class);
+
+    @Value("${keith.version}")
+    private String version;
+
+    @Value("${keith.project.name}")
+    private String projectName;
+
+
     public Restart(@Value("${keith.commands.admin.utilities.restart.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.restart.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
+    }
+
+    @PostConstruct
+    public void init() {
+        logger.info("Restart configured to use jar command: {}", (Object) getRestartArguments("[Placeholder Message Id]", "[Placeholder Channel Id]"));
     }
 
     @Override
@@ -26,6 +46,27 @@ public class Restart extends AbstractAdminUtilsCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        Utilities.restart(event);
+        try {
+            Message message = event.getChannel().sendMessage("Restarting...").complete();
+
+            Process p = Runtime.getRuntime().exec(getRestartArguments(message.getId(), message.getChannelId()));
+
+            Utilities.setStatus("Restarting...");
+
+            try {
+                if (p.waitFor(10, TimeUnit.SECONDS)) {
+                    Utilities.runShutdownProcedure();
+                } else {
+                    event.getChannel().sendMessage("Restart failed...").queue();
+                }
+            } catch (InterruptedException ignored) {}
+
+        } catch (IOException e) {
+            event.getChannel().sendMessage("Restart failed badly...").queue();
+        }
+    }
+
+    private String[] getRestartArguments(String messageId, String channelId) {
+        return new String[]{"screen", "-dm", "java", "-jar", System.getProperty("user.dir") + "\\" + projectName + "-" + version +".jar", messageId, channelId};
     }
 }

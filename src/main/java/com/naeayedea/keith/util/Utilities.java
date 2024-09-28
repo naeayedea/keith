@@ -228,27 +228,6 @@ public class Utilities {
         return result.toString().trim();
     }
 
-    public static void restart(MessageReceivedEvent event) {
-        try {
-            Message message = event.getChannel().sendMessage("Restarting...").complete();
-            Process p = Runtime.getRuntime().exec(new String[]{"screen", "-dm", "java", "-jar", "/home/succ/keith/v3/build/libs/keithv3-v3.00-all.jar", message.getId(), message.getChannelId()});
-
-            setStatus("Restarting...");
-
-            try {
-                if (p.waitFor(10, TimeUnit.SECONDS)) {
-                    runShutdownProcedure();
-                } else {
-                    event.getChannel().sendMessage("Restart failed...").queue();
-                }
-            } catch (InterruptedException ignored) {
-            }
-
-        } catch (IOException e) {
-            event.getChannel().sendMessage("Restart failed badly...").queue();
-        }
-
-    }
 
     public static void runShutdownProcedure() {
         System.exit(0);

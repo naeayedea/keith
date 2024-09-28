@@ -19,7 +19,8 @@ import java.util.List;
 @Component
 public class Stats extends AbstractAdminCommand {
 
-    private static final String VERSION = "3.1.1 \"PIN HOTFIX\"";
+    @Value("${keith.version}")
+    private String VERSION;
 
     private final CandidateManager candidateManager;
 
