@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.message.admin;
 
-import com.naeayedea.config.commands.MessageCommandConfig;
+import com.naeayedea.config.discord.commands.MessageCommandConfig;
 import com.naeayedea.keith.commands.message.AbstractCommandPortal;
 import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.commands.message.MessageCommand;
@@ -8,6 +8,7 @@ import com.naeayedea.keith.commands.message.info.Help;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.util.MultiMap;
+import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class Admin extends AbstractCommandPortal {
 
         commands = new MultiMap<>();
 
-        MessageCommandConfig.populateCommandMap(commands, adminCommandHandlers, List.of(adminHelp.getDefaultName()));
+        Utilities.populateCommandMap(commands, adminCommandHandlers, List.of(adminHelp.getDefaultName()));
 
         commands.putAll(adminHelp.getAliases(), adminHelp);
         commands.putAll(adminUtilities.getAliases(), adminUtilities);

@@ -1,4 +1,4 @@
-package com.naeayedea.config.discord;
+package com.naeayedea.config.discord.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

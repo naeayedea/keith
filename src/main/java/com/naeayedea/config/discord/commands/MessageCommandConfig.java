@@ -1,4 +1,4 @@
-package com.naeayedea.config.commands;
+package com.naeayedea.config.discord.commands;
 
 import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.admin.AbstractAdminCommand;
@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+
+import static com.naeayedea.keith.util.Utilities.populateCommandMap;
 
 @Configuration
 public class MessageCommandConfig {
@@ -46,13 +48,5 @@ public class MessageCommandConfig {
         populateCommandMap(commandMap, adminUtilsCommands, List.of(defaultName));
 
         return new Help(commandMap, serverManager, defaultName, commandAliases);
-    }
-
-    public static void populateCommandMap(MultiMap<String, MessageCommand> commandMap, List<? extends MessageCommand> commands, List<String> exclusions) {
-        for (MessageCommand command : commands) {
-            if (!exclusions.contains(command.getDefaultName())) {
-                commandMap.putAll(command.getAliases(), command);
-            }
-        }
     }
 }

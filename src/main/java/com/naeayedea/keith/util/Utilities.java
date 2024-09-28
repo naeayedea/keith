@@ -1,5 +1,6 @@
 package com.naeayedea.keith.util;
 
+import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -289,5 +290,13 @@ public class Utilities {
             return matcher.group();
         }
         return "";
+    }
+
+    public static void populateCommandMap(MultiMap<String, MessageCommand> commandMap, List<? extends MessageCommand> commands, List<String> exclusions) {
+        for (MessageCommand command : commands) {
+            if (!exclusions.contains(command.getDefaultName())) {
+                commandMap.putAll(command.getAliases(), command);
+            }
+        }
     }
 }
