@@ -6,8 +6,6 @@ public class SubCommandGroup {
 
     private String name;
 
-    private String description;
-
     private List<SubCommandInformation> subCommands;
 
     public String getName() {
@@ -16,14 +14,6 @@ public class SubCommandGroup {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public List<SubCommandInformation> getSubCommands() {

@@ -11,8 +11,6 @@ public class CommandInformation {
 
     private String name;
 
-    private String description;
-
     private boolean isNSFW;
 
     private boolean isGuildOnly;
@@ -33,14 +31,6 @@ public class CommandInformation {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @JsonGetter("isNSFW")

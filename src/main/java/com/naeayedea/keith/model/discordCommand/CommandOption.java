@@ -8,8 +8,6 @@ public class CommandOption {
 
     private String name;
 
-    private String description;
-
     private String type;
 
     private boolean isOptional;
@@ -22,14 +20,6 @@ public class CommandOption {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @JsonSetter("isOptional")
