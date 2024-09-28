@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,71 +27,61 @@ public class DiscordCommandConfig {
         List<CommandData> commands = new ArrayList<>();
 
         try (InputStream input = location.getInputStream()) {
-            if (input == null) {
-                throw new FileNotFoundException("Cannot access file at location \""+location+ "\".");
-            }
 
             List<CommandInformation> commandInformationList = objectMapper.readValue(input, new TypeReference<>() {});
 
             for (CommandInformation commandInformation : commandInformationList) {
-                CommandData currentCommand;
-
-                switch (commandInformation.getType().toLowerCase()) {
-                    case "slash" -> {
-                        SlashCommandData slashCommand = Commands.slash(commandInformation.getName(), commandInformation.getDescription());
-
-                        if (!commandInformation.getSubCommandGroups().isEmpty() || !commandInformation.getSubCommands().isEmpty()) {
-                            if (!commandInformation.getOptions().isEmpty()) {
-                                throw new IOException("Options cannot be specified when subcommands are configured. Offending command: "+ commandInformation.getName());
-                            }
-
-                            slashCommand.addSubcommands(buildSubCommandsFromSubCommandInformation(commandInformation.getSubCommands()));
-
-                            slashCommand.addSubcommandGroups(buildSubCommandGroupsFromCommandInformation(commandInformation.getSubCommandGroups()));
-                        } else {
-                            slashCommand.addOptions(buildOptionsFromCommandOptions(commandInformation.getOptions()));
-                        }
-
-                        currentCommand = slashCommand;
-                    }
-                    case "message" -> {
-                        currentCommand = Commands.message(commandInformation.getName());
-                    }
-                    case "user" -> {
-                        currentCommand = Commands.user(commandInformation.getName());
-                    }
-                    default -> throw new IOException("Expected slash, message, or user. Got "+ commandInformation.getType());
-                }
-
-                currentCommand
-                    .setGuildOnly(commandInformation.isGuildOnly())
-                    .setNSFW(commandInformation.isNSFW())
-                    .setDefaultPermissions(
-                        switch (commandInformation.getDefaultPermission()) {
-                           case "ENABLED" -> DefaultMemberPermissions.ENABLED;
-                           case "DISABLED" -> DefaultMemberPermissions.DISABLED;
-                           default -> throw new IOException("Unexpected default permission, currently support ENABLED and DISABLED");
-                        }
-                    )
-                    .setLocalizationFunction(getLocalizationFunction());
-
-                commands.add(currentCommand);
+                commands.add(processCommandInformation(commandInformation));
             }
         }
 
         return commands;
     }
 
-    private Collection<OptionData> buildOptionsFromCommandOptions(List<CommandOption> commandOptions) {
-        return commandOptions.stream()
-            .map(option -> {
-                OptionData optionData = new OptionData(OptionType.valueOf(option.getType()), option.getName(), option.getDescription());
+    private CommandData processCommandInformation(CommandInformation commandInformation) throws IOException {
+        return unpackCommandInformation(commandInformation)
+            .setGuildOnly(commandInformation.isGuildOnly())
+            .setNSFW(commandInformation.isNSFW())
+            .setDefaultPermissions(processDefaultPermission(commandInformation.getDefaultPermission()))
+            .setLocalizationFunction(getLocalizationFunction());
 
-                for (CommandChoice choice : option.getChoices()) {
-                    optionData.addChoice(choice.getName(), choice.getValue());
-                }
+    }
 
-                return optionData;
+    private CommandData unpackCommandInformation(CommandInformation commandInformation) throws IOException {
+        return switch (commandInformation.getType().toLowerCase()) {
+            case "slash" -> processSlashCommand(commandInformation);
+            case "message" -> Commands.message(commandInformation.getName());
+            case "user" -> Commands.user(commandInformation.getName());
+            default -> throw new IOException("Expected slash, message, or user. Got "+ commandInformation.getType());
+        };
+    }
+
+    private CommandData processSlashCommand(CommandInformation commandInformation) throws IOException {
+        SlashCommandData slashCommand = Commands.slash(commandInformation.getName(), commandInformation.getDescription());
+
+        if (!commandInformation.getSubCommandGroups().isEmpty() || !commandInformation.getSubCommands().isEmpty()) {
+            if (!commandInformation.getOptions().isEmpty()) {
+                throw new IOException("Options cannot be specified when subcommands are configured. Offending command: "+ commandInformation.getName());
+            }
+
+            slashCommand.addSubcommands(buildSubCommandsFromSubCommandInformation(commandInformation.getSubCommands()));
+
+            slashCommand.addSubcommandGroups(buildSubCommandGroupsFromCommandInformation(commandInformation.getSubCommandGroups()));
+        } else {
+            slashCommand.addOptions(buildOptionsFromCommandOptions(commandInformation.getOptions()));
+        }
+
+        return slashCommand;
+    }
+
+    private Collection<SubcommandGroupData> buildSubCommandGroupsFromCommandInformation(List<SubCommandGroup> subCommandGroups) {
+        return subCommandGroups.stream()
+            .map(subCommandGroup -> {
+                SubcommandGroupData subcommandGroupData = new SubcommandGroupData(subCommandGroup.getName(), subCommandGroup.getDescription());
+
+                subcommandGroupData.addSubcommands(buildSubCommandsFromSubCommandInformation(subCommandGroup.getSubCommands()));
+
+                return subcommandGroupData;
             })
             .toList();
     }
@@ -121,17 +110,28 @@ public class DiscordCommandConfig {
             .toList();
     }
 
-    private Collection<SubcommandGroupData> buildSubCommandGroupsFromCommandInformation(List<SubCommandGroup> subCommandGroups) {
-        return subCommandGroups.stream()
-            .map(subCommandGroup -> {
-                SubcommandGroupData subcommandGroupData = new SubcommandGroupData(subCommandGroup.getName(), subCommandGroup.getDescription());
+    private Collection<OptionData> buildOptionsFromCommandOptions(List<CommandOption> commandOptions) {
+        return commandOptions.stream()
+            .map(option -> {
+                OptionData optionData = new OptionData(OptionType.valueOf(option.getType()), option.getName(), option.getDescription());
 
-                subcommandGroupData.addSubcommands(buildSubCommandsFromSubCommandInformation(subCommandGroup.getSubCommands()));
+                for (CommandChoice choice : option.getChoices()) {
+                    optionData.addChoice(choice.getName(), choice.getValue());
+                }
 
-                return subcommandGroupData;
+                return optionData;
             })
             .toList();
     }
+
+    private DefaultMemberPermissions processDefaultPermission(String defaultPermission) throws IOException {
+        return switch (defaultPermission) {
+            case "ENABLED" -> DefaultMemberPermissions.ENABLED;
+            case "DISABLED" -> DefaultMemberPermissions.DISABLED;
+            default -> throw new IOException("Unexpected default permission, currently support ENABLED and DISABLED");
+        };
+    }
+
 
     private LocalizationFunction getLocalizationFunction() {
         return key -> {return new HashMap<>(); };
