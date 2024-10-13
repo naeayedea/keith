@@ -23,7 +23,7 @@ public class SetCandidateLevel extends AbstractAdminCommand {
 
     private final Logger logger = LoggerFactory.getLogger(SetCandidateLevel.class);
 
-    public SetCandidateLevel(CandidateManager candidateManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
+    public SetCandidateLevel(CandidateManager candidateManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
     }

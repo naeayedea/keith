@@ -1,4 +1,4 @@
-package com.naeayedea.i18n;
+package com.naeayedea.keith.i18n;
 
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 

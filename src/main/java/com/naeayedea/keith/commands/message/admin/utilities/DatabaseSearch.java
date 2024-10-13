@@ -14,7 +14,7 @@ public class DatabaseSearch extends AbstractOwnerCommand {
 
     private final Database database;
 
-    public DatabaseSearch(@Value("${keith.commands.admin.utilities.databaseSearch.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.databaseSearch.aliases}', ',')}") List<String> commandAliases, Database database) {
+    public DatabaseSearch(@Value("${keith.commands.admin.utilities.databaseSearch.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.databaseSearch.aliases}', ',')}") List<String> commandAliases, Database database) {
         super(defaultName, commandAliases);
         this.database = database;
     }

@@ -43,7 +43,7 @@ public class OnThisDay extends AbstractUserCommand {
 
     private final Logger logger = LoggerFactory.getLogger(OnThisDay.class);
 
-    public OnThisDay(@Value("${keith.commands.onThisDay.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.onThisDay.aliases}', ',')}") List<String> commandAliases) {
+    public OnThisDay(@Value("${keith.commands.onThisDay.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.onThisDay.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.mapper = new ObjectMapper();

@@ -32,7 +32,7 @@ public class Stats extends AbstractAdminCommand {
     @Value("${keith.commands.stats.statements.returnServers}")
     private String RETURN_SERVER_STATEMENT;
 
-    public Stats(CandidateManager candidateManager, @Value("${keith.commands.admin.stats.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.stats.aliases}', ',')}") List<String> commandAliases, Database database) {
+    public Stats(CandidateManager candidateManager, @Value("${keith.commands.admin.stats.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.stats.aliases}', ',')}") List<String> commandAliases, Database database) {
         super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
         this.database = database;

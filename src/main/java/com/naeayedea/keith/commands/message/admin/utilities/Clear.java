@@ -16,7 +16,7 @@ public class Clear extends AbstractAdminUtilsCommand {
 
     private final CandidateManager candidateManager;
 
-    public Clear(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.clear.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.clear.aliases}', ',')}") List<String> commandAliases) {
+    public Clear(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.clear.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.clear.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
         this.serverManager = serverManager;
         this.candidateManager = candidateManager;

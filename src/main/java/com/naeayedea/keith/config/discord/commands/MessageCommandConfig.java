@@ -1,4 +1,4 @@
-package com.naeayedea.config.discord.commands;
+package com.naeayedea.keith.config.discord.commands;
 
 import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.admin.AbstractAdminCommand;
@@ -22,7 +22,7 @@ public class MessageCommandConfig {
 
 
     @Bean
-    public Help baseHelp(List<AbstractUserCommand> userCommands, List<AbstractInfoCommand> infoCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
+    public Help baseHelp(List<AbstractUserCommand> userCommands, List<AbstractInfoCommand> infoCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
         MultiMap<String, MessageCommand> commandMap = new MultiMap<>();
 
         populateCommandMap(commandMap, userCommands, List.of(defaultName));
@@ -32,7 +32,7 @@ public class MessageCommandConfig {
     }
 
     @Bean
-    public Help adminHelp(List<AbstractAdminCommand> adminCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
+    public Help adminHelp(List<AbstractAdminCommand> adminCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
         MultiMap<String, MessageCommand> commandMap = new MultiMap<>();
 
         populateCommandMap(commandMap, adminCommands, List.of(defaultName));
@@ -41,7 +41,7 @@ public class MessageCommandConfig {
     }
 
     @Bean
-    public Help adminUtilitiesHelp(List<AbstractOwnerCommand> ownerCommands, List<AbstractAdminUtilsCommand> adminUtilsCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
+    public Help adminUtilitiesHelp(List<AbstractOwnerCommand> ownerCommands, List<AbstractAdminUtilsCommand> adminUtilsCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
         MultiMap<String, MessageCommand> commandMap = new MultiMap<>();
 
         populateCommandMap(commandMap, ownerCommands, List.of(defaultName));

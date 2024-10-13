@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class Invite extends AbstractInfoCommand {
 
-    public Invite(@Value("${keith.commands.invite.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.invite.aliases}', ',')}") List<String> commandAliases) {
+    public Invite(@Value("${keith.commands.invite.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.invite.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
     }
 

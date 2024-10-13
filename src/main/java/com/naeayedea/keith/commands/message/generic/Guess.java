@@ -18,7 +18,7 @@ public class Guess extends AbstractUserCommand {
 
     private final ChannelCommandManager channelCommandManager;
 
-    public Guess(ServerManager serverManager, ChannelCommandManager channelCommandManager, @Value("${keith.commands.guess.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.guess.aliases}', ',')}") List<String> commandAliases) {
+    public Guess(ServerManager serverManager, ChannelCommandManager channelCommandManager, @Value("${keith.commands.guess.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.guess.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.serverManager = serverManager;

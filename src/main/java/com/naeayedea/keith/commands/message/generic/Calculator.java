@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class Calculator extends AbstractUserCommand {
 
-    public Calculator(@Value("${keith.commands.calculator.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.calculator.aliases}', ',')}") List<String> commandAliases) {
+    public Calculator(@Value("${keith.commands.calculator.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.calculator.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
     }

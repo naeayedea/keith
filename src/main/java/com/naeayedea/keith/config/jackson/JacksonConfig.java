@@ -1,4 +1,4 @@
-package com.naeayedea.config.jackson;
+package com.naeayedea.keith.config.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;

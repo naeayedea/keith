@@ -1,8 +1,8 @@
-package com.naeayedea.config.discord.commands;
+package com.naeayedea.keith.config.discord.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naeayedea.i18n.LocalizationRetriever;
+import com.naeayedea.keith.i18n.LocalizationRetriever;
 import com.naeayedea.keith.model.discordCommand.*;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;

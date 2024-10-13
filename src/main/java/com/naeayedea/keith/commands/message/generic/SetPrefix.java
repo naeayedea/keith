@@ -17,7 +17,7 @@ public class SetPrefix extends AbstractUserCommand {
 
     private final ServerManager serverManager;
 
-    public SetPrefix(ServerManager serverManager, @Value("${keith.commands.setPrefix.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.setPrefix.aliases}', ',')}") List<String> commandAliases) {
+    public SetPrefix(ServerManager serverManager, @Value("${keith.commands.setPrefix.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.setPrefix.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.serverManager = serverManager;

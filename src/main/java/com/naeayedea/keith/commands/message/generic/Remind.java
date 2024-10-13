@@ -93,7 +93,7 @@ public class Remind extends AbstractUserCommand {
 
     private final Logger logger = LoggerFactory.getLogger(Remind.class);
 
-    public Remind(@Value("${keith.commands.remind.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.remind.aliases}', ',')}") List<String> commandAliases, Database database) {
+    public Remind(@Value("${keith.commands.remind.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.remind.aliases}', ',')}") List<String> commandAliases, Database database) {
         super(defaultName, commandAliases);
 
         this.database = database;

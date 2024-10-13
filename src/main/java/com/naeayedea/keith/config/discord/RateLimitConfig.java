@@ -1,4 +1,4 @@
-package com.naeayedea.config.discord;
+package com.naeayedea.keith.config.discord;
 
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import org.springframework.beans.factory.annotation.Value;

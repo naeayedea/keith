@@ -28,10 +28,10 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
 
     private final ServerManager serverManager;
 
-    @Value("#{T(com.naeayedea.converter.StringToEmojiConverter).convertList('${keith.commands.pin.reactionTriggers}', ',')}")
+    @Value("#{T(com.naeayedea.keith.converter.StringToEmojiConverter).convertList('${keith.commands.pin.reactionTriggers}', ',')}")
     private List<Emoji> reactionTriggers;
 
-    public Pin(ServerManager serverManager, @Value("${keith.commands.pin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.pin.aliases}', ',')}") List<String> commandAliases) {
+    public Pin(ServerManager serverManager, @Value("${keith.commands.pin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.pin.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.serverManager = serverManager;

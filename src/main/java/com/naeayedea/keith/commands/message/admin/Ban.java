@@ -24,7 +24,7 @@ public class Ban extends AbstractAdminCommand {
 
     private final Logger logger = LoggerFactory.getLogger(Ban.class);
 
-    public Ban(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.ban.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.ban.aliases}', ',')}") List<String> commandAliases) {
+    public Ban(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.ban.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.ban.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
         this.serverManager = serverManager;
         this.candidateManager = candidateManager;

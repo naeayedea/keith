@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class SetStatus extends AbstractAdminCommand {
 
-    public SetStatus(@Value("${keith.commands.admin.setStatus.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.setStatus.aliases}', ',')}") List<String> commandAliases) {
+    public SetStatus(@Value("${keith.commands.admin.setStatus.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.setStatus.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
     }
 

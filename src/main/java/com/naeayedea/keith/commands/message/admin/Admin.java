@@ -1,6 +1,5 @@
 package com.naeayedea.keith.commands.message.admin;
 
-import com.naeayedea.config.discord.commands.MessageCommandConfig;
 import com.naeayedea.keith.commands.message.AbstractCommandPortal;
 import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.commands.message.MessageCommand;
@@ -36,7 +35,7 @@ public class Admin extends AbstractCommandPortal {
         return AccessLevel.ADMIN;
     }
 
-    public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
+    public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
         super(defaultName, commandAliases, true, true);
 
         this.adminCommandHandlers = adminCommandHandlers;

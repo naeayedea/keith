@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class Avatar extends AbstractUserCommand {
 
-    public Avatar(@Value("${keith.commands.avatar.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.avatar.aliases}', ',')}") List<String> commandAliases) {
+    public Avatar(@Value("${keith.commands.avatar.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.avatar.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
     }
 

@@ -1,4 +1,4 @@
-package com.naeayedea.config.db;
+package com.naeayedea.keith.config.db;
 
 import org.mariadb.jdbc.MariaDbDataSource;
 import org.springframework.beans.factory.annotation.Value;

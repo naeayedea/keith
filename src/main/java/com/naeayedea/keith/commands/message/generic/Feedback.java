@@ -21,7 +21,7 @@ public class Feedback extends AbstractUserCommand {
 
     private final ServerManager serverManager;
 
-    public Feedback(ServerChatManager chatManager, ServerManager serverManager, @Value("${keith.commands.feedback.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.feedback.aliases}', ',')}") List<String> commandAliases) {
+    public Feedback(ServerChatManager chatManager, ServerManager serverManager, @Value("${keith.commands.feedback.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.feedback.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.chatManager = chatManager;

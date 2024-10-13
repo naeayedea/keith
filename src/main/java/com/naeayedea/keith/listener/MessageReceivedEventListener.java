@@ -1,6 +1,5 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.config.discord.commands.MessageCommandConfig;
 import com.naeayedea.keith.commands.message.MessageCommand;
 import com.naeayedea.keith.commands.message.admin.Admin;
 import com.naeayedea.keith.commands.message.channelCommandDrivers.ChannelCommandDriver;

@@ -1,4 +1,4 @@
-package com.naeayedea.config.discord;
+package com.naeayedea.keith.config.discord;
 
 import com.github.ygimenez.model.PaginatorBuilder;
 import com.naeayedea.keith.model.BotConfiguration;

@@ -1,6 +1,5 @@
 package com.naeayedea.keith.commands.message.admin;
 
-import com.naeayedea.config.discord.commands.MessageCommandConfig;
 import com.naeayedea.keith.commands.message.AbstractCommandPortal;
 import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.commands.message.MessageCommand;
@@ -38,7 +37,7 @@ public class AdminUtilities extends AbstractCommandPortal {
 
     private final Help adminUtilitiesHelp;
 
-    public AdminUtilities(CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsCommand> adminUtilsCommandHandlers, List<AbstractOwnerCommand> ownerCommandHandlers, @Qualifier("adminUtilitiesHelp") Help adminUtilitiesHelp) {
+    public AdminUtilities(CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsCommand> adminUtilsCommandHandlers, List<AbstractOwnerCommand> ownerCommandHandlers, @Qualifier("adminUtilitiesHelp") Help adminUtilitiesHelp) {
         super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
         this.adminUtilsCommandHandlers = adminUtilsCommandHandlers;

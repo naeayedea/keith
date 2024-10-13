@@ -14,7 +14,7 @@ import java.util.List;
 public class Banner extends AbstractUserCommand {
 
 
-    public Banner(@Value("${keith.commands.banner.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.banner.aliases}', ',')}") List<String> commandAliases) {
+    public Banner(@Value("${keith.commands.banner.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.banner.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
     }
 

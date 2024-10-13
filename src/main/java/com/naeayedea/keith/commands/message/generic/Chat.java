@@ -14,7 +14,7 @@ public class Chat extends AbstractUserCommand {
 
     private final ServerChatManager chatManager;
 
-    public Chat(ServerChatManager chatManager, @Value("${keith.commands.chat.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.chat.aliases}', ',')}") List<String> commandAliases) {
+    public Chat(ServerChatManager chatManager, @Value("${keith.commands.chat.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.chat.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
 
         this.chatManager = chatManager;

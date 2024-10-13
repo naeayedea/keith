@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class Locate extends AbstractAdminUtilsCommand {
 
-    public Locate(@Value("${keith.commands.admin.utilities.locate.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.locate.aliases}', ',')}") List<String> commandAliases) {
+    public Locate(@Value("${keith.commands.admin.utilities.locate.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.locate.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
     }
 

@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class Sneaky extends AbstractAdminCommand {
 
-    public Sneaky(@Value("${keith.commands.admin.sneaky.defaultName}") String defaultName, @Value("#{T(com.naeayedea.converter.StringToAliasListConverter).convert('${keith.commands.admin.sneaky.aliases}', ',')}") List<String> commandAliases) {
+    public Sneaky(@Value("${keith.commands.admin.sneaky.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.sneaky.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases, false, true);
     }
 

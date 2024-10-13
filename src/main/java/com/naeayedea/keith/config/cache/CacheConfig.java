@@ -1,4 +1,4 @@
-package com.naeayedea.config.cache;
+package com.naeayedea.keith.config.cache;
 
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
