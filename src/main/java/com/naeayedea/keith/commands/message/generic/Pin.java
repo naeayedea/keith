@@ -5,6 +5,7 @@ import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Server;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -63,16 +64,18 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
     @Override
     public void run(MessageReactionAddEvent event, User user) {
         MessageChannel channel = event.getChannel();
+
         channel.retrieveMessageById(event.getMessageId()).queue(message -> {
             String messageContent = message.getContentRaw().trim();
 
             List<String> tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
 
             Guild guild = event.getGuild();
+            JDA jda = event.getJDA();
 
             Server server = serverManager.getServer(guild.getId());
 
-            MessageChannel pinChannel = getPinChannel(server, guild);
+            MessageChannel pinChannel = getPinChannel(jda, server, guild);
 
             if (pinChannel == null) {
                 //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
@@ -95,8 +98,11 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         MessageChannel channel = event.getChannel();
         Message message = event.getMessage();
         Guild guild = event.getGuild();
+        JDA jda = event.getJDA();
+
         Server server = serverManager.getServer(guild.getId());
-        MessageChannel pinChannel = getPinChannel(server, guild);
+
+        MessageChannel pinChannel = getPinChannel(jda, server, guild);
         if (pinChannel == null) {
             //if getPinChannel returns null, then no pin channel exists and bot does not have the permissions to create it
             event.getChannel().sendMessage("No pin channel exists, please give the bot manage channel permissions").queue();
@@ -110,12 +116,12 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
         }
     }
 
-    private MessageChannel getPinChannel(Server server, Guild guild) {
+    private MessageChannel getPinChannel(JDA jda, Server server, Guild guild) {
         String pinChannel = server.pinChannel();
 
         final TextChannel channel;
 
-        Member selfMember = guild.getMember(Utilities.getJDAInstance().getSelfUser());
+        Member selfMember = guild.getMember(jda.getSelfUser());
 
         if ((pinChannel.equals("empty") || guild.getTextChannelById(pinChannel) == null) && selfMember != null) {
             try {

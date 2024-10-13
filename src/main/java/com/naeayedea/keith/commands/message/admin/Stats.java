@@ -50,7 +50,7 @@ public class Stats extends AbstractAdminCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException {
-        JDA jda = Utilities.getJDAInstance();
+        JDA jda = event.getJDA();
         MessageChannel channel = event.getChannel();
 
         String type;
@@ -98,24 +98,24 @@ public class Stats extends AbstractAdminCommand {
                     channel.sendMessage("Servers:\n" + serverList).queue();
 
                 }
-                case "users" -> channel.sendMessage("User count: " + returnUserCount()).queue();
+                case "users" -> channel.sendMessage("User count: " + returnUserCount(jda)).queue();
                 default -> channel.sendMessage("Expected admins or servers, got: "+type).queue();
             }
         }
     }
 
-    private int returnUserCount() {
-        return Utilities.getJDAInstance().getUsers().size();
+    private int returnUserCount(JDA jda) {
+        return jda.getUsers().size();
     }
 
     private void sendStats(MessageChannel channel) {
-        JDA jda = Utilities.getJDAInstance();
+        JDA jda = channel.getJDA();
         EmbedBuilder bd = new EmbedBuilder();
         bd.setTitle("Stats");
-        bd.setAuthor(jda.getSelfUser().getName() + " Version " + VERSION, null, jda.getSelfUser().getAvatarUrl());
+        bd.setAuthor(jda.getSelfUser().getName() + " " + VERSION, null, jda.getSelfUser().getAvatarUrl());
         bd.setColor(Utilities.getBotColor());
         bd.addField("Uptime", Utilities.getUptimeString(), false);
-        bd.addField("Total Users", "" + returnUserCount(), true);
+        bd.addField("Total Users", "" + returnUserCount(jda), true);
         bd.addField("Total Servers", "" + jda.getGuilds().size(), true);
         channel.sendMessageEmbeds(bd.build()).queue();
     }

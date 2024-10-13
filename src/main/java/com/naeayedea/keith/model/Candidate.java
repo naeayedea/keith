@@ -13,7 +13,6 @@ public class Candidate {
 
     private final long commandCount;
 
-
     public Candidate(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
         this.discordID = discordID;
         this.accessLevel = accessLevel;
@@ -46,9 +45,7 @@ public class Candidate {
     }
 
     public String toString() {
-        net.dv8tion.jda.api.entities.User user = Utilities.getJDAInstance().getUserById(this.discordID);
-        String tail = " " + accessLevel + ", " + firstSeen + ", " + commandCount;
-        return user == null ? "Unknown User, ID: " + discordID + tail : user.getName() + "#" + user.getDiscriminator() + tail;
+        return discordID + " " + accessLevel + ", " + firstSeen + ", " + commandCount;
     }
 
     public String getAsMention() {
@@ -56,9 +53,7 @@ public class Candidate {
     }
 
     public String getDescription() {
-        net.dv8tion.jda.api.entities.User user = Utilities.getJDAInstance().getUserById(this.discordID);
-        String tail = " ID: " + discordID;
-        return user == null ? "Unknown User," + tail : user.getName() + "#" + user.getDiscriminator() + tail;
+        return this.toString();
     }
 
 

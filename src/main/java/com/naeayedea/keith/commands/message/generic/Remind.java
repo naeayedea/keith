@@ -83,6 +83,8 @@ public class Remind extends AbstractUserCommand {
     @Value("${keith.executor.reminders.scheduler.poolSize.core}")
     private int corePoolSize;
 
+    private final JDA jda;
+
     private final Database database;
 
     private final String onDateRegex = "(?<=on)( )*(\\d{1,2}/\\d{1,2}/\\d{4}|(\\d{1,2}-\\d{1,2}-\\d{4})|(\\d{1,2} \\d{1,2} \\d{4}))";
@@ -93,9 +95,10 @@ public class Remind extends AbstractUserCommand {
 
     private final Logger logger = LoggerFactory.getLogger(Remind.class);
 
-    public Remind(@Value("${keith.commands.remind.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.remind.aliases}', ',')}") List<String> commandAliases, Database database) {
+    public Remind(JDA jda, @Value("${keith.commands.remind.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.remind.aliases}', ',')}") List<String> commandAliases, Database database) {
         super(defaultName, commandAliases);
 
+        this.jda = jda;
         this.database = database;
         this.executor = new RemindExecutor(corePoolSize);
 
@@ -131,8 +134,7 @@ public class Remind extends AbstractUserCommand {
                 time = Long.parseLong(args[3]);
                 text = result.substring(result.indexOf(args[3]) + args[3].length() + 1).trim();
                 Runnable remind = () -> {
-                    JDA jda = Utilities.getJDAInstance();
-                    TextChannel channel = Utilities.getJDAInstance().getTextChannelById(channelId);
+                    TextChannel channel = jda.getTextChannelById(channelId);
                     remind(guildId, channelId, userid, time, text, jda, channel);
                 };
                 executor.schedule(remind, time - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
@@ -353,7 +355,7 @@ public class Remind extends AbstractUserCommand {
 
         String userid = event.getAuthor().getId();
         Runnable remind = () -> {
-            JDA jda = Utilities.getJDAInstance();
+            JDA jda = event.getJDA();
             MessageChannel channel = Utilities.getMessageChannelById(channelId);
             remind(guildId, channelId, userid, time, text, jda, channel);
         };

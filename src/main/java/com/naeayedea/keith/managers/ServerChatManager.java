@@ -6,6 +6,7 @@ import com.naeayedea.keith.model.chat.ChatCandidate;
 import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -42,13 +43,14 @@ public class ServerChatManager {
 
     private final ServerManager serverManager;
 
-    public ServerChatManager(ServerManager serverManager) {
+    public ServerChatManager(JDA jda, ServerManager serverManager) {
         this.serverManager = serverManager;
-        chats = new HashMap<>();
-        identifiers = new HashMap<>();
-        matchmaking = new HashMap<>();
-        matchmakingLock = new ReentrantLock();
-        feedback = Utilities.getJDAInstance().getTextChannelById("760226764529336350");
+        this.chats = new HashMap<>();
+        this.identifiers = new HashMap<>();
+        this.matchmaking = new HashMap<>();
+        this.matchmakingLock = new ReentrantLock();
+
+        this.feedback = jda.getTextChannelById("760226764529336350");
     }
 
     public MessageChannel getFeedbackChannel() {

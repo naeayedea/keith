@@ -4,6 +4,7 @@ import com.naeayedea.keith.commands.message.AccessLevel;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -57,7 +58,7 @@ public class Ban extends AbstractAdminCommand {
                     event.getChannel().sendMessage("couldn't ban user").queue();
                 }
             } else if (type.equals("server") && candidateManager.getCandidate(event.getAuthor().getId()).getAccessLevel().num > 2) {
-                Guild guild = Utilities.getJDAInstance().getGuildById(id);
+                Guild guild = event.getJDA().getGuildById(id);
                 if (guild != null) {
                     if (serverManager.setBanned(guild.getId(), true).banned()) {
                         event.getAuthor().openPrivateChannel().flatMap(channel -> channel.sendMessage("Successfully banned server id " + id + " contact succ to undo")).queue();

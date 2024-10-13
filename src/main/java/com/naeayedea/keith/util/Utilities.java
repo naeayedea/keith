@@ -86,6 +86,7 @@ public class Utilities {
     }
 
     private static long lastReconnect;
+
     private static JDA jda;
 
     /*stores the maximum total "cost" of commands a user can do within 30 seconds, the cost of each command is defined
@@ -132,10 +133,6 @@ public class Utilities {
 
     public static long getUptimeMillis() {
         return ManagementFactory.getRuntimeMXBean().getUptime() - lastReconnect;
-    }
-
-    public static JDA getJDAInstance() {
-        return Utilities.jda;
     }
 
     public static int getRateLimitMax() {

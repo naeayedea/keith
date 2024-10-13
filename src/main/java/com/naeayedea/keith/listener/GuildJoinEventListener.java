@@ -39,7 +39,7 @@ public class GuildJoinEventListener {
                 .setTitle("Hello!")
                 .setFooter("Use " + server.prefix() + "feedback if you have any issues!- Succ")
                 .setDescription("Use " + server.prefix() + "help to see available commands")
-                .setThumbnail(Utilities.getJDAInstance().getSelfUser().getAvatarUrl())
+                .setThumbnail(event.getJDA().getSelfUser().getAvatarUrl())
                 .build()).queue();
 
             logger.info("New Server {} has added the bot!", guild);

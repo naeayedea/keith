@@ -46,7 +46,7 @@ public class SetCandidateLevel extends AbstractAdminCommand {
 
         Candidate mentionedCandidate;
 
-        JDA jda = Utilities.getJDAInstance();
+        JDA jda = event.getJDA();
 
         if (mentionedUsers.isEmpty()) {
             if (tokens.size() != 1) {
