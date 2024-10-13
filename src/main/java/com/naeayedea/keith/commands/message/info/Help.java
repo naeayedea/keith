@@ -16,7 +16,16 @@ public class Help extends AbstractInfoCommand {
 
     private final ServerManager serverManager;
 
-    public Help(Map<String, MessageCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases) {
+    private final String defaultEmbedTitle;
+
+    private final StringSelectMenu commandSelectionMenu;
+
+    private final String commandSelectionMenuComponentId;
+
+    @Value("${keith.defaultPrefix}")
+    private String DEFAULT_PREFIX;
+
+    public Help(Map<String, MessageCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases, String defaultEmbedTitle) {
         super(defaultName, commandAliases);
 
         this.commands = commandMap;
@@ -36,8 +45,7 @@ public class Help extends AbstractInfoCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        String prefix = Utilities.getPrefix(serverManager, event);
-
+        String prefix = event.isFromGuild() ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX;
 
         if (tokens.isEmpty()) {
             sendAllCommandHelp(event.getChannel(), prefix);

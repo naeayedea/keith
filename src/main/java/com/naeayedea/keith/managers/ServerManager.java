@@ -31,6 +31,9 @@ public class ServerManager {
     @Value("${keith.manager.server.statements.setPrefix}")
     private String SET_PREFIX_STATEMENT;
 
+    @Value("${keith.defaultPrefix}")
+    private String DEFAULT_PREFIX;
+
     private final Database database;
 
     public ServerManager(Database database) {
@@ -62,7 +65,7 @@ public class ServerManager {
             //server doesn't exist yet, create
             database.executeUpdate(CREATE_SERVER_STATEMENT, guildID);
 
-            return new Server(guildID, Instant.now().toString(), "?", false, null);
+            return new Server(guildID, Instant.now().toString(), DEFAULT_PREFIX, false, null);
         }
     }
 
