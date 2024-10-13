@@ -18,14 +18,14 @@ public class Calculator extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"evaluates the expression passed using " + prefix + getDefaultName() + " [expression]\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return """
-            basic calculator functionality supports common operators such as:
+            Basic calculator functionality supports common operators such as:
             +, -, / (divide), * (multiply), ^ (exponential or power)
             
             and some functions such as:

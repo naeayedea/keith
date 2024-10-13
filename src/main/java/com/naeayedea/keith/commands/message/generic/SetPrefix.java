@@ -27,12 +27,12 @@ public class SetPrefix extends AbstractUserCommand {
 
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the prefix of the bot in your server, for prefix limits do " + prefix + "help setprefix!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than " + limit + " characters";
     }
 

@@ -50,12 +50,12 @@ public class OnThisDay extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Find out what happened this day in history!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Gives a selection of events that happened on this day in the past, use \"?otd [day] [month]\" for a specific " +
             "date or just \"?otd\" for today!";
     }

@@ -21,7 +21,7 @@ public interface MessageCommand extends Command {
      * @param prefix the prefix of the server/channel
      * @return a String containing the description
      */
-    String getShortDescription(String prefix);
+    String getExampleUsage(String prefix);
 
     /**
      * Return a longer description of the command which should show use cases etc. - used when help [command] is used to
@@ -29,7 +29,7 @@ public interface MessageCommand extends Command {
      *
      * @return a String containing the long description
      */
-    String getLongDescription();
+    String getDescription();
 
     /**
      * Return the default name of the command

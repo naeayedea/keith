@@ -15,12 +15,12 @@ public class SetStatus extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the bots status to the specified message\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "sets the bot status to the specified message, can also do \"" +
             "setstatus default\" to return the bot status to the default setting";
     }

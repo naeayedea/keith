@@ -14,12 +14,12 @@ public class Echo extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"bot simply returns the text included in the command minus the prefix/command\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Echo command is self explanatory, the bot will echo any text given to it minus the prefix+command";
     }
 

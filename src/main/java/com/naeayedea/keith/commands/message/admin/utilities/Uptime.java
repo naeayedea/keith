@@ -15,12 +15,12 @@ public class Uptime extends AbstractAdminUtilsCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"get uptime\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Returns the current uptime since last restart or major disconnect";
     }
 

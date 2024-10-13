@@ -67,12 +67,12 @@ public class AdminUtilities extends AbstractCommandPortal {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \":eyes:\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return ":eyes: nunaya";
     }
 

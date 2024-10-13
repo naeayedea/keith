@@ -15,12 +15,12 @@ public class Invite extends AbstractInfoCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Invite me to your other servers!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "sends a link which can be used to invite keith to other servers!";
     }
 

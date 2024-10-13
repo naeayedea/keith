@@ -39,12 +39,12 @@ public class Stats extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"returns various bot stats from database\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "usage: admin stats (servers/users/admins)";
     }
 

@@ -17,12 +17,12 @@ public class ServerIcon extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"displays icon of the current guild/server\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "servericon displays the icon of the current server/guild";
     }
 

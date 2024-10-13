@@ -1,16 +1,28 @@
 package com.naeayedea.keith.commands.message.info;
 
 import com.naeayedea.keith.commands.message.MessageCommand;
+import com.naeayedea.keith.commands.message.StringSelectInteractionHandler;
+import com.naeayedea.keith.exception.KeithException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class Help extends AbstractInfoCommand {
+public class Help extends AbstractInfoCommand implements StringSelectInteractionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(Help.class);
 
     private final Map<String, MessageCommand> commands;
 
@@ -30,15 +42,20 @@ public class Help extends AbstractInfoCommand {
 
         this.commands = commandMap;
         this.serverManager = serverManager;
+        this.defaultEmbedTitle = defaultEmbedTitle;
+
+        this.commandSelectionMenuComponentId = "command-selection-"+defaultEmbedTitle.toLowerCase().replace("\\S+", "-");
+
+        this.commandSelectionMenu = createMessageSelects();
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"for more information on a command use " + prefix + "help [command]\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Help lists all available commands as well as going into further detail when help on a specific command" +
             "is requested using one of its aliases";
     }
@@ -48,69 +65,110 @@ public class Help extends AbstractInfoCommand {
         String prefix = event.isFromGuild() ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX;
 
         if (tokens.isEmpty()) {
-            sendAllCommandHelp(event.getChannel(), prefix);
+            sendAllCommandHelp(event.getChannel());
         } else {
-            sendSingleCommandHelp(event.getChannel(), tokens.getFirst().toLowerCase());
+            sendSingleCommandHelp(event.getChannel(), tokens.getFirst().toLowerCase(), prefix);
         }
     }
 
-    public void sendAllCommandHelp(MessageChannel channel, String prefix) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Help");
-        eb.setColor(Utilities.getBotColor());
-        eb.setDescription("For information on specific commands do \"" + prefix + "help [command]\"");
-        StringBuilder helpString = new StringBuilder("```cs\n");
-        for (MessageCommand command : commands.values()) {
-            String description = command.getShortDescription(prefix);
-            //only add description if not duplicate (need to look into improving multimap, maybe have two maps?)
-            if (helpString.indexOf(description) == -1 && !command.isHidden()) {
-                helpString.append(command.getShortDescription(prefix)).append("\n");
-            }
-        }
-        helpString.append("```");
-        eb.addField("List of Commands", helpString.toString(), false);
-        channel.sendMessageEmbeds(eb.build()).queue();
+    public void sendAllCommandHelp(MessageChannel channel) {
+        channel.sendMessageEmbeds(getDefaultHelpEmbed()).addActionRow(commandSelectionMenu).queue();
     }
 
-    public void sendSingleCommandHelp(MessageChannel channel, String commandString) {
-        EmbedBuilder eb = new EmbedBuilder();
-
-        eb.setColor(Utilities.getBotColor());
-
+    public void sendSingleCommandHelp(MessageChannel channel, String commandString, String prefix) {
         MessageCommand command = commands.get(commandString);
 
         if (command != null) {
-
-            eb.setTitle("Command: " + command.getDefaultName());
-
-            StringBuilder knownAliases = new StringBuilder();
-
-            commands.forEach((key, val) -> {
-                //for every command, if command matches the requested command, add its aliases to the embed
-                //do not add the default name.
-                if (val.equals(command) && !key.equals(val.getDefaultName())) {
-                    knownAliases.append(key).append(", ");
-                }
-            });
-
-            eb.setDescription("Below is extended information on the command " + command.getDefaultName() + " and its known aliases");
-            eb.addField("User Level", command.getAccessLevel().toString(), false);
-            eb.addField("Is Hidden", command.isHidden() ? "True" : "False", false);
-            eb.addField("Private Message Compatible", command.isPrivateMessageCompatible() ? "True" : "False", false);
-            eb.addField("Time Out", command.getTimeOut() + "s", false);
-
-            if (knownAliases.toString().trim().isEmpty()) {
-                eb.addField("Known Aliases", "No aliases", false);
-            } else {
-                eb.addField("Known Aliases", knownAliases.substring(0, knownAliases.length() - 2), false);
-            }
-
-            eb.addField("Information", command.getLongDescription(), false);
-            channel.sendMessageEmbeds(eb.build()).queue();
+            channel.sendMessageEmbeds(getCommandHelpEmbed(command, prefix)).addActionRow(commandSelectionMenu).queue();
         } else {
-            channel.sendMessage("No command found with that name or alias").queue();
+            channel.sendMessageEmbeds(getDefaultHelpEmbed()).addActionRow(commandSelectionMenu).queue();
+        }
+    }
+
+    private MessageEmbed getDefaultHelpEmbed() {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        embedBuilder.setTitle(this.defaultEmbedTitle);
+        embedBuilder.setColor(Utilities.getBotColor());
+
+        addHelpFooter(embedBuilder);
+
+        return embedBuilder.build();
+    }
+
+    private void addHelpFooter(EmbedBuilder embedBuilder) {
+        embedBuilder.addField("Need Command Information?", "Use the menu below to select information on a specific command or group of commands", false);
+    }
+
+    private <T extends MessageCommand> MessageEmbed getCommandHelpEmbed(T command, String prefix) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        embedBuilder.setColor(Utilities.getBotColor());
+        embedBuilder.setTitle(command.getDefaultName().substring(0, 1).toUpperCase() + command.getDefaultName().substring(1).toLowerCase());
+        embedBuilder.setDescription(command.getDescription());
+
+        String knownAliases = commands.entrySet().stream().filter(entry -> entry.getValue().equals(command) && !entry.getKey().equals(entry.getValue().getDefaultName())).map(Map.Entry::getKey).collect(Collectors.joining(", "));
+
+        embedBuilder.addField("Example Usage: ", command.getExampleUsage(prefix), false);
+        embedBuilder.addField("User Level", command.getAccessLevel().toString(), false);
+        embedBuilder.addField("Is Hidden", command.isHidden() ? "True" : "False", false);
+        embedBuilder.addField("Private Message Compatible", command.isPrivateMessageCompatible() ? "True" : "False", false);
+        embedBuilder.addField("Time Out", command.getTimeOut() + "s", false);
+
+        if (knownAliases.trim().isEmpty()) {
+            embedBuilder.addField("Known Aliases", "No aliases", false);
+        } else {
+            embedBuilder.addField("Known Aliases", knownAliases, false);
         }
 
+        addHelpFooter(embedBuilder);
 
+        return embedBuilder.build();
+    }
+
+    @Override
+    public List<String> getTriggerOptions() {
+        return List.of(commandSelectionMenuComponentId);
+    }
+
+    @Override
+    public void handleStringSelectEvent(StringSelectInteractionEvent event) throws KeithException {
+        if (event.getComponentId().equals(commandSelectionMenuComponentId)) {
+            commands.get(event.getValues().getFirst());
+
+            MessageCommand command = commands.get(event.getValues().getFirst());
+
+            MessageEditAction action;
+            if (command == null) {
+                action = event.getMessage().editMessageEmbeds(getDefaultHelpEmbed());
+
+            } else {
+                action = event.getMessage().editMessageEmbeds(getCommandHelpEmbed(command, event.getGuild() != null ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX));
+            }
+
+            action.queue(message -> {
+                event.editSelectMenu(commandSelectionMenu).queueAfter(1, TimeUnit.SECONDS);
+            });
+        }
+    }
+
+    private StringSelectMenu createMessageSelects() {
+        StringSelectMenu.Builder messageMenu = StringSelectMenu.create(commandSelectionMenuComponentId);
+
+        messageMenu.addOption("Learn How to Use This Menu", "default message help");
+
+        Map<String, MessageCommand> distinctCommands = new HashMap<>();
+
+        commands.values().forEach(command -> distinctCommands.put(command.getDefaultName(), command));
+
+        distinctCommands.forEach((key, val) -> {
+            if (messageMenu.getOptions().size() < 25) {
+                messageMenu.addOption(val.getDefaultName().substring(0, 1).toUpperCase() + val.getDefaultName().substring(1).toLowerCase(), key.toLowerCase());
+            } else {
+                logger.warn("More than 25 command options at level: {}, consider grouping some commands.", defaultEmbedTitle);
+            }
+        });
+
+        return messageMenu.build();
     }
 }

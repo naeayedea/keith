@@ -39,13 +39,13 @@ public class Pin extends AbstractUserCommand implements ReactionCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + "pin: \"reply with " + prefix + "pin to a message to 'pin' it in a separate channel - useful when channel pins are full!"
             + " See " + prefix + "help pin for more usages!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Pin allows users to 'pin' messages to a separate read only channel. They can pin a message by replying, with the message"
             + "id or by using 'pin [text]' to pin the text entered in the message.";
     }

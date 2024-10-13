@@ -46,12 +46,12 @@ public class Admin extends AbstractCommandPortal {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"admin command portal, for authorised users only\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Allows authorised users to access more powerful commands such as moderation, bot utilities and the database";
     }
 

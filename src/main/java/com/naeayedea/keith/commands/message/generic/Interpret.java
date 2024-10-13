@@ -16,12 +16,12 @@ public class Interpret extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
-        return prefix + getDefaultName() + super.getShortDescription(prefix);
+    public String getExampleUsage(String prefix) {
+        return prefix + getDefaultName() + "";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Runs commands in an interpreted language known as Lox.";
     }
 

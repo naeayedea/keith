@@ -15,12 +15,12 @@ public class Shutdown extends AbstractOwnerCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"shut down the bot completely\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Will shutdown the bot and terminate all processes without restarting";
     }
 

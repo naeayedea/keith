@@ -79,13 +79,13 @@ public abstract class AbstractCommand implements MessageCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
-        return "[DEFAULT SHORT DESCRIPTION]";
+    public String getExampleUsage(String prefix) {
+        return "[DEFAULT EXAMPLE USAGE]";
     }
 
     @Override
-    public String getLongDescription() {
-        return "[DEFAULT LONG DESCRIPTION]";
+    public String getDescription() {
+        return "[DEFAULT DESCRIPTION]";
     }
 
     //Hidden commands won't be displayed to users but can still be accessed by people with sufficient level who know of them

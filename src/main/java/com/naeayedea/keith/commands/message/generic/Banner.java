@@ -19,13 +19,13 @@ public class Banner extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Retrieve the profile banner of a user!\"";
     }
 
     @Override
-    public String getLongDescription() {
-        return "banner retrieves the profile banner of the user doing the command, alternatively banner can "
+    public String getDescription() {
+        return "Banner retrieves the profile banner of the user doing the command, alternatively banner can "
             + "retrieve the banner of another user that has been tagged such as ?banner @Succ would return succs banner";
     }
 

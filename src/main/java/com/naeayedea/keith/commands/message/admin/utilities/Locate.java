@@ -17,12 +17,12 @@ public class Locate extends AbstractAdminUtilsCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Find a user or server\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Enter the ID of a user or server to locate it within the database";
     }
 

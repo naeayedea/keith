@@ -32,12 +32,12 @@ public class Ban extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"gives admins the ability to ban users/servers\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "bans the specified user or server - do 'ban user/server [user or server id]'";
     }
 

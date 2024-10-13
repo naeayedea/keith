@@ -26,12 +26,12 @@ public class Guess extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"number guessing game: use '" + prefix + "guess' or '" + prefix + "guess [number]' to start a game!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Guess lets you and your friends to guess the number generated between 1-100 or 1-[number] where [number]"
             + " can be any number between 1-5000! Simply start the game and type your guess in chat to play!";
     }

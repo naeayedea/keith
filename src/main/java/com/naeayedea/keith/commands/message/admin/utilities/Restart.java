@@ -35,12 +35,12 @@ public class Restart extends AbstractAdminUtilsCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"restarts the bot\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Will shutdown and relaunch the bots processes - useful after update";
     }
 

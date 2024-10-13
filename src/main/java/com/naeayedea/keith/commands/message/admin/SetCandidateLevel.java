@@ -29,12 +29,12 @@ public class SetCandidateLevel extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the UserLevel of the specified user\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "sets the UserLevel of the user that corresponds to the entered id or any users that have been tagged" +
             "UserLevels are: 3 (OWNER), 2 (ADMIN), 1 (USER), 0 (BANNED) please use the integer for this command.";
     }

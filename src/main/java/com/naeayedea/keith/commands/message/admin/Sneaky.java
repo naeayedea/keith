@@ -23,12 +23,12 @@ public class Sneaky extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return "sneaky: \"attempts to give any bot admin a role with server admin if the bot has permissions\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Attempts to give admin powers to the user, will only work if keith has higher permissions than the user and also has admin powers";
     }
 

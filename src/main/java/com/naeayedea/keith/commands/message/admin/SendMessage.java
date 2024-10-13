@@ -18,12 +18,12 @@ public class SendMessage extends AbstractAdminCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"lets you send a message to another channel\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "lets you send a message to another channel - use \"send message/embed [channelid] [title(embed only] [message]\"";
     }
 

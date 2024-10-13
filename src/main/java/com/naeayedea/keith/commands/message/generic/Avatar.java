@@ -18,13 +18,13 @@ public class Avatar extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"displays avatar of a user\"";
     }
 
     @Override
-    public String getLongDescription() {
-        return "avatar retrieves the current discord avatar of the user doing the command, alternatively avatar can "
+    public String getDescription() {
+        return "Avatar retrieves the current discord avatar of the user doing the command, alternatively avatar can "
             + " retrieve the avatar of another user that has been tagged such as ?avatar @Succ would return succ's avatar";
     }
 

@@ -145,12 +145,12 @@ public class Remind extends AbstractUserCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"set a reminder and the bot will message you after the specified timeframe!\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return """
             Forgetful? Use remind to have the bot tag you in the specified amount of time\
             with a message to help you remember! Acceptable uses are:

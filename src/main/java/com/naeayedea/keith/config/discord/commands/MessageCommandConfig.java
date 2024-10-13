@@ -28,7 +28,7 @@ public class MessageCommandConfig {
         populateCommandMap(commandMap, userCommands, List.of(defaultName));
         populateCommandMap(commandMap, infoCommands, List.of(defaultName));
 
-        return new Help(commandMap, serverManager, defaultName, commandAliases);
+        return new Help(commandMap, serverManager, defaultName, commandAliases, "Help");
     }
 
     @Bean
@@ -37,7 +37,7 @@ public class MessageCommandConfig {
 
         populateCommandMap(commandMap, adminCommands, List.of(defaultName));
 
-        return new Help(commandMap, serverManager, defaultName, commandAliases);
+        return new Help(commandMap, serverManager, defaultName, commandAliases, "Admin Help");
     }
 
     @Bean
@@ -47,6 +47,6 @@ public class MessageCommandConfig {
         populateCommandMap(commandMap, ownerCommands, List.of(defaultName));
         populateCommandMap(commandMap, adminUtilsCommands, List.of(defaultName));
 
-        return new Help(commandMap, serverManager, defaultName, commandAliases);
+        return new Help(commandMap, serverManager, defaultName, commandAliases, "Admin Utilities Help");
     }
 }

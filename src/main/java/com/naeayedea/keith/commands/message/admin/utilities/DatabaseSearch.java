@@ -20,12 +20,12 @@ public class DatabaseSearch extends AbstractOwnerCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"use the database\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Used for interacting with the database directly - be careful";
     }
 

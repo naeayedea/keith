@@ -23,12 +23,12 @@ public class Clear extends AbstractAdminUtilsCommand {
     }
 
     @Override
-    public String getShortDescription(String prefix) {
+    public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"clear manager caches\"";
     }
 
     @Override
-    public String getLongDescription() {
+    public String getDescription() {
         return "Used to clear the cache of the candidateManager or ServerManager class\n\n Use ?admin utils clear-cache [server, user, all]";
     }
 
