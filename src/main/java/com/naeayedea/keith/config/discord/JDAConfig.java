@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,16 +57,16 @@ public class JDAConfig {
             GatewayIntent.MESSAGE_CONTENT
         );
 
-        builder.setMemberCachePolicy(MemberCachePolicy.ALL);
-        builder.setChunkingFilter(ChunkingFilter.ALL);
-        builder.setLargeThreshold(50);
-
         try {
             JDA jda = builder
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .disableCache(CacheFlag.SCHEDULED_EVENTS)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .setLargeThreshold(50)
                 .build()
                 .awaitReady();
 
-            logger.info("Adding commands. Count {}", commands.size());
+            logger.info("Adding {} slash commands.", commands.size());
 
             jda.updateCommands()
                 .addCommands(commands)
