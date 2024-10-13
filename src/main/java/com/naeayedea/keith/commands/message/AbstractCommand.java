@@ -30,8 +30,8 @@ public abstract class AbstractCommand implements MessageCommand {
         this.cost = cost;
 
         this.commandAliases = new ArrayList<>(commandAliases);
+
         this.commandAliases.add(defaultName);
-        this.commandAliases.addAll(commandAliases);
     }
 
     /**
