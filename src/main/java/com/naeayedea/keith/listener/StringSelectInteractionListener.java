@@ -1,7 +1,7 @@
 package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.commands.text.StringSelectInteractionHandler;
-import com.naeayedea.keith.exception.KeithException;
+import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.entities.Guild;
@@ -45,7 +45,7 @@ public class StringSelectInteractionListener {
         if (handler != null) {
             try {
                 handler.handleStringSelectEvent(event);
-            } catch (KeithException e) {
+            } catch (KeithExecutionException e) {
                 event.reply(e.getMessage()).setEphemeral(true).queue();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

@@ -61,7 +61,7 @@ public class Help extends AbstractInfoCommand implements StringSelectInteraction
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException, KeithPermissionException {
         String prefix = event.isFromGuild() ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX;
 
         if (tokens.isEmpty()) {
