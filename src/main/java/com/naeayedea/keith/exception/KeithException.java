@@ -1,6 +1,6 @@
 package com.naeayedea.keith.exception;
 
-class KeithException extends Exception {
+public class KeithException extends Exception {
 
     public KeithException(String message) {
         super(message);
