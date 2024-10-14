@@ -3,6 +3,7 @@ package com.naeayedea.keith.config.discord;
 import com.github.ygimenez.model.PaginatorBuilder;
 import com.naeayedea.keith.model.BotConfiguration;
 import com.naeayedea.keith.util.Utilities;
+import jdk.jshell.execution.Util;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -91,7 +92,7 @@ public class JDAConfig {
 
             Utilities.setJDA(jda);
 
-            jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));
+            Utilities.forceDefaultStatus();
 
             return jda;
         } catch (Throwable e) {

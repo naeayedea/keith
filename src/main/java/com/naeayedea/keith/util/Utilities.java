@@ -116,16 +116,15 @@ public class Utilities {
 
     //set status to default by force
     public static void forceDefaultStatus() {
-        jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));
+        jda.getPresence().setActivity(Activity.listening("?help for commands | " + jda.getGuilds().size() + " servers"));
     }
 
     //update default status if it is already set, otherwise leave current status alone
     public static void updateDefaultStatus() {
         if (Objects.requireNonNull(jda.getPresence().getActivity()).getName().contains("help for commands | ")) {
-            jda.getPresence().setActivity(Activity.playing("?help for commands | " + jda.getGuilds().size() + " servers"));  //Default discord status
+            jda.getPresence().setActivity(Activity.listening("?help for commands | " + jda.getGuilds().size() + " servers"));  //Default discord status
         }
     }
-
 
     /*
      * Getter methods for static variables
