@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -27,30 +28,31 @@ public class DiscordCommandConfig {
 
     private final MessageSource messageSource;
 
-
     public DiscordCommandConfig(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
+    @Bean("slash-command-data-list")
+    public List<CommandInformation> getCommandInformationList(@Value("${keith.commands.config.location}") Resource location, ObjectMapper objectMapper) throws IOException {
+        try (InputStream input = location.getInputStream()) {
+            //parse the config json
+            return objectMapper.readValue(input, new TypeReference<>(){});
+        }
+    }
+
     @Bean
-    public List<CommandData> slashCommands(@Value("${keith.commands.config.location}") Resource location, ObjectMapper objectMapper, MessageSource messageSource) throws IOException {
+    public List<CommandData> slashCommands(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformationList) throws IOException {
         List<CommandData> commands = new ArrayList<>();
 
-        try (InputStream input = location.getInputStream()) {
-
-            List<CommandInformation> commandInformationList = objectMapper.readValue(input, new TypeReference<>() {
-            });
-
-            for (CommandInformation commandInformation : commandInformationList) {
-                commands.add(processCommandInformation(commandInformation, messageSource));
-
-            }
+        //for every configuration in the file, process it
+        for (CommandInformation commandInformation : commandInformationList) {
+            commands.add(processCommandInformation(commandInformation));
         }
 
         return commands;
     }
 
-    private CommandData processCommandInformation(CommandInformation commandInformation, MessageSource messageSource) throws IOException {
+    private CommandData processCommandInformation(CommandInformation commandInformation) throws IOException {
         return unpackCommandInformation(commandInformation)
             .setGuildOnly(commandInformation.isGuildOnly())
             .setNSFW(commandInformation.isNSFW())

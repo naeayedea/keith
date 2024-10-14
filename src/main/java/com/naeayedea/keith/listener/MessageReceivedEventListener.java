@@ -1,11 +1,11 @@
 package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.commands.text.TextCommand;
-import com.naeayedea.keith.commands.text.admin.Admin;
+import com.naeayedea.keith.commands.text.admin.AdminTextCommandPortal;
 import com.naeayedea.keith.commands.text.channelCommandDrivers.ChannelCommandDriver;
 import com.naeayedea.keith.commands.text.generic.AbstractUserTextCommand;
 import com.naeayedea.keith.commands.text.info.AbstractInfoTextCommand;
-import com.naeayedea.keith.commands.text.info.Help;
+import com.naeayedea.keith.commands.text.info.HelpTextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
@@ -59,13 +59,13 @@ public class MessageReceivedEventListener {
 
     private final CommandRateLimiter rateLimiter;
 
-    private final Admin admin;
+    private final AdminTextCommandPortal adminTextCommandPortal;
 
     private final List<TextCommand> textCommands;
 
-    private final Help baseHelp;
+    private final HelpTextCommand baseHelpTextCommand;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, @Qualifier("baseHelp") Help baseHelp, Admin admin) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, @Qualifier("baseHelp") HelpTextCommand baseHelpTextCommand, AdminTextCommandPortal adminTextCommandPortal) {
         this.messageService = messageService;
         this.candidateManager = candidateManager;
         this.serverManager = serverManager;
@@ -73,10 +73,10 @@ public class MessageReceivedEventListener {
         this.chatManager = chatManager;
         this.commandService = commandService;
         this.rateLimiter = rateLimiter;
-        this.admin = admin;
+        this.adminTextCommandPortal = adminTextCommandPortal;
 
         this.textCommands = new ArrayList<>(userCommands.size() + infoCommands.size());
-        this.baseHelp = baseHelp;
+        this.baseHelpTextCommand = baseHelpTextCommand;
 
         this.textCommands.addAll(infoCommands);
         this.textCommands.addAll(userCommands);
@@ -88,10 +88,10 @@ public class MessageReceivedEventListener {
 
         commands = new MultiMap<>();
 
-        Utilities.populateCommandMap(commands, textCommands, List.of(baseHelp.getDefaultName()));
+        Utilities.populateCommandMap(commands, textCommands, List.of(baseHelpTextCommand.getDefaultName()));
 
-        commands.putAll(baseHelp.getAliases(), baseHelp);
-        commands.putAll(admin.getAliases(), admin);
+        commands.putAll(baseHelpTextCommand.getAliases(), baseHelpTextCommand);
+        commands.putAll(adminTextCommandPortal.getAliases(), adminTextCommandPortal);
 
         logger.info("Loaded {} base message command aliases", commands.size());
     }

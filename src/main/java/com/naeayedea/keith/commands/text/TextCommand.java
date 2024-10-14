@@ -1,5 +1,6 @@
 package com.naeayedea.keith.commands.text;
 
+import com.naeayedea.keith.commands.lib.command.Command;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -7,6 +8,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.List;
 
 public interface TextCommand extends Command {
+
+    /**
+     * Determine if a command is usable in private messages
+     *
+     * @return true if compatible, false otherwise.
+     */
+    boolean isPrivateMessageCompatible();
 
     /**
      * Returns all aliases that can be used to trigger the command
@@ -30,14 +38,6 @@ public interface TextCommand extends Command {
      * @return a String containing the long description
      */
     String getDescription();
-
-    /**
-     * Return the default name of the command
-     *
-     * @return the default name of the command
-     */
-    String getDefaultName();
-
 
     /**
      * Runs the given command

@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.messageContentProvider.help;
 
 import com.naeayedea.keith.commands.lib.MessageContext;
-import com.naeayedea.keith.commands.lib.MessageEmbedProvider;
-import com.naeayedea.keith.commands.lib.MessageStringSelectionMenuProvider;
+import com.naeayedea.keith.commands.lib.provider.MessageEmbedProvider;
+import com.naeayedea.keith.commands.lib.provider.MessageStringSelectionMenuProvider;
 import com.naeayedea.keith.commands.text.TextCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -38,7 +38,6 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
 
     @Override
     public List<MessageEmbed> getEmbeds(MessageContext<HelpContextOptions> context) {
-        logger.info("Got options {}, and arguments {}", context.getOptions(), context.getArguments());
         if (!context.getOptions().isEmpty() && context.getOptions().getFirst() == HelpContextOptions.COMMAND) {
             try {
                 return List.of(getCommandHelpEmbed((TextCommand) context.getArguments().get(0), context.getArguments().get(1).toString()));
@@ -69,13 +68,11 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
 
         commands.values().forEach(command -> distinctCommands.put(command.getDefaultName(), command));
 
-        distinctCommands.forEach((key, val) -> {
-            if (messageMenu.getOptions().size() < 25) {
-                messageMenu.addOption(val.getDefaultName().substring(0, 1).toUpperCase() + val.getDefaultName().substring(1).toLowerCase(), key.toLowerCase());
-            } else {
-                logger.warn("More than 25 command options at level: {}, consider grouping some commands.", defaultEmbedTitle);
-            }
-        });
+        if (distinctCommands.size() > 25) {
+            logger.warn("More than 25 command options at level: {}, consider grouping some commands. List: {}", defaultEmbedTitle, distinctCommands.keySet());
+        }
+
+        distinctCommands.entrySet().stream().limit(25).forEach(entry -> messageMenu.addOption(entry.getValue().getDefaultName().substring(0, 1).toUpperCase() + entry.getValue().getDefaultName().substring(1).toLowerCase(), entry.getKey().toLowerCase()));
 
         return messageMenu.build();
     }

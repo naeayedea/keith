@@ -1,7 +1,7 @@
 package com.naeayedea.keith.commands.text.info;
 
 import com.naeayedea.keith.commands.text.AbstractTextCommand;
-import com.naeayedea.keith.commands.text.AccessLevel;
+import com.naeayedea.keith.commands.lib.command.AccessLevel;
 
 import java.util.List;
 

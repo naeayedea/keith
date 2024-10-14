@@ -1,7 +1,7 @@
 package com.naeayedea.keith.commands.text.admin.utilities;
 
 import com.naeayedea.keith.commands.text.AbstractTextCommand;
-import com.naeayedea.keith.commands.text.AccessLevel;
+import com.naeayedea.keith.commands.lib.command.AccessLevel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

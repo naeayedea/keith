@@ -1,9 +1,10 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.text.AccessLevel;
+import com.naeayedea.keith.commands.lib.command.AccessLevel;
 import com.naeayedea.keith.model.Candidate;
 import com.naeayedea.keith.util.Database;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
@@ -39,6 +40,7 @@ public class CandidateManager {
         userCache = new HashMap<>();
     }
 
+    @NonNull
     public Candidate getCandidate(String discordID) throws SQLException {
         Candidate candidate = userCache.get(discordID);
 
@@ -49,9 +51,11 @@ public class CandidateManager {
 
             userCache.put(discordID, candidate);
         }
+
         return candidate;
     }
 
+    @NonNull
     public Candidate incrementCommandCount(String discordID) throws SQLException {
         if (database.executeUpdate(INCREMENT_COMMAND_COUNT_STATEMENT, discordID)) {
             return reloadCandidate(discordID);
@@ -60,6 +64,7 @@ public class CandidateManager {
         throw new SQLException();
     }
 
+    @NonNull
     public Candidate setAccessLevel(String discordID, AccessLevel accessLevel) throws SQLException {
         Candidate candidate = getCandidate(discordID);
 
@@ -72,6 +77,7 @@ public class CandidateManager {
         return candidate;
     }
 
+    @NonNull
     public Candidate reloadCandidate(String discordID) throws SQLException {
         List<String> results = database.getStringResult(GET_CANDIDATE_STATEMENT, discordID);
 

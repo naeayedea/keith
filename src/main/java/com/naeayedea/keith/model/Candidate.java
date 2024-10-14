@@ -1,6 +1,6 @@
 package com.naeayedea.keith.model;
 
-import com.naeayedea.keith.commands.text.AccessLevel;
+import com.naeayedea.keith.commands.lib.command.AccessLevel;
 
 public class Candidate {
 

@@ -1,17 +1,16 @@
 package com.naeayedea.keith.commands.text;
 
+import com.naeayedea.keith.commands.common.AbstractCommand;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractTextCommand implements TextCommand {
-
-    private final String defaultName;
+public abstract class AbstractTextCommand extends AbstractCommand implements TextCommand {
 
     private final boolean isPrivateMessageCompatible;
 
     private final boolean isHidden;
 
-    private final int cost;
 
     private final List<String> commandAliases;
 
@@ -24,14 +23,14 @@ public abstract class AbstractTextCommand implements TextCommand {
      * @param cost                       the cost of a command with respect to rate limiting
      */
     public AbstractTextCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
-        this.defaultName = name;
+        super(name, cost);
+
         this.isPrivateMessageCompatible = isPrivateMessageCompatible;
         this.isHidden = isHidden;
-        this.cost = cost;
 
         this.commandAliases = new ArrayList<>(commandAliases);
 
-        this.commandAliases.add(defaultName);
+        this.commandAliases.add(name);
     }
 
     /**
@@ -95,11 +94,6 @@ public abstract class AbstractTextCommand implements TextCommand {
     }
 
     @Override
-    public int getTimeOut() {
-        return 10;
-    }
-
-    @Override
     public boolean isPrivateMessageCompatible() {
         return isPrivateMessageCompatible;
     }
@@ -109,13 +103,4 @@ public abstract class AbstractTextCommand implements TextCommand {
         return true;
     }
 
-    @Override
-    public String getDefaultName() {
-        return defaultName;
-    }
-
-    @Override
-    public int getCost() {
-        return cost;
-    }
 }

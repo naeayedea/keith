@@ -1,5 +1,6 @@
 package com.naeayedea.keith.commands.text;
 
+import com.naeayedea.keith.commands.lib.command.Command;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import net.dv8tion.jda.api.entities.User;
