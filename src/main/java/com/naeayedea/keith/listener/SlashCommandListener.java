@@ -1,67 +1,91 @@
 package com.naeayedea.keith.listener;
 
+import com.naeayedea.keith.commands.slash.SlashCommand;
+import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithPermissionException;
+import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.discordCommand.CommandInformation;
+import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SlashCommandListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(SlashCommandListener.class);
+
+    private final CandidateManager candidateManager;
+
+    private final Map<String, SlashCommand> commands;
+
+    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommand> slashCommands, CandidateManager candidateManager) {
+        this.candidateManager = candidateManager;
+        Map<String, SlashCommand> commandHandlers = new HashMap<>();
+
+        logger.info("Loaded {} slash commands handlers", slashCommands.size());
+
+        for (SlashCommand command : slashCommands) {
+            commandHandlers.put(command.getDefaultName(), command);
+        }
+
+        MultiMap<String, SlashCommand> commandMultiMap = new MultiMap<>();
+
+        for (CommandInformation command : commandInformation) {
+            SlashCommand handler = commandHandlers.get(command.getName());
+
+            if (handler != null) {
+                commandMultiMap.put(command.getName(), handler);
+            } else {
+                logger.warn("No slash command handler found for command {}", command.getName());
+            }
+        }
+
+        logger.info("Loaded {} slash commands entries", commandMultiMap.size());
+
+        this.commands = commandMultiMap;
+    }
+
     @EventListener(SlashCommandInteractionEvent.class)
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        switch (event.getName()) {
-            case "say" -> {
-                String content = event.getOption("message", OptionMapping::getAsString);
+        SlashCommand command = commands.get(event.getName());
 
-                event.reply(content != null ? content : "What do you want me to say?")
-                    .setEphemeral(true)
-                    .queue();
-            }
-            case "testwithgroups" -> {
-                String chosenGroup = event.getSubcommandGroup();
-
-                if ("groupone".equals(chosenGroup)) {
-                    String chosenSubCommand = event.getSubcommandName();
-
-                    if ("say".equals(chosenSubCommand)) {
-                        String content = event.getOption("message", OptionMapping::getAsString);
-
-                        event.reply(content != null ? content : "What do you want me to say?")
-                            .setEphemeral(true)
-                            .queue();
-                    } else if ("saywithoptions".equals(chosenSubCommand)) {
-                        String content = event.getOption("message", OptionMapping::getAsString);
-
-                        event.reply(content != null ? content : "What do you want me to say?")
-                            .setEphemeral(true)
-                            .queue();
-                    } else {
-                        event.reply("No subcommand found in group one")
-                            .setEphemeral(true)
-                            .queue();
+        if (command != null) {
+            try {
+                try {
+                    if (!candidateManager.getCandidate(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+                        throw new KeithPermissionException("You do not have permission to use this command");
                     }
 
-                } else if ("grouptwo".equals(chosenGroup)) {
-                    String chosenSubCommand = event.getSubcommandName();
-
-                    if ("sayhello".equals(chosenSubCommand)) {
-                        event.reply("Hello")
-                            .setEphemeral(true)
-                            .queue();
-                    } else {
-                        event.reply("No subcommand found in group two")
-                            .setEphemeral(true)
-                            .queue();
-                    }
-
-                } else {
-                    event.reply("No group found.")
+                    command.run(event);
+                } catch (KeithExecutionException e) {
+                    logger.error("Error encountered whilst running command {}, {}", event.getName(), e.getMessage(), e);
+                    throw new IOException(e);
+                } catch (KeithPermissionException e) {
+                    event.reply("You do not have permission to do that!")
                         .setEphemeral(true)
                         .queue();
                 }
+            } catch (Throwable e) {
+                event.reply("Something went wrong :(")
+                    .setEphemeral(true)
+                    .queue();
             }
-            default -> event.reply("No handler")
+
+        } else {
+            logger.error("No handler configured for event {}", event.getName());
+
+            event.reply("This command has not been configured properly. Please contact the owner using /feedback")
                 .setEphemeral(true)
                 .queue();
         }
