@@ -1,6 +1,6 @@
 package com.naeayedea.keith.util;
 
-import com.naeayedea.keith.commands.message.MessageCommand;
+import com.naeayedea.keith.commands.text.MessageCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;

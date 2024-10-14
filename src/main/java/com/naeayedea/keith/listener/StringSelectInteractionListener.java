@@ -1,6 +1,6 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.message.StringSelectInteractionHandler;
+import com.naeayedea.keith.commands.text.StringSelectInteractionHandler;
 import com.naeayedea.keith.exception.KeithException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.MultiMap;

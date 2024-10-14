@@ -1,12 +1,12 @@
 package com.naeayedea.keith.config.discord.commands;
 
-import com.naeayedea.keith.commands.message.MessageCommand;
-import com.naeayedea.keith.commands.message.admin.AbstractAdminCommand;
-import com.naeayedea.keith.commands.message.admin.utilities.AbstractAdminUtilsCommand;
-import com.naeayedea.keith.commands.message.admin.utilities.AbstractOwnerCommand;
-import com.naeayedea.keith.commands.message.generic.AbstractUserCommand;
-import com.naeayedea.keith.commands.message.info.AbstractInfoCommand;
-import com.naeayedea.keith.commands.message.info.Help;
+import com.naeayedea.keith.commands.text.MessageCommand;
+import com.naeayedea.keith.commands.text.admin.AbstractAdminCommand;
+import com.naeayedea.keith.commands.text.admin.utilities.AbstractAdminUtilsCommand;
+import com.naeayedea.keith.commands.text.admin.utilities.AbstractOwnerCommand;
+import com.naeayedea.keith.commands.text.generic.AbstractUserCommand;
+import com.naeayedea.keith.commands.text.info.AbstractInfoCommand;
+import com.naeayedea.keith.commands.text.info.Help;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.MultiMap;
 import org.springframework.beans.factory.annotation.Value;

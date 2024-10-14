@@ -1,6 +1,6 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.message.AccessLevel;
+import com.naeayedea.keith.commands.text.AccessLevel;
 import com.naeayedea.keith.model.Candidate;
 import com.naeayedea.keith.util.Database;
 import org.springframework.beans.factory.annotation.Value;

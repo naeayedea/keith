@@ -1,6 +1,6 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.message.ReactionCommand;
+import com.naeayedea.keith.commands.text.ReactionCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;

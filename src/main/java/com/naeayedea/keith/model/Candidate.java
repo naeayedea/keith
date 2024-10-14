@@ -1,7 +1,6 @@
 package com.naeayedea.keith.model;
 
-import com.naeayedea.keith.commands.message.AccessLevel;
-import com.naeayedea.keith.util.Utilities;
+import com.naeayedea.keith.commands.text.AccessLevel;
 
 public class Candidate {
 
