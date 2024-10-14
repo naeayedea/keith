@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Locate extends AbstractAdminUtilsCommand {
+public class Locate extends AbstractAdminUtilsTextCommand {
 
     public Locate(@Value("${keith.commands.admin.utilities.locate.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.locate.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

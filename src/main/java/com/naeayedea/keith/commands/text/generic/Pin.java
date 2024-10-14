@@ -25,7 +25,7 @@ import java.util.*;
 import static net.dv8tion.jda.api.Permission.*;
 
 @Component
-public class Pin extends AbstractUserCommand implements ReactionCommand {
+public class Pin extends AbstractUserTextCommand implements ReactionCommand {
 
     private final ServerManager serverManager;
 

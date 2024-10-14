@@ -32,7 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class Remind extends AbstractUserCommand {
+public class Remind extends AbstractUserTextCommand {
 
     private static class RemindExecutor extends ScheduledThreadPoolExecutor {
 

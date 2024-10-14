@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.text.info;
 import com.naeayedea.keith.commands.lib.MessageContext;
 import com.naeayedea.keith.commands.messageContentProvider.help.HelpContextOptions;
 import com.naeayedea.keith.commands.messageContentProvider.help.HelpMessageContentProvider;
-import com.naeayedea.keith.commands.text.MessageCommand;
+import com.naeayedea.keith.commands.text.TextCommand;
 import com.naeayedea.keith.commands.text.StringSelectInteractionHandler;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class Help extends AbstractInfoCommand implements StringSelectInteractionHandler {
+public class Help extends AbstractInfoTextCommand implements StringSelectInteractionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(Help.class);
 
-    private final Map<String, MessageCommand> commands;
+    private final Map<String, TextCommand> commands;
 
     private final ServerManager serverManager;
 
@@ -33,7 +33,7 @@ public class Help extends AbstractInfoCommand implements StringSelectInteraction
     @Value("${keith.defaultPrefix}")
     private String DEFAULT_PREFIX;
 
-    public Help(Map<String, MessageCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases, String defaultEmbedTitle) {
+    public Help(Map<String, TextCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases, String defaultEmbedTitle) {
         super(defaultName, commandAliases);
 
         this.commands = commandMap;
@@ -60,7 +60,7 @@ public class Help extends AbstractInfoCommand implements StringSelectInteraction
         String prefix = event.isFromGuild() ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX;
 
         if (!tokens.isEmpty() && commands.get(tokens.getFirst().toLowerCase()) != null) {
-            MessageCommand command = commands.get(tokens.getFirst().toLowerCase());
+            TextCommand command = commands.get(tokens.getFirst().toLowerCase());
 
             event
                 .getChannel()
@@ -86,7 +86,7 @@ public class Help extends AbstractInfoCommand implements StringSelectInteraction
         if (event.getComponentId().equals(commandSelectionMenuComponentId)) {
             commands.get(event.getValues().getFirst());
 
-            MessageCommand command = commands.get(event.getValues().getFirst());
+            TextCommand command = commands.get(event.getValues().getFirst());
 
             MessageEditAction action;
             if (command == null) {

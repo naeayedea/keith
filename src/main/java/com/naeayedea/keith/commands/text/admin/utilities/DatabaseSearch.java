@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class DatabaseSearch extends AbstractOwnerCommand {
+public class DatabaseSearch extends AbstractOwnerTextCommand {
 
     private final Database database;
 

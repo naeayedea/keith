@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Echo extends AbstractAdminCommand {
+public class Echo extends AbstractAdminTextCommand {
 
     public Echo(@Value("${keith.commands.admin.echo.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.echo.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

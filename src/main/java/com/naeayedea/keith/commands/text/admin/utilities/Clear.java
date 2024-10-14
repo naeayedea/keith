@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Clear extends AbstractAdminUtilsCommand {
+public class Clear extends AbstractAdminUtilsTextCommand {
 
     private final ServerManager serverManager;
 

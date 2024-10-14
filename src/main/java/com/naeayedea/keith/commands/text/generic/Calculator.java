@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 @Component
-public class Calculator extends AbstractUserCommand {
+public class Calculator extends AbstractUserTextCommand {
 
     public Calculator(@Value("${keith.commands.calculator.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.calculator.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

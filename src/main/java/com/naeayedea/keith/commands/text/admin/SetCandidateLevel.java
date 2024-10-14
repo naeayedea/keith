@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class SetCandidateLevel extends AbstractAdminCommand {
+public class SetCandidateLevel extends AbstractAdminTextCommand {
 
     private final CandidateManager candidateManager;
 

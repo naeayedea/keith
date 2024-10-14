@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class Ban extends AbstractAdminCommand {
+public class Ban extends AbstractAdminTextCommand {
 
     private final ServerManager serverManager;
 

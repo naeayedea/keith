@@ -1,10 +1,10 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.text.MessageCommand;
+import com.naeayedea.keith.commands.text.TextCommand;
 import com.naeayedea.keith.commands.text.admin.Admin;
 import com.naeayedea.keith.commands.text.channelCommandDrivers.ChannelCommandDriver;
-import com.naeayedea.keith.commands.text.generic.AbstractUserCommand;
-import com.naeayedea.keith.commands.text.info.AbstractInfoCommand;
+import com.naeayedea.keith.commands.text.generic.AbstractUserTextCommand;
+import com.naeayedea.keith.commands.text.info.AbstractInfoTextCommand;
 import com.naeayedea.keith.commands.text.info.Help;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
@@ -43,7 +43,7 @@ public class MessageReceivedEventListener {
 
     private final Logger logger = LoggerFactory.getLogger(MessageReceivedEventListener.class);
 
-    private MultiMap<String, MessageCommand> commands;
+    private MultiMap<String, TextCommand> commands;
 
     private final ExecutorService messageService;
 
@@ -61,11 +61,11 @@ public class MessageReceivedEventListener {
 
     private final Admin admin;
 
-    private final List<MessageCommand> messageCommands;
+    private final List<TextCommand> textCommands;
 
     private final Help baseHelp;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoCommand> infoCommands, List<AbstractUserCommand> userCommands, @Qualifier("baseHelp") Help baseHelp, Admin admin) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, @Qualifier("baseHelp") Help baseHelp, Admin admin) {
         this.messageService = messageService;
         this.candidateManager = candidateManager;
         this.serverManager = serverManager;
@@ -75,11 +75,11 @@ public class MessageReceivedEventListener {
         this.rateLimiter = rateLimiter;
         this.admin = admin;
 
-        this.messageCommands = new ArrayList<>(userCommands.size() + infoCommands.size());
+        this.textCommands = new ArrayList<>(userCommands.size() + infoCommands.size());
         this.baseHelp = baseHelp;
 
-        this.messageCommands.addAll(infoCommands);
-        this.messageCommands.addAll(userCommands);
+        this.textCommands.addAll(infoCommands);
+        this.textCommands.addAll(userCommands);
     }
 
     @PostConstruct
@@ -88,7 +88,7 @@ public class MessageReceivedEventListener {
 
         commands = new MultiMap<>();
 
-        Utilities.populateCommandMap(commands, messageCommands, List.of(baseHelp.getDefaultName()));
+        Utilities.populateCommandMap(commands, textCommands, List.of(baseHelp.getDefaultName()));
 
         commands.putAll(baseHelp.getAliases(), baseHelp);
         commands.putAll(admin.getAliases(), admin);
@@ -130,7 +130,7 @@ public class MessageReceivedEventListener {
                             //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
                             tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
 
-                            MessageCommand command = findCommand(tokens);
+                            TextCommand command = findCommand(tokens);
 
                             //Check if command was found and that user isn't rate limited
                             if (command != null) {
@@ -220,7 +220,7 @@ public class MessageReceivedEventListener {
         return message.length() > prefix.length() && message.toLowerCase().startsWith(prefix);
     }
 
-    private MessageCommand findCommand(List<String> list) {
+    private TextCommand findCommand(List<String> list) {
         String commandString = list.removeFirst().toLowerCase();
         return commands.get(commandString);
     }

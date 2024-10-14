@@ -16,7 +16,7 @@ import java.util.List;
  * with server admin if the bot has sufficient permissions. (only for fun in friend servers)
  */
 @Component
-public class Sneaky extends AbstractAdminCommand {
+public class Sneaky extends AbstractAdminTextCommand {
 
     public Sneaky(@Value("${keith.commands.admin.sneaky.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.sneaky.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases, false, true);

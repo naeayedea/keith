@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Chat extends AbstractUserCommand {
+public class Chat extends AbstractUserTextCommand {
 
 
     private final ServerChatManager chatManager;

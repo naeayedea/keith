@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Shutdown extends AbstractOwnerCommand {
+public class Shutdown extends AbstractOwnerTextCommand {
 
     public Shutdown(@Value("${keith.commands.admin.utilities.shutdown.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.shutdown.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

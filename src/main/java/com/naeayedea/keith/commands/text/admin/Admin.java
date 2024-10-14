@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.text.admin;
 
-import com.naeayedea.keith.commands.text.AbstractCommandPortal;
+import com.naeayedea.keith.commands.text.AbstractTextCommandPortal;
 import com.naeayedea.keith.commands.text.AccessLevel;
-import com.naeayedea.keith.commands.text.MessageCommand;
+import com.naeayedea.keith.commands.text.TextCommand;
 import com.naeayedea.keith.commands.text.info.Help;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
@@ -18,13 +18,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Admin extends AbstractCommandPortal {
+public class Admin extends AbstractTextCommandPortal {
 
     private final Logger logger = LoggerFactory.getLogger(Admin.class);
 
-    private MultiMap<String, MessageCommand> commands;
+    private MultiMap<String, TextCommand> commands;
 
-    private final List<AbstractAdminCommand> adminCommandHandlers;
+    private final List<AbstractAdminTextCommand> adminCommandHandlers;
 
     private final Help adminHelp;
 
@@ -35,7 +35,7 @@ public class Admin extends AbstractCommandPortal {
         return AccessLevel.ADMIN;
     }
 
-    public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
+    public Admin(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminTextCommand> adminCommandHandlers, @Qualifier("adminHelp") Help adminHelp, AdminUtilities adminUtilities) {
         super(defaultName, commandAliases, true, true);
 
         this.adminCommandHandlers = adminCommandHandlers;
@@ -58,7 +58,7 @@ public class Admin extends AbstractCommandPortal {
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) throws KeithPermissionException, KeithExecutionException {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
-        MessageCommand command = findCommand(tokens);
+        TextCommand command = findCommand(tokens);
 
         if (command != null) {
             command.run(event, tokens);
@@ -83,7 +83,7 @@ public class Admin extends AbstractCommandPortal {
         logger.info("Loaded {} admin message command aliases", commands.size());
     }
 
-    private MessageCommand findCommand(List<String> list) {
+    private TextCommand findCommand(List<String> list) {
         if (list == null || list.isEmpty())
             return null;
 

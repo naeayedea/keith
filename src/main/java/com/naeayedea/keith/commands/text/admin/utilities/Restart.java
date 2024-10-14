@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class Restart extends AbstractAdminUtilsCommand {
+public class Restart extends AbstractAdminUtilsTextCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(Restart.class);
 

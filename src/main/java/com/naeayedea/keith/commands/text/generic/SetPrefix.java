@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class SetPrefix extends AbstractUserCommand {
+public class SetPrefix extends AbstractUserTextCommand {
 
     private final int limit;
 

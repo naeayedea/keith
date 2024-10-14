@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.messageContentProvider.help;
 import com.naeayedea.keith.commands.lib.MessageContext;
 import com.naeayedea.keith.commands.lib.MessageEmbedProvider;
 import com.naeayedea.keith.commands.lib.MessageStringSelectionMenuProvider;
-import com.naeayedea.keith.commands.text.MessageCommand;
+import com.naeayedea.keith.commands.text.TextCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,13 +22,13 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
 
     private final String defaultEmbedTitle;
 
-    private final Map<String, MessageCommand> commands;
+    private final Map<String, TextCommand> commands;
 
     private final StringSelectMenu commandSelectionMenu;
 
     private final String commandSelectionMenuComponentId;
 
-    public HelpMessageContentProvider(Map<String, MessageCommand> commandMap, String defaultEmbedTitle, String commandSelectionMenuComponentId) {
+    public HelpMessageContentProvider(Map<String, TextCommand> commandMap, String defaultEmbedTitle, String commandSelectionMenuComponentId) {
         this.defaultEmbedTitle = defaultEmbedTitle;
         this.commands = commandMap;
         this.commandSelectionMenuComponentId = commandSelectionMenuComponentId;
@@ -41,7 +41,7 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
         logger.info("Got options {}, and arguments {}", context.getOptions(), context.getArguments());
         if (!context.getOptions().isEmpty() && context.getOptions().getFirst() == HelpContextOptions.COMMAND) {
             try {
-                return List.of(getCommandHelpEmbed((MessageCommand) context.getArguments().get(0), context.getArguments().get(1).toString()));
+                return List.of(getCommandHelpEmbed((TextCommand) context.getArguments().get(0), context.getArguments().get(1).toString()));
             } catch (IndexOutOfBoundsException e) {
                 logger.error("Unexpected number of arguments found in HelpMessageContentProvider. Got {}", context.getArguments());
                 return List.of(getDefaultHelpEmbed());
@@ -65,7 +65,7 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
 
         messageMenu.addOption("Learn How to Use This Menu", "default message help");
 
-        Map<String, MessageCommand> distinctCommands = new HashMap<>();
+        Map<String, TextCommand> distinctCommands = new HashMap<>();
 
         commands.values().forEach(command -> distinctCommands.put(command.getDefaultName(), command));
 
@@ -95,7 +95,7 @@ public class HelpMessageContentProvider implements MessageEmbedProvider<HelpCont
         embedBuilder.addField("Need Command Information?", "Use the menu below to select information on a specific command or group of commands", false);
     }
 
-    private <T extends MessageCommand> MessageEmbed getCommandHelpEmbed(T command, String prefix) {
+    private <T extends TextCommand> MessageEmbed getCommandHelpEmbed(T command, String prefix) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         embedBuilder.setColor(Utilities.getBotColor());

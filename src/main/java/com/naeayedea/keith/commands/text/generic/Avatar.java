@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Avatar extends AbstractUserCommand {
+public class Avatar extends AbstractUserTextCommand {
 
     public Avatar(@Value("${keith.commands.avatar.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.avatar.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

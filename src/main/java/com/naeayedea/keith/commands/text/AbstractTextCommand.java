@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.text;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractCommand implements MessageCommand {
+public abstract class AbstractTextCommand implements TextCommand {
 
     private final String defaultName;
 
@@ -23,7 +23,7 @@ public abstract class AbstractCommand implements MessageCommand {
      * @param isHidden                   set true if command shouldn't show up in help
      * @param cost                       the cost of a command with respect to rate limiting
      */
-    public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
+    public AbstractTextCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
         this.defaultName = name;
         this.isPrivateMessageCompatible = isPrivateMessageCompatible;
         this.isHidden = isHidden;
@@ -43,7 +43,7 @@ public abstract class AbstractCommand implements MessageCommand {
      *             isHidden: true
      *             cost: 1
      */
-    public AbstractCommand(String name, List<String> commandAliases) {
+    public AbstractTextCommand(String name, List<String> commandAliases) {
         this(name, commandAliases, true, false, 1);
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractCommand implements MessageCommand {
      *                                   isHidden: true
      *                                   cost: 1
      */
-    public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible) {
+    public AbstractTextCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible) {
         this(name, commandAliases, isPrivateMessageCompatible, false, 1);
     }
 
@@ -69,7 +69,7 @@ public abstract class AbstractCommand implements MessageCommand {
      *                                   default properties:
      *                                   cost: 1
      */
-    public AbstractCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
+    public AbstractTextCommand(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
         this(name, commandAliases, isPrivateMessageCompatible, isHidden, 1);
     }
 

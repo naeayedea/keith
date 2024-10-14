@@ -2,21 +2,21 @@ package com.naeayedea.keith.commands.text;
 
 import java.util.List;
 
-public abstract class AbstractCommandPortal extends AbstractCommand implements CommandPortal {
+public abstract class AbstractTextCommandPortal extends AbstractTextCommand implements CommandPortal {
 
-    public AbstractCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
+    public AbstractTextCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden, int cost) {
         super(name, commandAliases, isPrivateMessageCompatible, isHidden, cost);
     }
 
-    public AbstractCommandPortal(String name, List<String> commandAliases) {
+    public AbstractTextCommandPortal(String name, List<String> commandAliases) {
         super(name, commandAliases);
     }
 
-    public AbstractCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible) {
+    public AbstractTextCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible) {
         super(name, commandAliases, isPrivateMessageCompatible);
     }
 
-    public AbstractCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
+    public AbstractTextCommandPortal(String name, List<String> commandAliases, boolean isPrivateMessageCompatible, boolean isHidden) {
         super(name, commandAliases, isPrivateMessageCompatible, isHidden);
     }
 

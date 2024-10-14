@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SendMessage extends AbstractAdminCommand {
+public class SendMessage extends AbstractAdminTextCommand {
 
     public SendMessage(@Value("${keith.commands.admin.sendMessage.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.sendMessage.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

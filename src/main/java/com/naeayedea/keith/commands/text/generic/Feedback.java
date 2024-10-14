@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Feedback extends AbstractUserCommand {
+public class Feedback extends AbstractUserTextCommand {
 
     private final ServerChatManager chatManager;
 

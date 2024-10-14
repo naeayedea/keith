@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Uptime extends AbstractAdminUtilsCommand {
+public class Uptime extends AbstractAdminUtilsTextCommand {
 
     public Uptime(@Value("${keith.commands.admin.utilities.uptime.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.uptime.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);

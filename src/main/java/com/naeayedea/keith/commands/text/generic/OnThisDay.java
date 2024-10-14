@@ -32,7 +32,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 @Component
-public class OnThisDay extends AbstractUserCommand {
+public class OnThisDay extends AbstractUserTextCommand {
 
     private static final String API_URL = "https://byabbe.se/on-this-day/";
 

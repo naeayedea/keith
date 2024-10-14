@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ServerIcon extends AbstractUserCommand {
+public class ServerIcon extends AbstractUserTextCommand {
 
 
     public ServerIcon(@Value("${keith.commands.serverIcon.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.serverIcon.aliases}', ',')}") List<String> commandAliases) {

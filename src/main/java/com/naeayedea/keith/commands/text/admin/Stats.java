@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class Stats extends AbstractAdminCommand {
+public class Stats extends AbstractAdminTextCommand {
 
     @Value("${keith.version}")
     private String VERSION;
