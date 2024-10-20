@@ -4,6 +4,9 @@ import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class CacheConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
     private final ScheduledExecutorService scheduledExecutorService;
 
@@ -39,5 +44,11 @@ public class CacheConfig {
             serverManager.clear();
             candidateManager.clear();
         }, cacheRefreshIntervalInSeconds, cacheRefreshIntervalInSeconds, TimeUnit.SECONDS);
+    }
+
+    @PreDestroy
+    private void cleanup() {
+        logger.info("Cleaning up cache");
+        scheduledExecutorService.shutdownNow();
     }
 }

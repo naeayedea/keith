@@ -3,6 +3,7 @@ package com.naeayedea.keith.commands.impl.text.generic;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
@@ -142,6 +143,12 @@ public class RemindTextCommand extends AbstractUserTextCommand {
             n++;
         }
         logger.info("Reloaded {} reminders", n - 1);
+    }
+
+    @PreDestroy
+    private void cleanup() {
+        logger.info("Cleaning up reminders");
+        executor.shutdownNow();
     }
 
     @Override
