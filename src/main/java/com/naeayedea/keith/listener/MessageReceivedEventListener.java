@@ -1,11 +1,11 @@
 package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.commands.impl.text.TextCommand;
-import com.naeayedea.keith.commands.impl.text.admin.AdminTextCommandPortal;
+import com.naeayedea.keith.commands.impl.text.admin.AdminCommandPortal;
 import com.naeayedea.keith.commands.impl.text.channelCommandDrivers.ChannelCommandDriver;
-import com.naeayedea.keith.commands.impl.text.generic.AbstractUserTextCommand;
-import com.naeayedea.keith.commands.impl.text.info.AbstractInfoTextCommand;
-import com.naeayedea.keith.commands.impl.text.info.HelpTextCommand;
+import com.naeayedea.keith.commands.impl.text.generic.AbstractUserCommand;
+import com.naeayedea.keith.commands.impl.text.info.AbstractInfoCommand;
+import com.naeayedea.keith.commands.impl.text.info.HelpCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
@@ -59,13 +59,13 @@ public class MessageReceivedEventListener {
 
     private final CommandRateLimiter rateLimiter;
 
-    private final AdminTextCommandPortal adminTextCommandPortal;
+    private final AdminCommandPortal adminTextCommandPortal;
 
     private final List<TextCommand> textCommands;
 
-    private final HelpTextCommand baseHelpTextCommand;
+    private final HelpCommand baseHelpCommand;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, HelpTextCommand baseHelpTextCommand, AdminTextCommandPortal adminTextCommandPortal) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoCommand> infoCommands, List<AbstractUserCommand> userCommands, HelpCommand baseHelpCommand, AdminCommandPortal adminTextCommandPortal) {
         this.messageService = messageService;
         this.candidateManager = candidateManager;
         this.serverManager = serverManager;
@@ -76,7 +76,7 @@ public class MessageReceivedEventListener {
         this.adminTextCommandPortal = adminTextCommandPortal;
 
         this.textCommands = new ArrayList<>(userCommands.size() + infoCommands.size());
-        this.baseHelpTextCommand = baseHelpTextCommand;
+        this.baseHelpCommand = baseHelpCommand;
 
         this.textCommands.addAll(infoCommands);
         this.textCommands.addAll(userCommands);
@@ -88,9 +88,9 @@ public class MessageReceivedEventListener {
 
         commands = new MultiMap<>();
 
-        Utilities.populateCommandMap(commands, textCommands, List.of(baseHelpTextCommand.getDefaultName()));
+        Utilities.populateCommandMap(commands, textCommands, List.of(baseHelpCommand.getDefaultName()));
 
-        commands.putAll(baseHelpTextCommand.getAliases(), baseHelpTextCommand);
+        commands.putAll(baseHelpCommand.getAliases(), baseHelpCommand);
         commands.putAll(adminTextCommandPortal.getAliases(), adminTextCommandPortal);
 
         logger.info("Loaded {} base message command aliases", commands.size());

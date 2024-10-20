@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class BaseHelpCommand extends AbstractInfoTextCommand implements StringSelectInteractionHandler {
+public class BaseHelpCommand extends AbstractInfoCommand implements StringSelectInteractionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HelpTextCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
 
     private final Map<String, TextCommand> commands;
 

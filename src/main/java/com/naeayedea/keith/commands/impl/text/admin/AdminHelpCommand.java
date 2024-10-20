@@ -14,11 +14,11 @@ import static com.naeayedea.keith.util.Utilities.populateCommandMap;
 
 @Component
 public class AdminHelpCommand extends BaseHelpCommand {
-    public AdminHelpCommand(List<AbstractAdminTextCommand> adminCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
+    public AdminHelpCommand(List<AbstractAdminCommand> adminCommands, ServerManager serverManager, @Value("${keith.commands.help.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.help.aliases}', ',')}") List<String> commandAliases) {
         super(buildCommandMap(adminCommands, defaultName), serverManager, defaultName, commandAliases, "Admin Help");
     }
 
-    private static Map<String, TextCommand> buildCommandMap(List<AbstractAdminTextCommand> adminCommands, String defaultName) {
+    private static Map<String, TextCommand> buildCommandMap(List<AbstractAdminCommand> adminCommands, String defaultName) {
         MultiMap<String, TextCommand> commandMap = new MultiMap<>();
 
         populateCommandMap(commandMap, adminCommands, List.of(defaultName));
