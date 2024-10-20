@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 @Configuration
@@ -27,6 +28,13 @@ public class DatabaseConfig {
         dataSource.setUrl(keithDatabaseUrl);
         dataSource.setUser(keithDatabaseUser);
         dataSource.setPassword(keithDatabasePassword);
+
+        //check that connection works
+        Connection connection = dataSource.getConnection();
+
+        connection.prepareStatement("SELECT 1;").executeQuery();
+
+        connection.close();
 
         return dataSource;
     }
