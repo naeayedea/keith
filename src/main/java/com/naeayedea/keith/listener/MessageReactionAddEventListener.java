@@ -68,9 +68,9 @@ public class MessageReactionAddEventListener {
 
     @EventListener(MessageReactionAddEvent.class)
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        logger.info("Received reaction, starting thread, id: {}", Thread.currentThread().threadId());
+        if (event.getUser() == null || event.getUser().isBot()) return;
+
         reactionHandlingService.submit(() -> {
-            logger.info("Reaction thread started, id: {}", Thread.currentThread().threadId());
 
             Emoji emote = event.getReaction().getEmoji();
 
@@ -79,9 +79,11 @@ public class MessageReactionAddEventListener {
             //ensure that event is not caused by a bot and the emote is a standard emoji
             if (member != null && !member.getUser().isBot()) {
                 MessageChannel channel = event.getChannel();
-                //retrieve the message which is being reacted to
+
+                //retrieve the message which is being reacted to and the reaction itself
                 Message message = channel.retrieveMessageById(event.getMessageId()).complete();
                 ReactionCommand command = reactionCommands.get(emote.getAsReactionCode());
+
                 //ensure that this emoji has a corresponding command
                 if (command != null) {
 
