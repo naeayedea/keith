@@ -171,7 +171,7 @@ public class ServerChatManager {
 
     @PreDestroy
     public void closeAll() {
-        logger.info("Classing all chat instances");
+        logger.info("Closing all chat instances");
         for (Chat chat : chats.values()) {
             chat.close();
         }

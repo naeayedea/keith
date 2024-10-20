@@ -112,7 +112,7 @@ public class StatsTextCommand extends AbstractAdminTextCommand {
         JDA jda = channel.getJDA();
         EmbedBuilder bd = new EmbedBuilder();
         bd.setTitle("Stats");
-        bd.setAuthor(jda.getSelfUser().getName() + " " + VERSION, null, jda.getSelfUser().getAvatarUrl());
+        bd.setAuthor(jda.getSelfUser().getName() + " v" + VERSION, null, jda.getSelfUser().getAvatarUrl());
         bd.setColor(Utilities.getBotColor());
         bd.addField("Uptime", Utilities.getUptimeString(), false);
         bd.addField("Total Users", "" + returnUserCount(jda), true);
