@@ -26,7 +26,7 @@ public class AdminTextCommandPortal extends AbstractTextCommandPortal {
 
     private final List<AbstractAdminTextCommand> adminCommandHandlers;
 
-    private final HelpTextCommand adminHelpTextCommand;
+    private final AdminHelpCommand adminHelpTextCommand;
 
     private final AdminUtilitiesTextCommandPortal adminUtilitiesTextCommandPortal;
 
@@ -35,7 +35,7 @@ public class AdminTextCommandPortal extends AbstractTextCommandPortal {
         return AccessLevel.ADMIN;
     }
 
-    public AdminTextCommandPortal(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminTextCommand> adminCommandHandlers, @Qualifier("adminHelp") HelpTextCommand adminHelpTextCommand, AdminUtilitiesTextCommandPortal adminUtilitiesTextCommandPortal) {
+    public AdminTextCommandPortal(@Value("${keith.commands.admin.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminTextCommand> adminCommandHandlers, AdminHelpCommand adminHelpTextCommand, AdminUtilitiesTextCommandPortal adminUtilitiesTextCommandPortal) {
         super(defaultName, commandAliases, true, true);
 
         this.adminCommandHandlers = adminCommandHandlers;

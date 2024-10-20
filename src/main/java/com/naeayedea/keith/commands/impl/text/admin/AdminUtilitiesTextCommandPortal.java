@@ -1,11 +1,11 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.commands.impl.text.AbstractTextCommandPortal;
+import com.naeayedea.keith.commands.impl.text.admin.utilities.AdminUtilitiesHelpCommand;
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
 import com.naeayedea.keith.commands.impl.text.TextCommand;
 import com.naeayedea.keith.commands.impl.text.admin.utilities.AbstractAdminUtilsTextCommand;
 import com.naeayedea.keith.commands.impl.text.admin.utilities.AbstractOwnerTextCommand;
-import com.naeayedea.keith.commands.impl.text.info.HelpTextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
@@ -15,7 +15,6 @@ import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,9 +34,9 @@ public class AdminUtilitiesTextCommandPortal extends AbstractTextCommandPortal {
 
     private final List<AbstractOwnerTextCommand> ownerCommandHandlers;
 
-    private final HelpTextCommand adminUtilitiesHelpTextCommand;
+    private final AdminUtilitiesHelpCommand adminUtilitiesHelpTextCommand;
 
-    public AdminUtilitiesTextCommandPortal(CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsTextCommand> adminUtilsCommandHandlers, List<AbstractOwnerTextCommand> ownerCommandHandlers, @Qualifier("adminUtilitiesHelp") HelpTextCommand adminUtilitiesHelpTextCommand) {
+    public AdminUtilitiesTextCommandPortal(CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsTextCommand> adminUtilsCommandHandlers, List<AbstractOwnerTextCommand> ownerCommandHandlers, AdminUtilitiesHelpCommand adminUtilitiesHelpTextCommand) {
         super(defaultName, commandAliases);
         this.candidateManager = candidateManager;
         this.adminUtilsCommandHandlers = adminUtilsCommandHandlers;

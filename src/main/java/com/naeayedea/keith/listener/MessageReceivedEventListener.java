@@ -65,7 +65,7 @@ public class MessageReceivedEventListener {
 
     private final HelpTextCommand baseHelpTextCommand;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, @Qualifier("baseHelp") HelpTextCommand baseHelpTextCommand, AdminTextCommandPortal adminTextCommandPortal) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoTextCommand> infoCommands, List<AbstractUserTextCommand> userCommands, HelpTextCommand baseHelpTextCommand, AdminTextCommandPortal adminTextCommandPortal) {
         this.messageService = messageService;
         this.candidateManager = candidateManager;
         this.serverManager = serverManager;
