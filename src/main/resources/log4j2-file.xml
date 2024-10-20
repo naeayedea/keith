@@ -1,0 +1,36 @@
+<Configuration>
+    <Properties>
+        <Property name="LOG_ROOT">/var/log/keith</Property>
+    </Properties>
+
+    <Appenders>
+        <File name="MainLog" fileName="${LOG_ROOT}/keith.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{HH:mm:ss.SSS}}{cyan} [ %highlight{%-5level}{FATAL=red,ERROR=red,WARN=yellow,INFO=none,DEBUG=green,TRACE=magenta} ] [%style{%logger{36}}{white}]: %msg%n"/>
+        </File>
+        <File name="CommandLog" fileName="${LOG_ROOT}/keith-commands.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{HH:mm:ss.SSS}}{cyan}: %msg%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info" additivity="false">
+            <AppenderRef ref="MainLog"/>
+        </Root>
+
+        <Logger name="com.naeayedea" level="info" additivity="false">
+            <AppenderRef ref="MainLog"/>
+        </Logger>
+
+        <Logger name="net.dv8tion.jda" level="info" additivity="false">
+            <AppenderRef ref="MainLog"/>
+        </Logger>
+
+        <Logger name="net.dv8tion.jda.internal" level="warn" additivity="false">
+            <AppenderRef ref="MainLog"/>
+        </Logger>
+
+        <Logger name="org.springframework" level="warn" additivity="false">
+            <AppenderRef ref="MainLog"/>
+        </Logger>
+    </Loggers>
+</Configuration>
