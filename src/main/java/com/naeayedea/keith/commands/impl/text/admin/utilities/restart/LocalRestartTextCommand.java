@@ -52,7 +52,7 @@ public class LocalRestartTextCommand extends BaseRestartTextCommand {
             try {
                 if (p.waitFor(10, TimeUnit.SECONDS)) {
                     //restart with a non-zero exit code so the system service restarts us automatically
-                    SpringApplication.exit(applicationContext, () -> 1);
+                    System.exit(1);
                 } else {
                     event.getChannel().sendMessage("Restart failed...").queue();
                 }

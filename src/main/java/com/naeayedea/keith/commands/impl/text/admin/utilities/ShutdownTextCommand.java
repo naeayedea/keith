@@ -31,9 +31,6 @@ public class ShutdownTextCommand extends AbstractOwnerTextCommand {
 
     @Override
     public void run(MessageReceivedEvent event, List<String> tokens) {
-        event.getChannel().sendMessage("Goodbye").queue(success -> {
-                SpringApplication.exit(applicationContext, () -> 0);
-            }
-        );
+        event.getChannel().sendMessage("Goodbye").queue(success -> System.exit(0));
     }
 }

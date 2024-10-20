@@ -39,7 +39,7 @@ public class LinuxRestartTextCommand extends BaseRestartTextCommand {
         Utilities.setStatus("Restarting...");
 
         //restart with a non-zero exit code so the system service restarts us automatically
-        SpringApplication.exit(applicationContext, () -> 1);
+        System.exit(1);
     }
 
 }
