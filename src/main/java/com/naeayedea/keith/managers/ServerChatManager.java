@@ -69,11 +69,17 @@ public class ServerChatManager {
             //get first result
             ChatCandidate connection = matchmaking.remove(matchmaking.keySet().iterator().next());
             matchmakingLock.unlock();
+
+            //retrieve the information of the third party
             Guild linkedGuild = connection.guild();
             MessageChannel linkedChannel = connection.channel();
+
+            //initialize the chat
             createChat(channel, linkedChannel, false);
-            //inform both channels of the new connection and advise of ability to not  send
+
+            //inform both channels of the new connection and advise of ability to not send using prefix
             channel.sendMessage(getConnectionMessage(linkedGuild.getName(), linkedChannel.getName(), serverManager.getServer(guild.getId()).prefix())).queue();
+
             linkedChannel.sendMessage(getConnectionMessage(guild.getName(), channel.getName(), serverManager.getServer(linkedGuild.getId()).prefix())).queue();
             return true;
         }
@@ -104,6 +110,10 @@ public class ServerChatManager {
         if (chat != null) {
             chat.close();
         }
+    }
+
+    public boolean isInMatchmaking(String id) {
+        return matchmaking.containsKey(id);
     }
 
     public boolean hasActiveChat(String id) {
@@ -158,7 +168,7 @@ public class ServerChatManager {
         } else {
             eb.setTitle("Message sent by " + author.getName() + " from " + name);
         }
-        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> message.addReaction(new UnicodeEmojiImpl("U+2709")).queue());
+        getDestination(id).sendMessageEmbeds(eb.build()).queue(result -> message.addReaction(new UnicodeEmojiImpl("\u2709")).queue());
     }
 
     public MessageChannel getDestination(String id) {
