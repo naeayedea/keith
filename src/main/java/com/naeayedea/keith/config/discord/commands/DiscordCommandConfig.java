@@ -22,9 +22,14 @@ import java.util.*;
 @Configuration
 public class DiscordCommandConfig {
 
+
     private static final String NAME_TRANSLATION_SUFFIX = "name";
 
     private static final String DESCRIPTION_TRANSLATION_SUFFIX = "desc.slash";
+
+    private static final String MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX = "desc.message";
+
+    private static final String USER_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX = "desc.user";
 
     private final MessageSource messageSource;
 
@@ -64,9 +69,9 @@ public class DiscordCommandConfig {
         return switch (commandInformation.getType().toLowerCase()) {
             case "slash" -> processSlashCommand(commandInformation);
             case "message" ->
-                Commands.message(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
+                Commands.message(getTranslation(getTranslationKey("", commandInformation.getName(), MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
             case "user" ->
-                Commands.user(getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()));
+                Commands.user(getTranslation(getTranslationKey("", commandInformation.getName(), USER_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
             default -> throw new IOException("Expected slash, message, or user. Got " + commandInformation.getType());
         };
     }

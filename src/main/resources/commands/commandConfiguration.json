@@ -2,12 +2,40 @@
   {
     "name": "help",
     "isNSFW": false,
+    "isGuildOnly": false,
     "type": "SLASH",
     "defaultPermission": "ENABLED",
     "options": [
       {
         "name": "command",
         "isOptional": true,
+        "type": "STRING",
+        "choices": []
+      }
+    ],
+    "subCommands": [],
+    "subCommandGroups": []
+  },
+  {
+    "name": "pin",
+    "isNSFW": false,
+    "isGuildOnly": true,
+    "type": "MESSAGE",
+    "defaultPermission": "ENABLED",
+    "options": [],
+    "subCommands": [],
+    "subCommandGroups": []
+  },
+  {
+    "name": "pin",
+    "isNSFW": false,
+    "isGuildOnly": true,
+    "type": "SLASH",
+    "defaultPermission": "ENABLED",
+    "options": [
+      {
+        "name": "message",
+        "isOptional": false,
         "type": "STRING",
         "choices": []
       }

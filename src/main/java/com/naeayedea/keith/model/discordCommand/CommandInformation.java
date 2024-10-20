@@ -2,11 +2,9 @@ package com.naeayedea.keith.model.discordCommand;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configuration
 public class CommandInformation {
 
     private String name;
@@ -59,10 +57,12 @@ public class CommandInformation {
         this.options = options;
     }
 
+    @JsonGetter("isGuildOnly")
     public boolean isGuildOnly() {
         return isGuildOnly;
     }
 
+    @JsonGetter("isGuildOnly")
     public void setGuildOnly(boolean guildOnly) {
         isGuildOnly = guildOnly;
     }
