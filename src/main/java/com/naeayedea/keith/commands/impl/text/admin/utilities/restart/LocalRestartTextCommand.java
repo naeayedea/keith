@@ -1,4 +1,4 @@
-package com.naeayedea.keith.commands.impl.text.admin.utilities;
+package com.naeayedea.keith.commands.impl.text.admin.utilities.restart;
 
 import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PostConstruct;
@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,34 +17,27 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class RestartTextCommand extends AbstractAdminUtilsTextCommand {
+@ConditionalOnMissingBean(BaseRestartTextCommand.class)
+public class LocalRestartTextCommand extends BaseRestartTextCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestartTextCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalRestartTextCommand.class);
 
-    @Value("${keith.version}")
-    private String version;
+    private final String version;
 
-    @Value("${keith.project.name}")
-    private String projectName;
+    private final String projectName;
 
+    private final ApplicationContext applicationContext;
 
-    public RestartTextCommand(@Value("${keith.commands.admin.utilities.restart.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.restart.aliases}', ',')}") List<String> commandAliases) {
+    public LocalRestartTextCommand(@Value("${keith.commands.admin.utilities.restart.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.restart.aliases}', ',')}") List<String> commandAliases, @Value("${keith.version}") String version, @Value("${keith.project.name}") String projectName, ApplicationContext applicationContext) {
         super(defaultName, commandAliases);
+        this.version = version;
+        this.projectName = projectName;
+        this.applicationContext = applicationContext;
     }
 
     @PostConstruct
     public void init() {
         logger.info("Restart configured to use jar command: {}", (Object) getRestartArguments("[Placeholder Message Id]", "[Placeholder Channel Id]"));
-    }
-
-    @Override
-    public String getExampleUsage(String prefix) {
-        return prefix + getDefaultName() + ": \"restarts the bot\"";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Will shutdown and relaunch the bots processes - useful after update";
     }
 
     @Override
@@ -55,7 +51,8 @@ public class RestartTextCommand extends AbstractAdminUtilsTextCommand {
 
             try {
                 if (p.waitFor(10, TimeUnit.SECONDS)) {
-                    Utilities.runShutdownProcedure();
+                    //restart with a non-zero exit code so the system service restarts us automatically
+                    SpringApplication.exit(applicationContext, () -> 1);
                 } else {
                     event.getChannel().sendMessage("Restart failed...").queue();
                 }
@@ -67,6 +64,6 @@ public class RestartTextCommand extends AbstractAdminUtilsTextCommand {
     }
 
     private String[] getRestartArguments(String messageId, String channelId) {
-        return new String[]{"screen", "-dm", "java", "-jar", System.getProperty("user.dir") + "\\" + projectName + "-" + version +".jar", messageId, channelId};
+        return new String[]{"java", "-jar", System.getProperty("user.dir") + "\\" + projectName + "-" + version +".jar", messageId, channelId};
     }
 }

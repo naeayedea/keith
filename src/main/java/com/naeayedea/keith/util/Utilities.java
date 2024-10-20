@@ -225,11 +225,6 @@ public class Utilities {
         return result.toString().trim();
     }
 
-
-    public static void runShutdownProcedure() {
-        System.exit(0);
-    }
-
     public static String truncateString(String string, int length) {
         if (length > 0) {
             String format = "%-" + length + "s";
