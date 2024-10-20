@@ -1,11 +1,11 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.text.TextCommand;
-import com.naeayedea.keith.commands.text.admin.AdminTextCommandPortal;
-import com.naeayedea.keith.commands.text.channelCommandDrivers.ChannelCommandDriver;
-import com.naeayedea.keith.commands.text.generic.AbstractUserTextCommand;
-import com.naeayedea.keith.commands.text.info.AbstractInfoTextCommand;
-import com.naeayedea.keith.commands.text.info.HelpTextCommand;
+import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.impl.text.admin.AdminTextCommandPortal;
+import com.naeayedea.keith.commands.impl.text.channelCommandDrivers.ChannelCommandDriver;
+import com.naeayedea.keith.commands.impl.text.generic.AbstractUserTextCommand;
+import com.naeayedea.keith.commands.impl.text.info.AbstractInfoTextCommand;
+import com.naeayedea.keith.commands.impl.text.info.HelpTextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;

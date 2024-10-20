@@ -1,10 +1,9 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.slash.SlashCommand;
+import com.naeayedea.keith.commands.impl.interactions.slash.SlashCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.model.Candidate;
 import com.naeayedea.keith.model.discordCommand.CommandInformation;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,7 +14,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
