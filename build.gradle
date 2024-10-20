@@ -6,7 +6,11 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-version 'v4.0.0'
+application {
+    mainClassName = 'com.naeayedea.keith.KeithLauncher'
+}
+
+version '4.0.0'
 
 def jacksonVersion = "2.17.2"
 
@@ -14,24 +18,22 @@ repositories {
     mavenCentral()
 }
 
-processResources {
-    project.logger.info("Running processResources")
+tasks.register('addProjectInformation') {
+    group = "other"
+    description = "Adds project information to JAR"
 
-    ant.propertyfile(file: "application.properties") {
-        entry( key: "keith.version", value: version)
-        entry( key: "keith.project.name", value: rootProject.name)
+    //override some config so the local deployment runs better
+    doFirst {
+        ant.propertyfile(file: "./build/resources/main/application.properties") {
+            entry( key: "keith.version", value: version)
+            entry( key: "keith.project.name", value: rootProject.name)
+        }
     }
 }
 
-run {
-    project.logger.info("Running run")
+processResources {
+    finalizedBy addProjectInformation
 }
-
-bootRun {
-    project.logger.info("Running bootRun")
-}
-
-
 
 dependencies {
     //spring
@@ -55,6 +57,3 @@ dependencies {
 
 compileJava.options.encoding = 'UTF-8'
 
-application {
-    mainClassName = 'com.naeayedea.KeithLauncher'
-}
