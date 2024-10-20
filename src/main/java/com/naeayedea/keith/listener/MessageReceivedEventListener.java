@@ -155,7 +155,7 @@ public class MessageReceivedEventListener {
                                         try {
                                             Runnable execution = () -> {
                                                 if (command.sendTyping()) {
-                                                    channel.sendTyping().queue();
+                                                    channel.sendTyping().complete();
                                                 }
 
                                                 try {
