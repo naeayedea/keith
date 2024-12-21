@@ -4,7 +4,7 @@
     </Properties>
 
     <Appenders>
-        <RollingFile name="MainLog" fileName="${LOG_ROOT}/keith.log" filePattern="${LOG_ROOT}/archive/keith-%d{dd-MM-yyyy}-%i.log.gz" immediateFlush="false" append="true">
+        <RollingFile name="MainLog" fileName="${LOG_ROOT}/keith.log" filePattern="${LOG_ROOT}/archive/keith-%d{dd-MM-yyyy}-%i.log.gz" immediateFlush="true" append="true">
             <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss.SSS}}{cyan} [ %highlight{%-5level}{FATAL=red,ERROR=red,WARN=yellow,INFO=none,DEBUG=green,TRACE=magenta} ] [%style{%logger{36}}{white}]: %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
