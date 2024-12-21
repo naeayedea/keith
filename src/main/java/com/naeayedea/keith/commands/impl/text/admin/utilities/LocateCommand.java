@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,18 +17,20 @@ public class LocateCommand extends AbstractAdminUtilsCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Find a user or server\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Enter the ID of a user or server to locate it within the database";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
         if (tokens.size() > 1) {
             String type = tokens.removeFirst();

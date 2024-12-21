@@ -1,11 +1,13 @@
 package com.naeayedea.keith.commands.impl.text.channelCommandDrivers;
 
+import com.naeayedea.keith.commands.lib.command.ChannelCommandDriver;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.model.Candidate;
 import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.entities.emoji.UnicodeEmojiImpl;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +48,7 @@ public class GuessDriver implements ChannelCommandDriver {
     }
 
     @Override
-    public void evaluate(Message message, List<String> args, Candidate candidate) {
+    public void evaluate(@NotNull Message message, @NotNull List<String> args, @NotNull Candidate candidate) {
         attempts++;
         try {
             int guess = Integer.parseInt(args.getFirst());

@@ -4,6 +4,7 @@ import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ public class LocalRestartCommand extends BaseRestartCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         try {
             Message message = event.getChannel().sendMessage("Restarting...").complete();
 

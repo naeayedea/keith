@@ -2,6 +2,7 @@ package com.naeayedea.keith.commands.impl.text.admin.utilities;
 
 import com.naeayedea.keith.commands.impl.text.AbstractTextCommand;
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public abstract class AbstractOwnerCommand extends AbstractTextCommand {
         super(name, commandAliases, isPrivateMessageCompatible, isHidden);
     }
 
+    @NotNull
     @Override
     public AccessLevel getAccessLevel() {
         return AccessLevel.OWNER;

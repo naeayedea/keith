@@ -4,11 +4,24 @@
     </Properties>
 
     <Appenders>
-        <File name="MainLog" fileName="${LOG_ROOT}/keith.log" immediateFlush="false" append="true">
-            <PatternLayout disableAnsi="false"  pattern=" %style{%d{HH:mm:ss.SSS}}{cyan} [ %highlight{%-5level}{FATAL=red,ERROR=red,WARN=yellow,INFO=none,DEBUG=green,TRACE=magenta} ] [%style{%logger{36}}{white}]: %msg%n"/>
+        <RollingFile name="MainLog" fileName="${LOG_ROOT}/keith.log" filePattern="${LOG_ROOT}/archive/keith-%d{dd-MM-yyyy}-%i.log.gz" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss.SSS}}{cyan} [ %highlight{%-5level}{FATAL=red,ERROR=red,WARN=yellow,INFO=none,DEBUG=green,TRACE=magenta} ] [%style{%logger{36}}{white}]: %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <File name="MessageCommandLog" fileName="${LOG_ROOT}/keith-commands.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss}}{cyan}: %msg%n"/>
         </File>
-        <File name="CommandLog" fileName="${LOG_ROOT}/keith-commands.log" immediateFlush="false" append="true">
-            <PatternLayout disableAnsi="false"  pattern=" %style{%d{HH:mm:ss.SSS}}{cyan}: %msg%n"/>
+        <File name="SlashCommandLog" fileName="${LOG_ROOT}/keith-slash-commands.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss}}{cyan}: %msg%n"/>
+        </File>
+        <File name="InteractionsCommandLog" fileName="${LOG_ROOT}/keith-interaction-commands.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss}}{cyan}: %msg%n"/>
+        </File>
+        <File name="ReactionCommandLog" fileName="${LOG_ROOT}/keith-reaction-commands.log" immediateFlush="false" append="true">
+            <PatternLayout disableAnsi="false"  pattern=" %style{%d{yyyy-MM-dd} %d{HH:mm:ss}}{cyan}: %msg%n"/>
         </File>
     </Appenders>
 
@@ -20,6 +33,19 @@
         <Logger name="com.naeayedea" level="info" additivity="false">
             <AppenderRef ref="MainLog"/>
         </Logger>
+
+        <Logger name="com.naeayedea.keith.listener.MessageReceivedEventListenerCommandLogger" level="info" additivity="false">
+            <AppenderRef ref="MessageCommandLog"/>
+        </Logger>
+
+        <Logger name="com.naeayedea.keith.listener.MessageReactionAddEventListenerCommandLogger" level="info" additivity="false">
+            <AppenderRef ref="ReactionCommandLog"/>
+        </Logger>
+
+        <Logger name="com.naeayedea.keith.listener.SlashCommandListenerCommandLogger" level="info" additivity="false">
+            <AppenderRef ref="SlashCommandLog"/>
+        </Logger>
+
 
         <Logger name="net.dv8tion.jda" level="info" additivity="false">
             <AppenderRef ref="MainLog"/>

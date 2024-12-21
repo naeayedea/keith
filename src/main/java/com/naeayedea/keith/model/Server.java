@@ -1,7 +1,5 @@
 package com.naeayedea.keith.model;
 
-import net.dv8tion.jda.api.entities.Guild;
-
 
 public record Server(String serverID, String firstSeen, String prefix, Boolean banned, String pinChannel) {
 

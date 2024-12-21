@@ -1,12 +1,14 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.impl.interactions.slash.SlashCommand;
+import com.naeayedea.keith.commands.lib.command.interactions.SlashCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.model.discordCommand.CommandInformation;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,12 +42,14 @@ public class SlashCommandListener {
         MultiMap<String, SlashCommand> commandMultiMap = new MultiMap<>();
 
         for (CommandInformation command : commandInformation) {
-            SlashCommand handler = commandHandlers.get(command.getName());
+            if (command.getType().equals(Command.Type.SLASH)) {
+                SlashCommand handler = commandHandlers.get(command.getName());
 
-            if (handler != null) {
-                commandMultiMap.put(command.getName(), handler);
-            } else {
-                logger.warn("No slash command handler found for command {}", command.getName());
+                if (handler != null) {
+                    commandMultiMap.put(command.getName(), handler);
+                } else {
+                    logger.warn("No slash command handler found for command {}", command.getName());
+                }
             }
         }
 
@@ -66,13 +70,18 @@ public class SlashCommandListener {
                     }
 
                     command.run(event);
-                } catch (KeithExecutionException e) {
-                    logger.error("Error encountered whilst running command {}, {}", event.getName(), e.getMessage(), e);
-                    throw new IOException(e);
+                } catch (KeithGracefulErrorException e) {
+                    event
+                        .reply(e.getMessage())
+                        .setEphemeral(true)
+                        .queue();
                 } catch (KeithPermissionException e) {
                     event.reply("You do not have permission to do that!")
                         .setEphemeral(true)
                         .queue();
+                } catch (KeithExecutionException e) {
+                    logger.error("Error encountered whilst running command {}, {}", event.getName(), e.getMessage(), e);
+                    throw new IOException(e);
                 }
             } catch (Throwable e) {
                 event.reply("Something went wrong :(")

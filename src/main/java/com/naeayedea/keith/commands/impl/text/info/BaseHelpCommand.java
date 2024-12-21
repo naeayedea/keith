@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.impl.text.info;
 import com.naeayedea.keith.commands.lib.MessageContext;
 import com.naeayedea.keith.commands.impl.common.messageContentProvider.help.HelpContextOptions;
 import com.naeayedea.keith.commands.impl.common.messageContentProvider.help.HelpMessageContentProvider;
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.commands.lib.command.StringSelectInteractionHandler;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
@@ -11,6 +11,7 @@ import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BaseHelpCommand extends AbstractInfoCommand implements StringSelectInteractionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseHelpCommand.class);
 
     private final Map<String, TextCommand> commands;
 
@@ -44,11 +45,13 @@ public class BaseHelpCommand extends AbstractInfoCommand implements StringSelect
         messageContentProvider = new HelpMessageContentProvider(commandMap, defaultEmbedTitle,commandSelectionMenuComponentId);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"for more information on a command use " + prefix + "help [command]\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Help lists all available commands as well as going into further detail when help on a specific command" +
@@ -56,7 +59,7 @@ public class BaseHelpCommand extends AbstractInfoCommand implements StringSelect
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException, KeithPermissionException {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithExecutionException, KeithPermissionException {
         String prefix = event.isFromGuild() ? serverManager.getServer(event.getGuild().getId()).prefix() : DEFAULT_PREFIX;
 
         if (!tokens.isEmpty() && commands.get(tokens.getFirst().toLowerCase()) != null) {
@@ -76,6 +79,7 @@ public class BaseHelpCommand extends AbstractInfoCommand implements StringSelect
         }
     }
 
+    @NotNull
     @Override
     public List<String> getTriggerOptions() {
         return List.of(commandSelectionMenuComponentId);

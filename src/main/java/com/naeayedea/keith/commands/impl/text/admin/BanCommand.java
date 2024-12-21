@@ -6,6 +6,7 @@ import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,18 +30,20 @@ public class BanCommand extends AbstractAdminCommand {
         this.candidateManager = candidateManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"gives admins the ability to ban users/servers\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "bans the specified user or server - do 'ban user/server [user or server id]'";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         try {
             String type = tokens.getFirst();
             List<User> mentionedUsers = event.getMessage().getMentions().getUsers();

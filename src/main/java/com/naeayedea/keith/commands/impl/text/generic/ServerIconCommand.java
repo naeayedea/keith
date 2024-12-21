@@ -3,6 +3,7 @@ package com.naeayedea.keith.commands.impl.text.generic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +17,13 @@ public class ServerIconCommand extends AbstractUserCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"displays icon of the current guild/server\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "servericon displays the icon of the current server/guild";
@@ -32,7 +35,7 @@ public class ServerIconCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         EmbedBuilder embed = new EmbedBuilder();
         Guild guild = event.getGuild();
         embed.setTitle("Icon for " + guild.getName());

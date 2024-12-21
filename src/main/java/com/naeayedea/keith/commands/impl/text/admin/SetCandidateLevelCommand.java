@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,11 +28,13 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
         this.candidateManager = candidateManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the UserLevel of the specified user\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "sets the UserLevel of the user that corresponds to the entered id or any users that have been tagged" +
@@ -39,7 +42,7 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
         List<User> mentionedUsers = event.getMessage().getMentions().getUsers();
 

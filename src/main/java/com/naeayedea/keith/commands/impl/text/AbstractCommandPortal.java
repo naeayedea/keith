@@ -1,5 +1,7 @@
 package com.naeayedea.keith.commands.impl.text;
 
+import com.naeayedea.keith.commands.lib.command.CommandPortal;
+
 import java.util.List;
 
 public abstract class AbstractCommandPortal extends AbstractTextCommand implements CommandPortal {

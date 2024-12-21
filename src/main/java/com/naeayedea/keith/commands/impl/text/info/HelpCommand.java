@@ -1,16 +1,17 @@
 package com.naeayedea.keith.commands.impl.text.info;
 
-import com.naeayedea.keith.commands.impl.interactions.slash.SlashCommand;
+import com.naeayedea.keith.commands.lib.command.interactions.SlashCommand;
 import com.naeayedea.keith.commands.impl.text.generic.AbstractUserCommand;
 import com.naeayedea.keith.commands.lib.MessageContext;
 import com.naeayedea.keith.commands.impl.common.messageContentProvider.help.HelpContextOptions;
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,7 @@ public class HelpCommand extends BaseHelpCommand implements SlashCommand {
     }
 
     @Override
-    public void run(SlashCommandInteractionEvent event) throws KeithPermissionException, KeithExecutionException {
+    public void run(@NotNull SlashCommandInteractionEvent event) throws KeithPermissionException, KeithExecutionException {
         String commandOption = event.getOption("command", "", OptionMapping::getAsString).toLowerCase();
 
         if (!commandOption.isEmpty() && getCommandMap().containsKey(commandOption)) {

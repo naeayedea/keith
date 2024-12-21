@@ -2,6 +2,7 @@ package com.naeayedea.keith.commands.impl.text.info;
 
 import com.naeayedea.keith.commands.impl.text.AbstractTextCommand;
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public abstract class AbstractInfoCommand extends AbstractTextCommand {
         super(name, commandAliases, isPrivateMessageCompatible, isHidden);
     }
 
+    @NotNull
     @Override
     public AccessLevel getAccessLevel() {
         return AccessLevel.ALL;

@@ -4,6 +4,7 @@ import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +24,13 @@ public class ChatCommand extends AbstractUserCommand {
         this.chatManager = chatManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": Use '" + prefix + "chat start' to connect to another server for a quick chat!";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Creates a connection between two guilds so that messages can be sent in between. " +
@@ -40,7 +43,7 @@ public class ChatCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
 
         boolean active = chatManager.hasActiveChat(channel.getId());

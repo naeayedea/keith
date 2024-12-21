@@ -1,7 +1,9 @@
 package com.naeayedea.keith.commands.impl.text.generic;
 
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +19,13 @@ public class CalculatorCommand extends AbstractUserCommand {
 
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"evaluates the expression passed using " + prefix + getDefaultName() + " [expression]\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return """
@@ -34,12 +38,12 @@ public class CalculatorCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithGracefulErrorException {
         try {
             double answer = eval(Utilities.stringListToString(tokens));
             event.getChannel().sendMessage(Double.isInfinite(answer) ? "infinity" : "" + BigDecimal.valueOf(answer).setScale(3, RoundingMode.HALF_UP).doubleValue()).queue();
         } catch (RuntimeException e) {
-            Utilities.Messages.sendError(event.getChannel(), "Calculator Error", e.getMessage());
+            throw new KeithGracefulErrorException("Calculator Error " + e.getMessage());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.naeayedea.keith.commands.impl.text.admin.utilities.restart;
 
 import com.naeayedea.keith.commands.impl.text.admin.utilities.AbstractAdminUtilsCommand;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +16,13 @@ public abstract class BaseRestartCommand extends AbstractAdminUtilsCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"restarts the bot\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Will shutdown and relaunch the bots processes - useful after update";

@@ -3,6 +3,7 @@ package com.naeayedea.keith.commands.impl.text.generic;
 import com.naeayedea.keith.commands.impl.text.generic.lox.Lox;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +16,13 @@ public class InterpretCommand extends AbstractUserCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + "";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Runs commands in an interpreted language known as Lox.";
@@ -36,7 +39,7 @@ public class InterpretCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
 
         String commandInput = Utilities.stringListToString(tokens).trim();
 

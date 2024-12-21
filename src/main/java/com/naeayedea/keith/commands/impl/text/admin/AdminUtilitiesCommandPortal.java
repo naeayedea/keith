@@ -5,14 +5,16 @@ import com.naeayedea.keith.commands.impl.text.admin.utilities.AbstractAdminUtils
 import com.naeayedea.keith.commands.impl.text.admin.utilities.AbstractOwnerCommand;
 import com.naeayedea.keith.commands.impl.text.admin.utilities.AdminUtilitiesHelpCommand;
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.util.MultiMap;
 import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,23 +62,26 @@ public class AdminUtilitiesCommandPortal extends AbstractCommandPortal {
         logger.info("Loaded {} admin utilities aliases", commands.size());
     }
 
+    @NotNull
     @Override
     public AccessLevel getAccessLevel() {
         return AccessLevel.OWNER;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \":eyes:\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return ":eyes: nunaya";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException, KeithPermissionException {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithExecutionException, KeithPermissionException, KeithGracefulErrorException {
         TextCommand command = findCommand(tokens);
         if (command != null) {
             try {

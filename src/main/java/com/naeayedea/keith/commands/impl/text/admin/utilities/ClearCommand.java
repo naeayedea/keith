@@ -4,6 +4,7 @@ import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,18 +23,20 @@ public class ClearCommand extends AbstractAdminUtilsCommand {
         this.candidateManager = candidateManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"clear manager caches\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Used to clear the cache of the candidateManager or ServerManager class\n\n Use ?admin utils clear-cache [server, user, all]";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
         if (tokens.isEmpty()) {
             channel.sendMessage("Clear what cache?").queue();

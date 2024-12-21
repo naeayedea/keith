@@ -1,11 +1,12 @@
-package com.naeayedea.keith.commands.impl.text;
+package com.naeayedea.keith.commands.lib.command;
 
-import com.naeayedea.keith.commands.lib.command.Command;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -19,20 +20,20 @@ public interface ReactionCommand extends Command {
      *
      * @return a list of Emoji representing reactions within Discord.
      */
-    List<Emoji> getReactionTriggers();
+    @NotNull List<Emoji> getReactionTriggers();
 
     /**
      * Check if an Emoji should trigger the command
      *
      * @return true if the Emoji is present in the list of reaction triggers, false otherwise.
      */
-    boolean triggeredBy(Emoji emoji);
+    boolean triggeredBy(@NotNull Emoji emoji);
 
     /**
      * Execute the command described by the implementing class
      *
      * @param event the discord event triggered by a message reaction
      */
-    void run(MessageReactionAddEvent event, User user) throws KeithPermissionException, KeithExecutionException;
+    void run(@NotNull MessageReactionAddEvent event, @NotNull User user) throws KeithPermissionException, KeithExecutionException, KeithGracefulErrorException;
 
 }

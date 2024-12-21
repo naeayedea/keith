@@ -1,6 +1,6 @@
 package com.naeayedea.keith.managers;
 
-import com.naeayedea.keith.commands.impl.text.channelCommandDrivers.ChannelCommandDriver;
+import com.naeayedea.keith.commands.lib.command.ChannelCommandDriver;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

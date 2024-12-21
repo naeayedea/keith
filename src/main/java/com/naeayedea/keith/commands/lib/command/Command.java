@@ -1,5 +1,7 @@
 package com.naeayedea.keith.commands.lib.command;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Defines universal properties of commands regardless of source
  */
@@ -11,7 +13,7 @@ public interface Command {
      * @return an {@link AccessLevel AccessLevel} object representing the permissions required for a command
      * @see AccessLevel
      */
-    AccessLevel getAccessLevel();
+    @NotNull AccessLevel getAccessLevel();
 
     /**
      * Get the message timeout of a command
@@ -37,5 +39,5 @@ public interface Command {
      *
      * @return the default name of the command
      */
-    String getDefaultName();
+    @NotNull String getDefaultName();
 }

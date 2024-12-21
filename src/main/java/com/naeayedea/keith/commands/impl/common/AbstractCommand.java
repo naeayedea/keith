@@ -1,6 +1,7 @@
 package com.naeayedea.keith.commands.impl.common;
 
 import com.naeayedea.keith.commands.lib.command.Command;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractCommand implements Command {
 
@@ -28,6 +29,7 @@ public abstract class AbstractCommand implements Command {
         return true;
     }
 
+    @NotNull
     @Override
     public String getDefaultName() {
         return defaultName;
@@ -37,4 +39,6 @@ public abstract class AbstractCommand implements Command {
     public int getCost() {
         return cost;
     }
+
+
 }

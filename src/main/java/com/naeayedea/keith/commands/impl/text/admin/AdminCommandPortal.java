@@ -2,12 +2,14 @@ package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.commands.impl.text.AbstractCommandPortal;
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.util.MultiMap;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,7 @@ public class AdminCommandPortal extends AbstractCommandPortal {
 
     private final AdminUtilitiesCommandPortal adminUtilitiesTextCommandPortal;
 
+    @NotNull
     @Override
     public AccessLevel getAccessLevel() {
         return AccessLevel.ADMIN;
@@ -43,18 +46,20 @@ public class AdminCommandPortal extends AbstractCommandPortal {
         initialiseCommands();
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"admin command portal, for authorised users only\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Allows authorised users to access more powerful commands such as moderation, bot utilities and the database";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithPermissionException, KeithExecutionException {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithPermissionException, KeithExecutionException, KeithGracefulErrorException {
         //Do not need to scrutinise the user as much re access level etc. as EventHandler already did this.
         TextCommand command = findCommand(tokens);
 

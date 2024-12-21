@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.commands.impl.text.info.BaseHelpCommand;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.MultiMap;

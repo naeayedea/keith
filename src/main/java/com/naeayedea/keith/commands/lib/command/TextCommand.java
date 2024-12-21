@@ -1,9 +1,10 @@
-package com.naeayedea.keith.commands.impl.text;
+package com.naeayedea.keith.commands.lib.command;
 
-import com.naeayedea.keith.commands.lib.command.Command;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface TextCommand extends Command {
      *
      * @return a list of aliases as String.
      */
-    List<String> getAliases();
+    @NotNull List<String> getAliases();
 
     /**
      * Returns a short description of the command, used when help is used to show all commands in a category
@@ -29,7 +30,7 @@ public interface TextCommand extends Command {
      * @param prefix the prefix of the server/channel
      * @return a String containing the description
      */
-    String getExampleUsage(String prefix);
+    @NotNull String getExampleUsage(String prefix);
 
     /**
      * Return a longer description of the command which should show use cases etc. - used when help [command] is used to
@@ -37,7 +38,7 @@ public interface TextCommand extends Command {
      *
      * @return a String containing the long description
      */
-    String getDescription();
+    @NotNull String getDescription();
 
     /**
      * Runs the given command
@@ -45,7 +46,7 @@ public interface TextCommand extends Command {
      * @param event  the event which triggered the command
      * @param tokens a list of tokens of the message from the user
      */
-    void run(MessageReceivedEvent event, List<String> tokens) throws KeithPermissionException, KeithExecutionException;
+    void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithPermissionException, KeithExecutionException, KeithGracefulErrorException;
 
     /**
      * Determine if a command is hidden

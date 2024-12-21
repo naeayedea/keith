@@ -1,6 +1,8 @@
 package com.naeayedea.keith.commands.impl.text;
 
 import com.naeayedea.keith.commands.impl.common.AbstractCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,16 +74,19 @@ public abstract class AbstractTextCommand extends AbstractCommand implements Tex
         this(name, commandAliases, isPrivateMessageCompatible, isHidden, 1);
     }
 
+    @NotNull
     @Override
     public final List<String> getAliases() {
         return commandAliases;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return "[DEFAULT EXAMPLE USAGE]";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "[DEFAULT DESCRIPTION]";

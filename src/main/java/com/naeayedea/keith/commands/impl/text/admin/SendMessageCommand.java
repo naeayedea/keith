@@ -1,10 +1,13 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.util.Utilities;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,18 +20,20 @@ public class SendMessageCommand extends AbstractAdminCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"lets you send a message to another channel\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "lets you send a message to another channel - use \"send message/embed [channelid] [title(embed only] [message]\"";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithGracefulErrorException {
         MessageChannel channel = event.getChannel();
         try {
             String type = tokens.removeFirst();
@@ -36,14 +41,35 @@ public class SendMessageCommand extends AbstractAdminCommand {
                 case "message": {
                     String channelId = tokens.removeFirst();
                     String message = Utilities.stringListToString(tokens);
-                    Utilities.Messages.sendMessage(channelId, message, event);
+
+                    MessageChannel destination = event.getJDA().getTextChannelById(channelId);
+
+                    if (destination == null) {
+                        throw new KeithGracefulErrorException("Channel unavailable, ensure id is correct.");
+                    }
+
+                    destination.sendMessage(message).queue();
+
                     break;
                 }
                 case "embed": {
                     String channelId = tokens.removeFirst();
                     String title = tokens.removeFirst();
                     String message = Utilities.stringListToString(tokens);
-                    Utilities.Messages.sendEmbed(channelId, title, message, event);
+
+                    EmbedBuilder embedBuilder = new EmbedBuilder();
+                    embedBuilder.setTitle(title);
+                    embedBuilder.setDescription(message);
+                    embedBuilder.setColor(Utilities.getBotColor());
+
+                    MessageChannel destination = event.getJDA().getTextChannelById(channelId);
+
+                    if (destination == null) {
+                        throw new KeithGracefulErrorException("Channel unavailable, ensure id is correct.");
+                    }
+
+                    destination.sendMessageEmbeds(embedBuilder.build()).queue();
+
                     break;
                 }
                 case "blast": {
@@ -55,8 +81,7 @@ public class SendMessageCommand extends AbstractAdminCommand {
                     for (MessageChannel messageChannel : event.getGuild().getTextChannels()) {
                         try {
                             messageChannel.sendMessage(message).queue();
-                        } catch (PermissionException ignored) {
-                        }
+                        } catch (PermissionException ignored) {}
                     }
                     break;
                 }

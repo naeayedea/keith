@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +19,13 @@ public class BannerCommand extends AbstractUserCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Retrieve the profile banner of a user!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Banner retrieves the profile banner of the user doing the command, alternatively banner can "
@@ -30,7 +33,7 @@ public class BannerCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         List<User> mentionedUsers = event.getMessage().getMentions().getUsers();
         User user;
         if (!mentionedUsers.isEmpty()) {

@@ -2,6 +2,7 @@ package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +15,13 @@ public class SetStatusCommand extends AbstractAdminCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the bots status to the specified message\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "sets the bot status to the specified message, can also do \"" +
@@ -26,7 +29,7 @@ public class SetStatusCommand extends AbstractAdminCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         if (tokens.size() == 1 && tokens.getFirst().equalsIgnoreCase("default")) {
             Utilities.forceDefaultStatus();
         } else {

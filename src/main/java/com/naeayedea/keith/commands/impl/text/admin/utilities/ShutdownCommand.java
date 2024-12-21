@@ -1,10 +1,8 @@
 package com.naeayedea.keith.commands.impl.text.admin.utilities;
 
-import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,18 +14,20 @@ public class ShutdownCommand extends AbstractOwnerCommand {
         super(defaultName, commandAliases);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"shut down the bot completely\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Will shutdown the bot and terminate all processes without restarting";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         event.getChannel().sendMessage("Goodbye").queue(success -> System.exit(0));
     }
 }

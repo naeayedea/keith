@@ -1,8 +1,7 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.impl.text.ReactionCommand;
-import com.naeayedea.keith.exception.KeithExecutionException;
-import com.naeayedea.keith.exception.KeithPermissionException;
+import com.naeayedea.keith.commands.lib.command.ReactionCommand;
+import com.naeayedea.keith.exception.KeithException;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Candidate;
@@ -118,7 +117,7 @@ public class MessageReactionAddEventListener {
                                 message.addReaction(emote).queue(success -> {
                                     try {
                                         command.run(event, member.getUser());
-                                    } catch (KeithPermissionException | KeithExecutionException e) {
+                                    } catch (KeithException e) {
                                         logger.error(e.getMessage(), e);
 
                                         message.removeReaction(emote).queue();

@@ -1,13 +1,13 @@
 package com.naeayedea.keith.util;
 
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.managers.ServerManager;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.GuildMessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -26,64 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utilities {
-
-
-    public static class Messages {
-
-        public static void sendError(MessageChannel channel, String header, String message) {
-            channel.sendMessageEmbeds(MessageTemplate.errorMessage(header, message).build()).queue();
-        }
-
-        public static class MessageTemplate {
-            /*
-             * Various message templates for ease of use when sending user a message such as error messages, information etc.
-             * Add various message types as required
-             */
-
-            public static EmbedBuilder errorMessage(String header, String text) {
-                EmbedBuilder eb = new EmbedBuilder();
-                eb.setTitle("ERROR");
-                eb.setDescription(header);
-                eb.addField("Information", text, false);
-                eb.setColor(new Color(155, 0, 0));
-                return eb;
-            }
-
-        }
-
-        public static void sendEmbed(String channelID, String title, String message, MessageReceivedEvent event) {
-            sendEmbed(jda.getTextChannelById(channelID), title, message, event);
-        }
-
-        public static void sendEmbed(MessageChannel channel, String title, String message, MessageReceivedEvent event) {
-            try {
-                EmbedBuilder eb = new EmbedBuilder();
-                eb.setTitle(title);
-                eb.setDescription(message);
-                eb.setColor(new Color(155, 0, 155));
-                if (channel != null) {
-                    channel.sendMessageEmbeds(eb.build()).queue();
-                } else {
-                    event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
-                }
-            } catch (IllegalArgumentException e) {
-                event.getChannel().sendMessage("Message send error").queue();
-            }
-        }
-
-        public static void sendMessage(String channelID, String message, MessageReceivedEvent event) {
-            try {
-                TextChannel channel = jda.getTextChannelById(channelID);
-                if (channel != null) {
-                    channel.sendMessage(message).queue();
-                } else {
-                    event.getChannel().sendMessage("Channel Unavailable, check id or for voice").queue();
-                }
-            } catch (IllegalArgumentException e) {
-                event.getChannel().sendMessage("Message send error").queue();
-            }
-        }
-    }
 
     private static long lastReconnect;
 
@@ -287,6 +229,34 @@ public class Utilities {
         for (TextCommand command : commands) {
             if (!exclusions.contains(command.getDefaultName())) {
                 commandMap.putAll(command.getAliases(), command);
+            }
+        }
+    }
+
+    public static boolean channelIsNSFW(GuildMessageChannelUnion channel) {
+        ChannelType type = channel.getType();
+
+        switch (type) {
+            case TEXT -> {
+                return channel.asTextChannel().isNSFW();
+            }
+            case VOICE -> {
+                return channel.asVoiceChannel().isNSFW();
+            }
+            case NEWS -> {
+                return channel.asNewsChannel().isNSFW();
+            }
+            case STAGE -> {
+                return channel.asStageChannel().isNSFW();
+            }
+            case GUILD_NEWS_THREAD -> {
+                return channel.asThreadChannel().getParentChannel().asNewsChannel().isNSFW();
+            }
+            case GUILD_PUBLIC_THREAD, GUILD_PRIVATE_THREAD -> {
+                return channel.asThreadChannel().getParentChannel().asTextChannel().isNSFW();
+            }
+            default -> {
+                return false;
             }
         }
     }

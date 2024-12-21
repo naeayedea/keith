@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,18 +29,20 @@ public class FeedbackCommand extends AbstractUserCommand {
         this.serverManager = serverManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"encountered bugs or have ideas for the bot? use this command to voice your opinion!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Have a suggestion? Use this command to contact the bot owner directly!";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
         String id = channel.getId();
         boolean active = chatManager.hasActiveChat(id);

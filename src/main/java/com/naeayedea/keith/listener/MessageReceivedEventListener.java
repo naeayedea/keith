@@ -1,12 +1,13 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.commands.impl.text.admin.AdminCommandPortal;
-import com.naeayedea.keith.commands.impl.text.channelCommandDrivers.ChannelCommandDriver;
+import com.naeayedea.keith.commands.lib.command.ChannelCommandDriver;
 import com.naeayedea.keith.commands.impl.text.generic.AbstractUserCommand;
 import com.naeayedea.keith.commands.impl.text.info.AbstractInfoCommand;
 import com.naeayedea.keith.commands.impl.text.info.HelpCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
+import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.managers.CandidateManager;
 import com.naeayedea.keith.managers.ChannelCommandManager;
@@ -160,10 +161,18 @@ public class MessageReceivedEventListener {
 
                                                 try {
                                                     command.run(event, tokens);
-                                                } catch (KeithExecutionException e) {
-                                                    Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
                                                 } catch (KeithPermissionException e) {
-                                                    sendMessage(channel, "You do not have access to this command");
+                                                    event.getMessage()
+                                                        .reply("You do not have access to this command.")
+                                                        .queue();
+                                                } catch (KeithGracefulErrorException e) {
+                                                    event.getMessage()
+                                                        .reply(e.getMessage())
+                                                        .queue();
+                                                } catch (KeithExecutionException e) {
+                                                    event.getMessage()
+                                                        .reply("Something went wrong :(")
+                                                        .queue();
                                                 }
 
                                                 try {
@@ -174,26 +183,38 @@ public class MessageReceivedEventListener {
                                             };
                                             commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                         } catch (PermissionException e) {
-                                            Utilities.Messages.sendError(channel, "I need more permissions to do that!", e.getMessage());
+                                            event.getMessage()
+                                                .reply("I need more permissions to do that!")
+                                                .queue();
                                         } catch (IllegalArgumentException e) {
-                                            Utilities.Messages.sendError(channel, "Invalid Arguments", e.getMessage());
+                                            event.getMessage()
+                                                .reply("Invalid Arguments")
+                                                .queue();
                                         } catch (TimeoutException e) {
-                                            Utilities.Messages.sendError(channel, "Timout", "Execution of command took too long.");
+                                            event.getMessage()
+                                                .reply("\"Execution of command took too long.")
+                                                .queue();
                                         }
                                     } else {
-                                        sendMessage(channel, command.getDefaultName() + " cannot be used in private message!");
+
+                                        event.getMessage()
+                                            .reply(command.getDefaultName() + " cannot be used in private message!")
+                                            .queue();
                                     }
 
                                 } else {
                                     logger.trace("User {} does not have permission to use command {}", candidate.getId(), command.getDefaultName());
 
-                                    sendMessage(channel, "You do not have access to this command");
+                                    event.getMessage()
+                                        .reply("You do not have access to this command")
+                                        .queue();
                                 }
                             } else {
-
                                 logger.trace("User {} has been rate limited.", candidate.getId());
 
-                                sendMessage(channel, "Too many commands in a short time.. please wait 30 seconds");
+                                event.getMessage()
+                                    .reply("Too many commands in a short time.. please wait 30 seconds")
+                                    .queue();
                             }
 
                         }
@@ -210,7 +231,9 @@ public class MessageReceivedEventListener {
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
 
-                Utilities.Messages.sendError(channel, "Something went wrong :(", e.getMessage());
+                event.getMessage()
+                    .reply("Something went wrong :(")
+                    .queue();
             }
         });
     }
@@ -223,11 +246,6 @@ public class MessageReceivedEventListener {
     private TextCommand findCommand(List<String> list) {
         String commandString = list.removeFirst().toLowerCase();
         return commands.get(commandString);
-    }
-
-    //wrapper for channel.sendMessage(content).queue() so dont have to write it in full every time.
-    private void sendMessage(MessageChannel channel, String content) {
-        channel.sendMessage(content).queue();
     }
 }
 

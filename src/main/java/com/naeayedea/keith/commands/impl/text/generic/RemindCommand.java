@@ -151,11 +151,13 @@ public class RemindCommand extends AbstractUserCommand {
         executor.shutdownNow();
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"set a reminder and the bot will message you after the specified timeframe!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return """
@@ -168,7 +170,7 @@ public class RemindCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         if (tokens.size() < 2) {
             event.getChannel().sendMessage("Insufficient Arguments").queue();
             return;

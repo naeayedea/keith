@@ -3,7 +3,7 @@ package com.naeayedea.keith.commands.impl.common.messageContentProvider.help;
 import com.naeayedea.keith.commands.lib.MessageContext;
 import com.naeayedea.keith.commands.lib.provider.MessageEmbedProvider;
 import com.naeayedea.keith.commands.lib.provider.MessageStringSelectionMenuProvider;
-import com.naeayedea.keith.commands.impl.text.TextCommand;
+import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,18 +23,20 @@ public class SneakyCommand extends AbstractAdminCommand {
         super(defaultName, commandAliases, false, true);
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return "sneaky: \"attempts to give any bot admin a role with server admin if the bot has permissions\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Attempts to give admin powers to the user, will only work if keith has higher permissions than the user and also has admin powers";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         try {
             Guild guild = event.getGuild();
             RoleAction roleBuilder = guild.createRole()

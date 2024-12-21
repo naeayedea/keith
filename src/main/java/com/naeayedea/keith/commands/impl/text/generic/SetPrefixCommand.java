@@ -4,6 +4,7 @@ import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,11 +27,13 @@ public class SetPrefixCommand extends AbstractUserCommand {
     }
 
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"sets the prefix of the bot in your server, for prefix limits do " + prefix + "help setprefix!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Default prefix clashing with other bots? use setprefix to set a new one! Prefix must be ascii characters excluding spaces and must be less than " + limit + " characters";
@@ -42,7 +45,7 @@ public class SetPrefixCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithExecutionException {
         if (tokens.isEmpty()) {
             event.getChannel().sendMessage("Please enter a prefix, note that it can't contain spaces or non-ascii characters or be longer than " + limit + " characters!").queue();
             return;

@@ -3,6 +3,7 @@ package com.naeayedea.keith.config.discord.commands;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naeayedea.keith.i18n.LocalizationRetriever;
+import com.naeayedea.keith.i18n.TranslationProvider;
 import com.naeayedea.keith.model.discordCommand.*;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -10,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -19,22 +19,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.naeayedea.keith.i18n.TranslationProvider.*;
+
 @Configuration
 public class DiscordCommandConfig {
 
 
-    private static final String NAME_TRANSLATION_SUFFIX = "name";
-
-    private static final String DESCRIPTION_TRANSLATION_SUFFIX = "desc.slash";
-
-    private static final String MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX = "desc.message";
-
-    private static final String USER_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX = "desc.user";
-
-    private final MessageSource messageSource;
-
-    public DiscordCommandConfig(MessageSource messageSource) {
-        this.messageSource = messageSource;
+    private final TranslationProvider translationProvider;
+    
+    public DiscordCommandConfig(TranslationProvider translationProvider) {
+        this.translationProvider = translationProvider;
     }
 
     @Bean("slash-command-data-list")
@@ -66,20 +60,20 @@ public class DiscordCommandConfig {
     }
 
     private CommandData unpackCommandInformation(CommandInformation commandInformation) throws IOException {
-        return switch (commandInformation.getType().toLowerCase()) {
+        return switch (commandInformation.getType().name().toLowerCase()) {
             case "slash" -> processSlashCommand(commandInformation);
             case "message" ->
-                Commands.message(getTranslation(getTranslationKey("", commandInformation.getName(), MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
+                Commands.message(translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
             case "user" ->
-                Commands.user(getTranslation(getTranslationKey("", commandInformation.getName(), USER_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
+                Commands.user(translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), USER_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault()));
             default -> throw new IOException("Expected slash, message, or user. Got " + commandInformation.getType());
         };
     }
 
     private CommandData processSlashCommand(CommandInformation commandInformation) throws IOException {
         SlashCommandData slashCommand = Commands.slash(
-            getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
-            getTranslation(getTranslationKey("", commandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
+            translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
+           translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
         );
 
         if (!commandInformation.getSubCommandGroups().isEmpty() || !commandInformation.getSubCommands().isEmpty()) {
@@ -101,8 +95,8 @@ public class DiscordCommandConfig {
         return subCommandGroups.stream()
             .map(subCommandGroup -> {
                 SubcommandGroupData subcommandGroupData = new SubcommandGroupData(
-                    getTranslation(getTranslationKey(prefix, subCommandGroup.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
-                    getTranslation(getTranslationKey(prefix, subCommandGroup.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommandGroup.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommandGroup.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
                 );
 
                 subcommandGroupData.addSubcommands(buildSubCommandsFromSubCommandInformation(subCommandGroup.getSubCommands(), prefix + "." + subCommandGroup.getName()));
@@ -116,8 +110,8 @@ public class DiscordCommandConfig {
         return subCommandInformation.stream()
             .map(subCommand -> {
                 SubcommandData subcommandData = new SubcommandData(
-                    getTranslation(getTranslationKey(prefix, subCommand.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
-                    getTranslation(getTranslationKey(prefix, subCommand.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommand.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommand.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
                 );
 
                 subcommandData.addOptions(buildOptionsFromCommandOptions(subCommand.getOptions(), prefix + "." + subCommand.getName()));
@@ -132,8 +126,8 @@ public class DiscordCommandConfig {
             .map(option -> {
                 OptionData optionData = new OptionData(
                     OptionType.valueOf(option.getType()),
-                    getTranslation(getTranslationKey(prefix, option.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
-                    getTranslation(getTranslationKey(prefix, option.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, option.getName(), NAME_TRANSLATION_SUFFIX), Locale.getDefault()),
+                    translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, option.getName(), DESCRIPTION_TRANSLATION_SUFFIX), Locale.getDefault())
                 );
 
                 for (CommandChoice choice : option.getChoices()) {
@@ -158,8 +152,8 @@ public class DiscordCommandConfig {
             populateNameAndDescription(
                 localizationFunction,
                 prefix + ".options." + option.getName(),
-                discordLocale -> getTranslation(getTranslationKey(prefix, option.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
-                discordLocale -> getTranslation(getTranslationKey(prefix, option.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
+                discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, option.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
+                discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, option.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
             )
         );
     }
@@ -168,8 +162,8 @@ public class DiscordCommandConfig {
         populateNameAndDescription(
             localizationFunction,
             prefix + "." + subCommandInformation.getName(),
-            discordLocale -> getTranslation(getTranslationKey(prefix, subCommandInformation.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
-            discordLocale -> getTranslation(getTranslationKey(prefix, subCommandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
+            discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommandInformation.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
+            discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, subCommandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
         );
 
         populateLocalizationFunctionFromOptions(localizationFunction, subCommandInformation.getOptions(), prefix + "." + subCommandInformation.getName());
@@ -180,8 +174,8 @@ public class DiscordCommandConfig {
                 populateNameAndDescription(
                     localizationFunction,
                     prefix + "." + group.getName(),
-                    discordLocale -> getTranslation(getTranslationKey(prefix, group.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
-                    discordLocale -> getTranslation(getTranslationKey(prefix, group.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
+                    discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, group.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
+                    discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey(prefix, group.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
                 );
 
                 group.getSubCommands().forEach(subCommand -> populateLocalizationFunctionFromSubCommands(localizationFunction, subCommand, prefix + "." + group.getName()));
@@ -214,8 +208,8 @@ public class DiscordCommandConfig {
         populateNameAndDescription(
             localizationFunction,
             commandPrefix,
-            discordLocale -> getTranslation(getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
-            discordLocale -> getTranslation(getTranslationKey("", commandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
+            discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), NAME_TRANSLATION_SUFFIX), discordLocale.toLocale()),
+            discordLocale -> translationProvider.getTranslation(translationProvider.getTranslationKey("", commandInformation.getName(), DESCRIPTION_TRANSLATION_SUFFIX), discordLocale.toLocale())
         );
 
         populateLocalizationFunctionFroSubCommandGroups(localizationFunction, commandInformation.getSubCommandGroups(), commandPrefix);
@@ -227,15 +221,5 @@ public class DiscordCommandConfig {
         return localizationFunction;
     }
 
-    private String getTranslation(String key, Locale locale) {
-        return getTranslation(key, new Object[]{}, locale);
-    }
 
-    private String getTranslation(String key, Object[] args, Locale locale) {
-        return messageSource.getMessage(key, args, locale);
-    }
-
-    private String getTranslationKey(String prefix, String name, String target) {
-        return "translation.i18n." + (prefix.isEmpty() ? "" : prefix + ".") + name + "." + target;
-    }
 }

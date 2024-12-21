@@ -3,10 +3,8 @@ package com.naeayedea.keith.config.discord;
 import com.github.ygimenez.model.PaginatorBuilder;
 import com.naeayedea.keith.model.BotConfiguration;
 import com.naeayedea.keith.util.Utilities;
-import jdk.jshell.execution.Util;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -71,7 +69,10 @@ public class JDAConfig {
 
             jda.updateCommands()
                 .addCommands(commands)
-                .queue();
+                .queue(s -> {
+                    logger.info("Loaded {} commands.", s.size());
+                    logger.info("Commands loaded: {}", s);
+                });
 
             logger.info("JDA ready. Preparing pagination.");
 

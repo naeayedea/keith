@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,11 +49,13 @@ public class OnThisDayCommand extends AbstractUserCommand {
         this.mapper = new ObjectMapper();
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"Find out what happened this day in history!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Gives a selection of events that happened on this day in the past, use \"?otd [day] [month]\" for a specific " +
@@ -66,7 +69,7 @@ public class OnThisDayCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         MessageChannel channel = event.getChannel();
         LocalDate date;
         if (!tokens.isEmpty()) {
@@ -82,11 +85,13 @@ public class OnThisDayCommand extends AbstractUserCommand {
                 HttpURLConnection con = (HttpURLConnection) api.openConnection();
                 con.setRequestMethod("GET");
                 con.connect();
+
                 //parse json
                 JsonNode response = mapper.readTree(Utilities.readInputStream(con.getInputStream()));
                 con.disconnect();
-                List<JsonNode> events = response.findValues("events");
+                JsonNode events = response.findValue("events");
                 String day = response.get("date").toString();
+
                 EmbedBuilder eb;
                 int numEvents = events.size();
                 int[] index;
@@ -97,32 +102,39 @@ public class OnThisDayCommand extends AbstractUserCommand {
                 } else {
                     index = ThreadLocalRandom.current().ints(0, numEvents).distinct().limit(6).toArray();
                 }
+
                 int c = 1;
                 int n = index.length;
                 for (int i : index) {
                     JsonNode result = events.get(i);
+
                     eb = new EmbedBuilder();
-                    eb.setTitle("On This Day || " + day + " " + result.get("year").toString());
-                    eb.addField("Description", "```" + result.get("description").toString() + "```", false);
-                    eb.setColor(Utilities.getColorFromString(result.get("description").toString()));
+                    eb.setTitle("On This Day || " + day + " " + result.get("year").asText());
+                    eb.addField("Description", "```" + result.get("description").asText() + "```", false);
+                    eb.setColor(Utilities.getColorFromString(result.get("description").asText()));
 
                     eb.setFooter("Page " + c + "/" + n);
-                    List<JsonNode> wikipedia = result.findValues("wikipedia");
+
+                    JsonNode wikipedia = result.findValue("wikipedia");
                     StringBuilder links = new StringBuilder();
                     for (int j = 0; j < Math.min(5, wikipedia.size()); j++) {
                         JsonNode link = wikipedia.get(j);
-                        URL firstLink = new java.net.URI(link.get("wikipedia").toString()).toURL();
+
+                        URL firstLink = new java.net.URI(link.get("wikipedia").asText().trim()).toURL();
                         HttpURLConnection getImage = (HttpURLConnection) firstLink.openConnection();
                         getImage.setRequestMethod("GET");
                         getImage.connect();
                         String imageURL = Utilities.getImageURL(Utilities.readInputStream(getImage.getInputStream()));
                         if (!imageURL.isEmpty()) {
                             eb.setImage(imageURL);
+
+                            break;
                         }
+
                         getImage.disconnect();
                     }
                     for (JsonNode wikiPage : wikipedia) {
-                        links.append(wikiPage.get("title").toString()).append("\n").append(wikiPage.get("wikipedia").toString()).append("\n");
+                        links.append(wikiPage.get("title").asText()).append("\n").append(wikiPage.get("wikipedia").asText()).append("\n");
                     }
                     eb.addField("Further Reading", links.toString(), false);
                     pages.add(InteractPage.of(eb.build()));

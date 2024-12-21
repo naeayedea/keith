@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,18 +39,20 @@ public class StatsCommand extends AbstractAdminCommand {
         this.database = database;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"returns various bot stats from database\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "usage: admin stats (servers/users/admins)";
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) throws KeithExecutionException {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) throws KeithExecutionException {
         JDA jda = event.getJDA();
         MessageChannel channel = event.getChannel();
 

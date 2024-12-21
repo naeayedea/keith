@@ -6,6 +6,7 @@ import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,11 +26,13 @@ public class GuessCommand extends AbstractUserCommand {
         this.channelCommandManager = channelCommandManager;
     }
 
+    @NotNull
     @Override
     public String getExampleUsage(String prefix) {
         return prefix + getDefaultName() + ": \"number guessing game: use '" + prefix + "guess' or '" + prefix + "guess [number]' to start a game!\"";
     }
 
+    @NotNull
     @Override
     public String getDescription() {
         return "Guess lets you and your friends to guess the number generated between 1-100 or 1-[number] where [number]"
@@ -37,7 +40,7 @@ public class GuessCommand extends AbstractUserCommand {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, List<String> tokens) {
+    public void run(@NotNull MessageReceivedEvent event, @NotNull List<String> tokens) {
         Server server = serverManager.getServer(event.getGuild().getId());
         MessageChannel channel = event.getChannel();
         if (tokens.isEmpty()) {

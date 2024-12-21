@@ -2,6 +2,7 @@ package com.naeayedea.keith.model.discordCommand;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class CommandInformation {
 
     private boolean isGuildOnly;
 
-    private String type;
+    private Command.Type type;
 
     private String defaultPermission;
 
@@ -41,11 +42,11 @@ public class CommandInformation {
         isNSFW = NSFW;
     }
 
-    public String getType() {
+    public Command.Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Command.Type type) {
         this.type = type;
     }
 
