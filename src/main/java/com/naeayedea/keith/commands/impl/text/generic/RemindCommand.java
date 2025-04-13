@@ -81,7 +81,7 @@ public class RemindCommand extends AbstractUserCommand {
     @Value("${keith.commands.remind.statements.setReminder}")
     private String SET_REMINDER_STATEMENT;
 
-    @Value("${keith.executor.reminders.scheduler.poolSize.core}")
+    @Value("${keith.executor.reminders.scheduler.pool-size.core}")
     private int corePoolSize;
 
     private final JDA jda;

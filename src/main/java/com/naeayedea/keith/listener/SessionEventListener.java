@@ -1,6 +1,6 @@
 package com.naeayedea.keith.listener;
 
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.managers.ServerManager;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionEventListener {
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final ServerManager serverManager;
 
     private final Logger logger = LoggerFactory.getLogger(SessionEventListener.class);
 
-    public SessionEventListener(CandidateManager candidateManager, ServerManager serverManager) {
-        this.candidateManager = candidateManager;
+    public SessionEventListener(KeithUserManager keithUserManager, ServerManager serverManager) {
+        this.keithUserManager = keithUserManager;
         this.serverManager = serverManager;
     }
 
@@ -32,7 +32,7 @@ public class SessionEventListener {
         Utilities.updateUptime();
         Utilities.setJDA(jda);
 
-        candidateManager.clear();
+        keithUserManager.clear();
         serverManager.clear();
 
         Utilities.updateDefaultStatus();

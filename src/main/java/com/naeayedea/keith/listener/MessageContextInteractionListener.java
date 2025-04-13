@@ -5,7 +5,7 @@ import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
 import com.naeayedea.keith.i18n.TranslationProvider;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.model.discordCommand.CommandInformation;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
@@ -30,15 +30,14 @@ public class MessageContextInteractionListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageContextInteractionListener.class);
 
-    private final CandidateManager candidateManager;
-
+    private final KeithUserManager keithUserManager;
 
     private final Map<String, MessageContextCommand> commands;
 
     private final Map<String, String> translationMappings;
 
-    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommand> messageContextCommands, CandidateManager candidateManager, TranslationProvider translationProvider) {
-        this.candidateManager = candidateManager;
+    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommand> messageContextCommands, KeithUserManager keithUserManager, TranslationProvider translationProvider) {
+        this.keithUserManager = keithUserManager;
         this. translationMappings = new HashMap<>();
 
         Map<String, MessageContextCommand> commandHandlers = new HashMap<>();
@@ -90,7 +89,7 @@ public class MessageContextInteractionListener {
         if (command != null) {
             try {
                 try {
-                    if (!candidateManager.getCandidate(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+                    if (!keithUserManager.getCandidate(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
                         throw new KeithPermissionException("You do not have permission to use this command");
                     }
 

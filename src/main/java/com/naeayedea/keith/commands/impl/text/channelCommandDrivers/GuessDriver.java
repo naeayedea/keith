@@ -2,7 +2,7 @@ package com.naeayedea.keith.commands.impl.text.channelCommandDrivers;
 
 import com.naeayedea.keith.commands.lib.command.ChannelCommandDriver;
 import com.naeayedea.keith.managers.ChannelCommandManager;
-import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.KeithUser;
 import com.naeayedea.keith.model.Server;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -48,14 +48,14 @@ public class GuessDriver implements ChannelCommandDriver {
     }
 
     @Override
-    public void evaluate(@NotNull Message message, @NotNull List<String> args, @NotNull Candidate candidate) {
+    public void evaluate(@NotNull Message message, @NotNull List<String> args, @NotNull KeithUser keithUser) {
         attempts++;
         try {
             int guess = Integer.parseInt(args.getFirst());
             if (guess == answer) {
                 finish();
                 message.addReaction(new UnicodeEmojiImpl("\uD83C\uDF89")).queue();
-                channel.sendMessage("Congratulations! " + candidate.getAsMention() + " You guessed correctly in " + attempts + " guesses! :tada:").queue();
+                channel.sendMessage("Congratulations! " + keithUser.getAsMention() + " You guessed correctly in " + attempts + " guesses! :tada:").queue();
                 timerTask.cancel(true);
             } else if (guess < answer) {
                 message.addReaction(new UnicodeEmojiImpl("\u2B06")).queue();

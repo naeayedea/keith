@@ -9,11 +9,11 @@ import com.naeayedea.keith.commands.impl.text.info.HelpCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.managers.ChannelCommandManager;
 import com.naeayedea.keith.managers.ServerChatManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.KeithUser;
 import com.naeayedea.keith.model.Server;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.util.MultiMap;
@@ -50,7 +50,7 @@ public class MessageReceivedEventListener {
 
     private final ExecutorService commandService;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final ServerManager serverManager;
 
@@ -66,9 +66,9 @@ public class MessageReceivedEventListener {
 
     private final HelpCommand baseHelpCommand;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, CandidateManager candidateManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoCommand> infoCommands, List<AbstractUserCommand> userCommands, HelpCommand baseHelpCommand, AdminCommandPortal adminTextCommandPortal) {
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, KeithUserManager keithUserManager, ServerManager serverManager, ChannelCommandManager channelCommandManager, ServerChatManager chatManager, CommandRateLimiter rateLimiter, List<AbstractInfoCommand> infoCommands, List<AbstractUserCommand> userCommands, HelpCommand baseHelpCommand, AdminCommandPortal adminTextCommandPortal) {
         this.messageService = messageService;
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
         this.serverManager = serverManager;
         this.channelCommandManager = channelCommandManager;
         this.chatManager = chatManager;
@@ -111,7 +111,7 @@ public class MessageReceivedEventListener {
                 }
 
                 String messageContent = message.getContentRaw();
-                Candidate candidate = candidateManager.getCandidate(event.getAuthor().getId());
+                KeithUser keithUser = keithUserManager.getCandidate(event.getAuthor().getId());
                 String prefix;
                 Server server = null;
                 boolean isPrivateMessage = channel instanceof PrivateChannel;
@@ -123,7 +123,7 @@ public class MessageReceivedEventListener {
                 }
                 List<String> tokens;
                 //check first if user is banned, if not check for server ban or private message
-                if (!candidate.isBanned() && (isPrivateMessage || !server.banned())) {
+                if (!keithUser.isBanned() && (isPrivateMessage || !server.banned())) {
                     //check for prefix
                     if (findPrefix(messageContent, prefix)) {
                         //trim prefix and trailing spaces from command
@@ -136,20 +136,17 @@ public class MessageReceivedEventListener {
 
                         //Check if command was found and that user isn't rate limited
                         if (command != null) {
-
                             logger.trace("Found command: {}", command.getDefaultName());
-                            /*
-                             * command was found, check that user is not rate limited and that they have permission
-                             */
-                            rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
 
-                            if (rateLimiter.userPermitted(candidate.getId())) {
+                            //command was found, check that user isn't rate limited
+                            if (rateLimiter.userPermitted(keithUser.getId())) {
+                                //not rate limited, proceed
 
-                                logger.trace("User {} passed rate limit check.", candidate.getId());
+                                logger.trace("User {} passed rate limit check.", keithUser.getId());
 
-                                if (candidate.hasPermission(command.getAccessLevel())) {
+                                if (keithUser.hasPermission(command.getAccessLevel())) {
 
-                                    logger.trace("User {} has permission to use command {}", candidate.getId(), command.getDefaultName());
+                                    logger.trace("User {} has permission to use command {}", keithUser.getId(), command.getDefaultName());
 
                                     if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
                                         //all checks passed, execute command
@@ -176,11 +173,15 @@ public class MessageReceivedEventListener {
                                                 }
 
                                                 try {
-                                                    candidateManager.incrementCommandCount(candidate.getId());
+                                                    keithUserManager.incrementCommandCount(keithUser.getId());
                                                 } catch (Exception e) {
-                                                    logger.error("Could not increment command count for user {}", candidate.getId(), e);
+                                                    logger.error("Could not increment command count for user {}", keithUser.getId(), e);
                                                 }
                                             };
+
+                                            //increment the rate limit before proceeding, if the command fails we don't want the user to be able to spam
+                                            rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
+
                                             commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
                                         } catch (PermissionException e) {
                                             event.getMessage()
@@ -203,14 +204,14 @@ public class MessageReceivedEventListener {
                                     }
 
                                 } else {
-                                    logger.trace("User {} does not have permission to use command {}", candidate.getId(), command.getDefaultName());
+                                    logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getDefaultName());
 
                                     event.getMessage()
                                         .reply("You do not have access to this command")
                                         .queue();
                                 }
                             } else {
-                                logger.trace("User {} has been rate limited.", candidate.getId());
+                                logger.trace("User {} has been rate limited.", keithUser.getId());
 
                                 event.getMessage()
                                     .reply("Too many commands in a short time.. please wait 30 seconds")
@@ -221,7 +222,7 @@ public class MessageReceivedEventListener {
                     } else if (channelCommandManager.gameInProgress(channel.getId())) {
                         tokens = new ArrayList<>(Arrays.asList(messageContent.trim().split("\\s+")));
                         ChannelCommandDriver cc = channelCommandManager.getGame(channel.getId());
-                        cc.evaluate(message, tokens, candidate);
+                        cc.evaluate(message, tokens, keithUser);
                     } else if (chatManager.hasActiveChat(channel.getId())) {
                         chatManager.sendMessage(channel.getId(), event);
                     }

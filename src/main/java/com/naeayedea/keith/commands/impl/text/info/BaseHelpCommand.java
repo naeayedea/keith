@@ -31,7 +31,7 @@ public class BaseHelpCommand extends AbstractInfoCommand implements StringSelect
 
     private final HelpMessageContentProvider messageContentProvider;
 
-    @Value("${keith.defaultPrefix}")
+    @Value("${keith.default-prefix}")
     private String DEFAULT_PREFIX;
 
     public BaseHelpCommand(Map<String, TextCommand> commandMap, ServerManager serverManager, String defaultName, List<String> commandAliases, String defaultEmbedTitle) {

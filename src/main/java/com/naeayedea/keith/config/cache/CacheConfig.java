@@ -1,54 +1,82 @@
 package com.naeayedea.keith.config.cache;
 
-import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@EnableCaching
 public class CacheConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
-    private final ScheduledExecutorService scheduledExecutorService;
-
-    private final ServerManager serverManager;
-
-    private final CandidateManager candidateManager;
-
-    private final CommandRateLimiter rateLimiter;
-
     @Value("${keith.manager.cache.refresh}")
-    private int cacheRefreshIntervalInSeconds;
+    private long DEFAULT_CACHE_EXPIRY_SECONDS;
 
-    public CacheConfig(@Qualifier("scheduler") ScheduledExecutorService scheduledExecutorService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter) {
-        this.scheduledExecutorService = scheduledExecutorService;
-        this.serverManager = serverManager;
-        this.candidateManager = candidateManager;
-        this.rateLimiter = rateLimiter;
+    @Value("${keith.rate-limit.timeout}")
+    private long RATE_LIMIT_CACHE_SECONDS;
+
+    @Bean
+    @Primary
+    public CacheManager cacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+
+        cacheManager.setCaffeine(Caffeine.newBuilder().expireAfter(new Expiry<>() {
+            @Override
+            public long expireAfterCreate(Object key, Object value, long currentTime) {
+                return TimeUnit.SECONDS.toNanos(DEFAULT_CACHE_EXPIRY_SECONDS);
+            }
+
+            @Override
+            public long expireAfterUpdate(Object key, Object value, long currentTime, long currentDuration) {
+                //reset on update
+                return expireAfterCreate(key, value, currentTime);
+            }
+
+            @Override
+            public long expireAfterRead(Object key, Object value, long currentTime, long currentDuration) {
+                //reset on read
+                return expireAfterCreate(key, value, currentTime);
+            }
+        }));
+
+        return cacheManager;
     }
 
-    @PostConstruct
-    private void configureManagerCleanup() {
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            rateLimiter.clearEntries();
-            serverManager.clear();
-            candidateManager.clear();
-        }, cacheRefreshIntervalInSeconds, cacheRefreshIntervalInSeconds, TimeUnit.SECONDS);
+    @Bean
+    public CacheManager rateLimitCacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+
+        cacheManager.setCaffeine(Caffeine.newBuilder().expireAfter(new Expiry<>() {
+            @Override
+            public long expireAfterCreate(Object key, Object value, long currentTime) {
+                return TimeUnit.SECONDS.toNanos(RATE_LIMIT_CACHE_SECONDS);
+            }
+
+            @Override
+            public long expireAfterUpdate(Object key, Object value, long currentTime, long currentDuration) {
+                //reset on update
+                return expireAfterCreate(key, value, currentTime);
+            }
+
+            @Override
+            public long expireAfterRead(Object key, Object value, long currentTime, long currentDuration) {
+                //don't reset the rate limit cache on read
+                return TimeUnit.SECONDS.toNanos(RATE_LIMIT_CACHE_SECONDS) - currentDuration;
+            }
+        }));
+
+        return cacheManager;
     }
 
-    @PreDestroy
-    private void cleanup() {
-        logger.info("Cleaning up cache");
-        scheduledExecutorService.shutdownNow();
-    }
 }

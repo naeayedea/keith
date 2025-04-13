@@ -35,11 +35,17 @@ processResources {
     finalizedBy addProjectInformation
 }
 
+configurations.configureEach {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
 dependencies {
     //spring
-    implementation ("org.springframework.boot:spring-boot-starter") {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
+    implementation ("org.springframework.boot:spring-boot-starter")
+    //spring cache support
+    implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.2'
+    //additional cache support such as caffeine cache
+    implementation 'org.springframework:spring-context-support:6.1.14'
 
     //replace logback with log4j2
     implementation "org.springframework.boot:spring-boot-starter-log4j2"
@@ -51,7 +57,6 @@ dependencies {
     implementation "org.mariadb.jdbc:mariadb-java-client:3.4.1"
 
     //discord related
-    implementation "com.github.ygimenez:Pagination-Utils:4.0.6"
     implementation "net.dv8tion:JDA:5.1.1"
 }
 

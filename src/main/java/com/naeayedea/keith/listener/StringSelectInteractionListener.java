@@ -22,7 +22,7 @@ public class StringSelectInteractionListener {
 
     private final Map<String, ? extends StringSelectInteractionHandler> handlers;
 
-    @Value("${keith.defaultPrefix}")
+    @Value("${keith.default-prefix}")
     private String DEFAULT_PREFIX;
 
     private final ServerManager serverManager;

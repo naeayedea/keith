@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
-import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.managers.KeithUserManager;
+import com.naeayedea.keith.model.KeithUser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -19,13 +19,13 @@ import java.util.List;
 @Component
 public class SetCandidateLevelCommand extends AbstractAdminCommand {
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final Logger logger = LoggerFactory.getLogger(SetCandidateLevelCommand.class);
 
-    public SetCandidateLevelCommand(CandidateManager candidateManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
+    public SetCandidateLevelCommand(KeithUserManager keithUserManager, @Value("${keith.commands.admin.setCandidateLevel.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.setCandidateLevel.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
     }
 
     @NotNull
@@ -46,7 +46,7 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
         MessageChannel channel = event.getChannel();
         List<User> mentionedUsers = event.getMessage().getMentions().getUsers();
 
-        Candidate mentionedCandidate;
+        KeithUser mentionedCandidate;
 
         JDA jda = event.getJDA();
 
@@ -59,7 +59,7 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
                 try {
                     User user = jda.getUserById(tokens.getFirst());
                     if (user != null) {
-                        mentionedCandidate = candidateManager.getCandidate(user.getId());
+                        mentionedCandidate = keithUserManager.getCandidate(user.getId());
                     } else {
                         channel.sendMessage("Could not locate user").queue();
                         return;
@@ -77,7 +77,7 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
             }
         } else {
             try {
-                mentionedCandidate = candidateManager.getCandidate(mentionedUsers.getFirst().getId());
+                mentionedCandidate = keithUserManager.getCandidate(mentionedUsers.getFirst().getId());
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
 
@@ -88,14 +88,14 @@ public class SetCandidateLevelCommand extends AbstractAdminCommand {
         }
 
         try {
-            Candidate author = candidateManager.getCandidate(event.getAuthor().getId());
+            KeithUser author = keithUserManager.getCandidate(event.getAuthor().getId());
 
             int newLevel = Integer.parseInt(tokens.get(1));
 
             if (newLevel < 0 || newLevel > 3) {
                 event.getChannel().sendMessage("Invalid level! Use values between 0 (Banned) and 3 (Admin)!").queue();
             } else if (author.getAccessLevel().num > newLevel && author.getAccessLevel().num > mentionedCandidate.getAccessLevel().num) {
-                candidateManager.setAccessLevel(mentionedCandidate.getId(), AccessLevel.getLevel("" + newLevel));
+                keithUserManager.setAccessLevel(mentionedCandidate.getId(), AccessLevel.getLevel("" + newLevel));
                 channel.sendMessage("AccessLevel set to " + AccessLevel.getLevel("" + newLevel)).queue();
             } else {
                 channel.sendMessage("You do not have the necessary permissions to set this access level!").queue();

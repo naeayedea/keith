@@ -1,8 +1,8 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.exception.KeithExecutionException;
-import com.naeayedea.keith.managers.CandidateManager;
-import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.managers.KeithUserManager;
+import com.naeayedea.keith.model.KeithUser;
 import com.naeayedea.keith.util.Database;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,7 +23,7 @@ public class StatsCommand extends AbstractAdminCommand {
     @Value("${keith.version}")
     private String VERSION;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final Database database;
 
@@ -33,9 +33,9 @@ public class StatsCommand extends AbstractAdminCommand {
     @Value("${keith.commands.stats.statements.returnServers}")
     private String RETURN_SERVER_STATEMENT;
 
-    public StatsCommand(CandidateManager candidateManager, @Value("${keith.commands.admin.stats.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.stats.aliases}', ',')}") List<String> commandAliases, Database database) {
+    public StatsCommand(KeithUserManager keithUserManager, @Value("${keith.commands.admin.stats.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.stats.aliases}', ',')}") List<String> commandAliases, Database database) {
         super(defaultName, commandAliases);
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
         this.database = database;
     }
 
@@ -72,9 +72,9 @@ public class StatsCommand extends AbstractAdminCommand {
                         String discordId = results.get(i).trim();
 
                         try {
-                            Candidate candidate = candidateManager.getCandidate(discordId);
+                            KeithUser keithUser = keithUserManager.getCandidate(discordId);
 
-                            adminList.append("> ").append(candidate.getDescription()).append("\n");
+                            adminList.append("> ").append(keithUser.getDescription()).append("\n");
                         } catch (SQLException e) {
                             throw new KeithExecutionException(e);
                         }

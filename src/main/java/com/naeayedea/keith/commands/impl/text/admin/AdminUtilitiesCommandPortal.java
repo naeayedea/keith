@@ -9,7 +9,7 @@ import com.naeayedea.keith.commands.lib.command.TextCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.util.MultiMap;
 import com.naeayedea.keith.util.Utilities;
 import jakarta.annotation.PostConstruct;
@@ -30,7 +30,7 @@ public class AdminUtilitiesCommandPortal extends AbstractCommandPortal {
 
     private MultiMap<String, TextCommand> commands;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final List<AbstractAdminUtilsCommand> adminUtilsCommandHandlers;
 
@@ -38,9 +38,9 @@ public class AdminUtilitiesCommandPortal extends AbstractCommandPortal {
 
     private final AdminUtilitiesHelpCommand adminUtilitiesHelpTextCommand;
 
-    public AdminUtilitiesCommandPortal(CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsCommand> adminUtilsCommandHandlers, List<AbstractOwnerCommand> ownerCommandHandlers, AdminUtilitiesHelpCommand adminUtilitiesHelpTextCommand) {
+    public AdminUtilitiesCommandPortal(KeithUserManager keithUserManager, @Value("${keith.commands.admin.utilities.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.aliases}', ',')}") List<String> commandAliases, List<AbstractAdminUtilsCommand> adminUtilsCommandHandlers, List<AbstractOwnerCommand> ownerCommandHandlers, AdminUtilitiesHelpCommand adminUtilitiesHelpTextCommand) {
         super(defaultName, commandAliases);
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
         this.adminUtilsCommandHandlers = adminUtilsCommandHandlers;
 
         this.ownerCommandHandlers = ownerCommandHandlers;
@@ -85,7 +85,7 @@ public class AdminUtilitiesCommandPortal extends AbstractCommandPortal {
         TextCommand command = findCommand(tokens);
         if (command != null) {
             try {
-                if (candidateManager.getCandidate(event.getAuthor().getId()).hasPermission(command.getAccessLevel())) {
+                if (keithUserManager.getCandidate(event.getAuthor().getId()).hasPermission(command.getAccessLevel())) {
                     command.run(event, tokens);
                 } else {
                     throw new KeithPermissionException("You do not have permission to run this command.");

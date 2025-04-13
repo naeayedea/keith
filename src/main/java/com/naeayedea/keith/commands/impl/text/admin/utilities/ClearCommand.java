@@ -1,6 +1,6 @@
 package com.naeayedea.keith.commands.impl.text.admin.utilities;
 
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -15,12 +15,12 @@ public class ClearCommand extends AbstractAdminUtilsCommand {
 
     private final ServerManager serverManager;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
-    public ClearCommand(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.utilities.clear.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.clear.aliases}', ',')}") List<String> commandAliases) {
+    public ClearCommand(ServerManager serverManager, KeithUserManager keithUserManager, @Value("${keith.commands.admin.utilities.clear.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.utilities.clear.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
         this.serverManager = serverManager;
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
     }
 
     @NotNull
@@ -32,7 +32,7 @@ public class ClearCommand extends AbstractAdminUtilsCommand {
     @NotNull
     @Override
     public String getDescription() {
-        return "Used to clear the cache of the candidateManager or ServerManager class\n\n Use ?admin utils clear-cache [server, user, all]";
+        return "Used to clear the cache of the keithUserManager or ServerManager class\n\n Use ?admin utils clear-cache [server, user, all]";
     }
 
     @Override
@@ -48,12 +48,12 @@ public class ClearCommand extends AbstractAdminUtilsCommand {
                     channel.sendMessage("Server cache cleared").queue();
                     break;
                 case "user":
-                    candidateManager.clear();
+                    keithUserManager.clear();
                     channel.sendMessage("User cache cleared").queue();
                     break;
                 case "all":
                     serverManager.clear();
-                    candidateManager.clear();
+                    keithUserManager.clear();
                     channel.sendMessage("All caches cleared").queue();
                     break;
                 default:

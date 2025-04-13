@@ -2,9 +2,9 @@ package com.naeayedea.keith.listener;
 
 import com.naeayedea.keith.commands.lib.command.ReactionCommand;
 import com.naeayedea.keith.exception.KeithException;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.managers.ServerManager;
-import com.naeayedea.keith.model.Candidate;
+import com.naeayedea.keith.model.KeithUser;
 import com.naeayedea.keith.model.Server;
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.util.MultiMap;
@@ -39,16 +39,16 @@ public class MessageReactionAddEventListener {
 
     private final ServerManager serverManager;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final CommandRateLimiter rateLimiter;
 
     private final List<ReactionCommand> reactionCommandHandlers;
 
-    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, CandidateManager candidateManager, CommandRateLimiter rateLimiter, List<ReactionCommand> reactionCommandHandlers) {
+    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, KeithUserManager keithUserManager, CommandRateLimiter rateLimiter, List<ReactionCommand> reactionCommandHandlers) {
         this.reactionHandlingService = reactionHandlingService;
         this.serverManager = serverManager;
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
         this.rateLimiter = rateLimiter;
         this.reactionCommandHandlers = reactionCommandHandlers;
     }
@@ -92,17 +92,17 @@ public class MessageReactionAddEventListener {
                     }
 
                     try {
-                        Candidate candidate = candidateManager.getCandidate(member.getUser().getId());
+                        KeithUser keithUser = keithUserManager.getCandidate(member.getUser().getId());
 
                         boolean isPrivateMessage = channel instanceof PrivateChannel;
 
                         Server server = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
 
                         //ensure that user and server has permission to use the bot
-                        if (!candidate.isBanned() && (isPrivateMessage || !server.banned())) {
+                        if (!keithUser.isBanned() && (isPrivateMessage || !server.banned())) {
 
                             //make sure that rate limit has not been reached
-                            if (rateLimiter.userPermitted(candidate.getId())) {
+                            if (rateLimiter.userPermitted(keithUser.getId())) {
                                 List<MessageReaction> reactions = message.getReactions();
 
                                 //check if any of our aliases have been fired before
@@ -112,7 +112,7 @@ public class MessageReactionAddEventListener {
                                     }
                                 }
 
-                                rateLimiter.incrementOrInsertRecord(candidate.getId(), command.getCost());
+                                rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
 
                                 message.addReaction(emote).queue(success -> {
                                     try {

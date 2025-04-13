@@ -1,6 +1,5 @@
 package com.naeayedea.keith.config.discord;
 
-import com.github.ygimenez.model.PaginatorBuilder;
 import com.naeayedea.keith.model.BotConfiguration;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.JDA;
@@ -75,12 +74,6 @@ public class JDAConfig {
                 });
 
             logger.info("JDA ready. Preparing pagination.");
-
-            PaginatorBuilder.createPaginator(jda)
-                .shouldRemoveOnReact(false)
-                .shouldEventLock(true)
-                .setDeleteOnCancel(true)
-                .activate();
 
             if (!botConfiguration.getRestartMessage().isEmpty()) {
                 logger.info("Restart message \"{}\" received for channel \"{}\"", botConfiguration.getRestartMessage(), botConfiguration.getRestartChannel());

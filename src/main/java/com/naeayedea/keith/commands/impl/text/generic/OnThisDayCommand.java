@@ -2,9 +2,6 @@ package com.naeayedea.keith.commands.impl.text.generic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.InteractPage;
-import com.github.ygimenez.model.Page;
 import com.naeayedea.keith.util.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -77,7 +74,7 @@ public class OnThisDayCommand extends AbstractUserCommand {
         } else {
             date = LocalDate.now();
         }
-        List<Page> pages = new ArrayList<>();
+        List<String> pages = new ArrayList<>();
         if (date != null) {
             try {
                 //contact api for the information on that day
@@ -137,10 +134,10 @@ public class OnThisDayCommand extends AbstractUserCommand {
                         links.append(wikiPage.get("title").asText()).append("\n").append(wikiPage.get("wikipedia").asText()).append("\n");
                     }
                     eb.addField("Further Reading", links.toString(), false);
-                    pages.add(InteractPage.of(eb.build()));
+                    pages.add("WORK IN PROGRESS");
                     c++;
                 }
-                channel.sendMessageEmbeds((MessageEmbed) pages.getFirst().getContent()).queue(success -> Pages.paginate(success, pages, true));
+                channel.sendMessage("WORK IN PROG").queue();
             } catch (IOException e) {
                 logger.error(e.getMessage());
                 throw new RuntimeException("Could not locate data source, please contact bot owner naeayedea#5861");

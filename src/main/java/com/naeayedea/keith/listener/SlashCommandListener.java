@@ -4,7 +4,7 @@ import com.naeayedea.keith.commands.lib.command.interactions.SlashCommand;
 import com.naeayedea.keith.exception.KeithExecutionException;
 import com.naeayedea.keith.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.exception.KeithPermissionException;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.model.discordCommand.CommandInformation;
 import com.naeayedea.keith.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,12 +25,12 @@ public class SlashCommandListener {
 
     private static final Logger logger = LoggerFactory.getLogger(SlashCommandListener.class);
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final Map<String, SlashCommand> commands;
 
-    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommand> slashCommands, CandidateManager candidateManager) {
-        this.candidateManager = candidateManager;
+    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommand> slashCommands, KeithUserManager keithUserManager) {
+        this.keithUserManager = keithUserManager;
         Map<String, SlashCommand> commandHandlers = new HashMap<>();
 
         logger.info("Loaded {} slash commands handlers", slashCommands.size());
@@ -65,7 +65,7 @@ public class SlashCommandListener {
         if (command != null) {
             try {
                 try {
-                    if (!candidateManager.getCandidate(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+                    if (!keithUserManager.getCandidate(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
                         throw new KeithPermissionException("You do not have permission to use this command");
                     }
 

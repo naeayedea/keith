@@ -1,7 +1,7 @@
 package com.naeayedea.keith.commands.impl.text.admin;
 
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
-import com.naeayedea.keith.managers.CandidateManager;
+import com.naeayedea.keith.managers.KeithUserManager;
 import com.naeayedea.keith.managers.ServerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -20,14 +20,14 @@ public class BanCommand extends AbstractAdminCommand {
 
     private final ServerManager serverManager;
 
-    private final CandidateManager candidateManager;
+    private final KeithUserManager keithUserManager;
 
     private final Logger logger = LoggerFactory.getLogger(BanCommand.class);
 
-    public BanCommand(ServerManager serverManager, CandidateManager candidateManager, @Value("${keith.commands.admin.ban.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.ban.aliases}', ',')}") List<String> commandAliases) {
+    public BanCommand(ServerManager serverManager, KeithUserManager keithUserManager, @Value("${keith.commands.admin.ban.defaultName}") String defaultName, @Value("#{T(com.naeayedea.keith.converter.StringToAliasListConverter).convert('${keith.commands.admin.ban.aliases}', ',')}") List<String> commandAliases) {
         super(defaultName, commandAliases);
         this.serverManager = serverManager;
-        this.candidateManager = candidateManager;
+        this.keithUserManager = keithUserManager;
     }
 
     @NotNull
@@ -53,12 +53,12 @@ public class BanCommand extends AbstractAdminCommand {
             else
                 id = tokens.get(1);
             if (type.equals("user")) {
-                if (candidateManager.setAccessLevel(id, AccessLevel.ALL).isBanned()) {
+                if (keithUserManager.setAccessLevel(id, AccessLevel.ALL).isBanned()) {
                     event.getChannel().sendMessage("User banned").queue();
                 } else {
                     event.getChannel().sendMessage("couldn't ban user").queue();
                 }
-            } else if (type.equals("server") && candidateManager.getCandidate(event.getAuthor().getId()).getAccessLevel().num > 2) {
+            } else if (type.equals("server") && keithUserManager.getCandidate(event.getAuthor().getId()).getAccessLevel().num > 2) {
                 Guild guild = event.getJDA().getGuildById(id);
                 if (guild != null) {
                     if (serverManager.setBanned(guild.getId(), true).banned()) {

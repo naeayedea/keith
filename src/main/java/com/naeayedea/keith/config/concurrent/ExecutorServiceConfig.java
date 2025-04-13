@@ -11,25 +11,25 @@ public class ExecutorServiceConfig {
 
     private static final int THREAD_KEEP_ALIVE_SECONDS = 60;
 
-    @Value("${keith.executor.messages.poolSize.min}")
+    @Value("${keith.executor.messages.pool-size.min}")
     private int messagesMinPoolSize;
 
-    @Value("${keith.executor.messages.poolSize.max}")
+    @Value("${keith.executor.messages.pool-size.max}")
     private int messagesMaxCorePoolSize;
 
-    @Value("${keith.executor.reactions.poolSize.min}")
+    @Value("${keith.executor.reactions.pool-size.min}")
     private int reactionsMinPoolSize;
 
-    @Value("${keith.executor.reactions.poolSize.max}")
+    @Value("${keith.executor.reactions.pool-size.max}")
     private int reactionsMaxPoolSize;
 
-    @Value("${keith.executor.commands.poolSize.min}")
+    @Value("${keith.executor.commands.pool-size.min}")
     private int commandsMinPoolSize;
 
-    @Value("${keith.executor.commands.poolSize.max}")
+    @Value("${keith.executor.commands.pool-size.max}")
     private int commandsMaxPoolSize;
 
-    @Value("${keith.executor.scheduler.poolSize.core}")
+    @Value("${keith.executor.scheduler.pool-size.core}")
     private int schedulerCorePoolSize;
 
     @Bean

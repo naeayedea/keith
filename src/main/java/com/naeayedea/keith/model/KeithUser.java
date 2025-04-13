@@ -2,7 +2,7 @@ package com.naeayedea.keith.model;
 
 import com.naeayedea.keith.commands.lib.command.AccessLevel;
 
-public class Candidate {
+public class KeithUser {
 
     private final String discordID;
 
@@ -12,7 +12,7 @@ public class Candidate {
 
     private final long commandCount;
 
-    public Candidate(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
+    public KeithUser(String discordID, AccessLevel accessLevel, String firstSeen, long commandCount) {
         this.discordID = discordID;
         this.accessLevel = accessLevel;
         this.firstSeen = firstSeen;

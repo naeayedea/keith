@@ -1,6 +1,7 @@
 package com.naeayedea.keith.config.discord;
 
 import com.naeayedea.keith.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.ratelimiter.RateLimitCache;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RateLimitConfig {
 
-    @Value("${keith.rateLimit.maxValue}")
+    @Value("${keith.rate-limit.max-value}")
     private int rateLimitMax;
 
     @Bean
-    public CommandRateLimiter commandRateLimiter() {
-        return new CommandRateLimiter(rateLimitMax);
+    public CommandRateLimiter commandRateLimiter(RateLimitCache rateLimitCache) {
+        return new CommandRateLimiter(rateLimitCache, rateLimitMax);
     }
 }
