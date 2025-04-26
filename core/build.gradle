@@ -1,0 +1,11 @@
+
+plugins {
+
+}
+
+group = 'com.naeayedea.keith.core'
+version = '4.0.0-alpha'
+
+dependencies {
+
+}

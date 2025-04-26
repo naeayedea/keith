@@ -1,0 +1,219 @@
+package com.naeayedea.keith.platform.discord.listener;
+
+import com.naeayedea.keith.core.exception.KeithExecutionException;
+import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.core.managers.KeithUserManager;
+import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.model.KeithUser;
+import com.naeayedea.keith.core.model.Server;
+import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.platform.discord.lib.command.TextCommand;
+import jakarta.annotation.PostConstruct;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+@Component
+public class MessageReceivedEventListener {
+
+    private final Logger logger = LoggerFactory.getLogger(MessageReceivedEventListener.class);
+
+    private MultiMap<String, TextCommand> commands;
+
+    private final ExecutorService messageService;
+
+    private final ExecutorService commandService;
+
+    private final KeithUserManager keithUserManager;
+
+    private final ServerManager serverManager;
+
+    private final CommandRateLimiter rateLimiter;
+
+    private final List<TextCommand> textCommands;
+
+
+    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, KeithUserManager keithUserManager, ServerManager serverManager, CommandRateLimiter rateLimiter) {
+        this.messageService = messageService;
+        this.keithUserManager = keithUserManager;
+        this.serverManager = serverManager;
+        this.commandService = commandService;
+        this.rateLimiter = rateLimiter;
+
+        this.textCommands = new ArrayList<>();
+    }
+
+    @PostConstruct
+    private void initialiseCommands() {
+        logger.info("Initializing base command map.");
+
+        commands = new MultiMap<>();
+
+        logger.info("Loaded {} base message command aliases", commands.size());
+    }
+
+    @EventListener(MessageReceivedEvent.class)
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (event.getAuthor().isBot()) return;
+
+        messageService.submit(() -> {
+            MessageChannel channel = event.getChannel();
+            try {
+                Message message = event.getMessage();
+                //automatically join any threads that are created so that bot feels easy to use in threads
+                if (channel instanceof ThreadChannel thread && !thread.isJoined()) {
+                    thread.join().queue();
+                }
+
+                String messageContent = message.getContentRaw();
+                KeithUser keithUser = keithUserManager.getUser(event.getAuthor().getId());
+                String prefix;
+                Server server = null;
+                boolean isPrivateMessage = channel instanceof PrivateChannel;
+                if (isPrivateMessage) {
+                    prefix = "?";
+                } else {
+                    server = serverManager.getServer(event.getGuild().getId());
+                    prefix = server.prefix();
+                }
+                List<String> tokens;
+                //check first if user is banned, if not check for server ban or private message
+                if (!keithUser.isBanned() && (isPrivateMessage || !server.banned())) {
+                    //check for prefix
+                    if (findPrefix(messageContent, prefix)) {
+                        //trim prefix and trailing spaces from command
+                        messageContent = messageContent.substring(prefix.length()).trim();
+
+                        //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+                        tokens = new ArrayList<>(Arrays.asList(messageContent.split("\\s+")));
+
+                        TextCommand command = findCommand(tokens);
+
+                        //Check if command was found and that user isn't rate limited
+                        if (command != null) {
+                            logger.trace("Found command: {}", command.getDefaultName());
+
+                            //command was found, check that user isn't rate limited
+                            if (rateLimiter.userPermitted(keithUser.getId())) {
+                                //not rate limited, proceed
+
+                                logger.trace("User {} passed rate limit check.", keithUser.getId());
+
+                                if (keithUser.hasPermission(command.getAccessLevel())) {
+
+                                    logger.trace("User {} has permission to use command {}", keithUser.getId(), command.getDefaultName());
+
+                                    if (command.isPrivateMessageCompatible() || !(channel instanceof PrivateChannel)) {
+                                        //all checks passed, execute command
+                                        try {
+                                            Runnable execution = () -> {
+                                                if (command.sendTyping()) {
+                                                    channel.sendTyping().complete();
+                                                }
+
+                                                try {
+                                                    command.run(event, tokens);
+                                                } catch (KeithPermissionException e) {
+                                                    event.getMessage()
+                                                        .reply("You do not have access to this command.")
+                                                        .queue();
+                                                } catch (KeithGracefulErrorException e) {
+                                                    event.getMessage()
+                                                        .reply(e.getMessage())
+                                                        .queue();
+                                                } catch (KeithExecutionException e) {
+                                                    event.getMessage()
+                                                        .reply("Something went wrong :(")
+                                                        .queue();
+                                                }
+
+                                                try {
+                                                    keithUserManager.incrementCommandCount(keithUser.getId());
+                                                } catch (Exception e) {
+                                                    logger.error("Could not increment command count for user {}", keithUser.getId(), e);
+                                                }
+                                            };
+
+                                            //increment the rate limit before proceeding, if the command fails we don't want the user to be able to spam
+                                            rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
+
+                                            commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+                                        } catch (PermissionException e) {
+                                            event.getMessage()
+                                                .reply("I need more permissions to do that!")
+                                                .queue();
+                                        } catch (IllegalArgumentException e) {
+                                            event.getMessage()
+                                                .reply("Invalid Arguments")
+                                                .queue();
+                                        } catch (TimeoutException e) {
+                                            event.getMessage()
+                                                .reply("\"Execution of command took too long.")
+                                                .queue();
+                                        }
+                                    } else {
+
+                                        event.getMessage()
+                                            .reply(command.getDefaultName() + " cannot be used in private message!")
+                                            .queue();
+                                    }
+
+                                } else {
+                                    logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getDefaultName());
+
+                                    event.getMessage()
+                                        .reply("You do not have access to this command")
+                                        .queue();
+                                }
+                            } else {
+                                logger.trace("User {} has been rate limited.", keithUser.getId());
+
+                                event.getMessage()
+                                    .reply("Too many commands in a short time.. please wait 30 seconds")
+                                    .queue();
+                            }
+
+                        }
+                    }
+                    //else ignore
+                }
+
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);
+
+                event.getMessage()
+                    .reply("Something went wrong :(")
+                    .queue();
+            }
+        });
+    }
+
+    private boolean findPrefix(String message, String prefix) {
+        //ensure that message content greater than prefix length then check if prefix is there
+        return message.length() > prefix.length() && message.toLowerCase().startsWith(prefix);
+    }
+
+    private TextCommand findCommand(List<String> list) {
+        String commandString = list.removeFirst().toLowerCase();
+        return commands.get(commandString);
+    }
+}
+

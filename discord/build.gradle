@@ -1,0 +1,37 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClassName = 'com.naeayedea.keith.discord.KeithLauncher'
+}
+
+group = 'com.naeayedea.keith.discord'
+version = '4.0.0-alpha'
+
+tasks.register('addProjectInformation') {
+    group = "other"
+    description = "Adds project information to JAR"
+
+    //override some config so the local deployment runs better
+    doFirst {
+        ant.propertyfile(file: "./build/resources/main/application.properties") {
+            entry( key: "keith.version", value: "$keithVersion")
+            entry( key: "keith.project.name", value: rootProject.name)
+        }
+    }
+}
+
+processResources {
+    finalizedBy addProjectInformation
+}
+
+dependencies {
+    //keith core
+    implementation project(':core')
+
+    //discord related
+    implementation "net.dv8tion:JDA:5.4.0"
+
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
+}

@@ -1,2 +1,4 @@
-rootProject.name = 'keithv4'
+rootProject.name = 'keith'
 
+include 'core'
+include 'discord'

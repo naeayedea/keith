@@ -1,64 +1,50 @@
 plugins {
-    id 'java'
-    id 'application'
     id 'org.springframework.boot' version '3.3.4'
+    id 'java'
 }
 
-apply plugin: 'io.spring.dependency-management'
-
-application {
-    mainClassName = 'com.naeayedea.keith.KeithLauncher'
+ext {
+    keithVersion = '4.0.0'
+    jacksonVersion = "2.17.2"
 }
 
-version '4.0.0'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
 
-def jacksonVersion = "2.17.2"
+    repositories {
+        mavenCentral()
+    }
 
-repositories {
-    mavenCentral()
-}
+    compileJava.options.encoding = 'UTF-8'
 
-tasks.register('addProjectInformation') {
-    group = "other"
-    description = "Adds project information to JAR"
+    configurations.configureEach {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 
-    //override some config so the local deployment runs better
-    doFirst {
-        ant.propertyfile(file: "./build/resources/main/application.properties") {
-            entry( key: "keith.version", value: version)
-            entry( key: "keith.project.name", value: rootProject.name)
-        }
+    dependencies {
+        //spring
+        implementation ("org.springframework.boot:spring-boot-starter")
+        //spring cache support
+        implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.2'
+        //additional cache support such as caffeine cache
+        implementation 'org.springframework:spring-context-support:6.1.14'
+
+        //replace logback with log4j2
+        implementation "org.springframework.boot:spring-boot-starter-log4j2"
+
+        //jackson
+        implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+        //database
+        implementation "org.mariadb.jdbc:mariadb-java-client:3.4.1"
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.2'
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
-
-processResources {
-    finalizedBy addProjectInformation
-}
-
-configurations.configureEach {
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-}
-
-dependencies {
-    //spring
-    implementation ("org.springframework.boot:spring-boot-starter")
-    //spring cache support
-    implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.2'
-    //additional cache support such as caffeine cache
-    implementation 'org.springframework:spring-context-support:6.1.14'
-
-    //replace logback with log4j2
-    implementation "org.springframework.boot:spring-boot-starter-log4j2"
-
-    //jackson
-    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-
-    //database
-    implementation "org.mariadb.jdbc:mariadb-java-client:3.4.1"
-
-    //discord related
-    implementation "net.dv8tion:JDA:5.1.1"
-}
-
-compileJava.options.encoding = 'UTF-8'
 
