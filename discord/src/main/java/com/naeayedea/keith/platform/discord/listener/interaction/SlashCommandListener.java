@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.interaction;
 
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
@@ -17,7 +17,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

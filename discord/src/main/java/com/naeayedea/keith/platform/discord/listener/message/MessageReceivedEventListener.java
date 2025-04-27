@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.message;
 
 import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
@@ -12,9 +12,11 @@ import com.naeayedea.keith.core.model.user.KeithUser;
 import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.core.util.MultiMap;
 import com.naeayedea.keith.platform.discord.lib.command.TextCommand;
+import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -110,7 +112,38 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
     @Override
     public boolean eventIsCompatible(MessageReceivedEvent event) {
-        return findPrefix(event.getMessage().getContentRaw(), getPrefix(event));
+        if (!findPrefix(event.getMessage().getContentRaw(), getPrefix(event))) {
+            return false;
+        }
+
+        BasicKeithUser keithUser = keithUserManager.getUser(event.getAuthor().getId());
+
+        //Check user isn't rate limited
+        if (rateLimitReached(event, keithUser)) {
+            return false;
+        }
+
+        //not rate limited, proceed
+        logger.trace("User {} passed rate limit check.", keithUser.getId());
+
+        String prefix = getPrefix(event);
+
+        //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
+        List<String> tokens = new ArrayList<>(Arrays.asList(event.getMessage().getContentRaw().substring(prefix.length()).trim().split("\\s+")));
+
+        TextCommand command = findCommand(tokens);
+
+        if (permissionsNotMet(event, keithUser, command)) {
+            return false;
+        }
+
+        MessageChannel channel = event.getChannel();
+
+        if (!(channel instanceof TextChannel)) {
+            return true;
+        }
+
+        return privateMessageCompatible(event, command, channel, keithUser);
     }
 
 
@@ -132,53 +165,7 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
         TextCommand command = findCommand(tokens);
 
-        //check command was found
-        if (command == null) {
-            return;
-        }
-
         logger.trace("Found command: {}", command.getDefaultName());
-
-        //Check user isn't rate limited
-        if (!rateLimiter.userPermitted(keithUser.getId())) {
-            logger.trace("User {} has been rate limited.", keithUser.getId());
-
-            //if user significantly above rate limit max then we just ignore them.
-            if (rateLimiter.getCurrentValue(keithUser.getId()) < rateLimiter.DEFAULT_RATE_LIMIT * 4) {
-                event.getMessage()
-                    .reply("Too many commands in a short time.. please wait 30 seconds")
-                    .queue();
-            }
-
-            return;
-        }
-
-        //not rate limited, proceed
-        logger.trace("User {} passed rate limit check.", keithUser.getId());
-
-        if (!keithUser.hasPermission(command.getAccessLevel())) {
-            logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getDefaultName());
-
-            //consider this a command, albeit a small penalty
-            rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
-
-            event.getMessage()
-                .reply("You do not have access to this command")
-                .queue();
-
-            return;
-        }
-
-        if (!command.isPrivateMessageCompatible() && channel instanceof PrivateChannel) {
-            //consider this a command, albeit a small penalty
-            rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
-
-            event.getMessage()
-                .reply(command.getDefaultName() + " cannot be used in private message!")
-                .queue();
-
-            return;
-        }
 
         //all checks passed, execute command
         Runnable execution = () -> {
@@ -213,6 +200,58 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
 
         commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+    }
+
+    private boolean privateMessageCompatible(MessageReceivedEvent event, TextCommand command, MessageChannel channel, BasicKeithUser keithUser) {
+        if (!command.isPrivateMessageCompatible()) {
+            //consider this a command, albeit a small penalty
+            rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
+
+            event.getMessage()
+                .reply(command.getDefaultName() + " cannot be used in private message!")
+                .queue();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean permissionsNotMet(MessageReceivedEvent event, BasicKeithUser keithUser, TextCommand command) {
+        if (!keithUser.hasPermission(command.getAccessLevel())) {
+            logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getDefaultName());
+
+            //consider this a command, albeit a small penalty
+            rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
+
+            event.getMessage()
+                .reply("You do not have access to this command")
+                .queue();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean rateLimitReached(MessageReceivedEvent event, BasicKeithUser keithUser) {
+        if (!rateLimiter.userPermitted(keithUser.getId())) {
+            logger.trace("User {} has been rate limited.", keithUser.getId());
+
+            //consider this a command, albeit a small penalty
+            rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
+
+            //if user significantly above rate limit max then we just ignore them.
+            if (rateLimiter.getCurrentValue(keithUser.getId()) < rateLimiter.DEFAULT_RATE_LIMIT * 2) {
+                event.getMessage()
+                    .reply("Too many commands in a short time.. please wait 30 seconds")
+                    .queue();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override

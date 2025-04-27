@@ -1,8 +1,9 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.guild;
 
 import com.naeayedea.keith.core.managers.ServerManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.server.KeithServer;
+import com.naeayedea.keith.platform.discord.listener.AbstractDiscordEventListener;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,19 +50,22 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
 
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
 
-        if (defaultChannel != null) {
-            defaultChannel.asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                .setColor(new Color(155, 0, 155))
-                .setTitle("Hello!")
-                .setFooter("Use " + keithServer.getPrefix() + "feedback if you have any issues!- Succ")
-                .setDescription("Use " + keithServer.getPrefix() + "help to see available commands")
-                .setThumbnail(event.getJDA().getSelfUser().getAvatarUrl())
-                .build()).queue();
+        Utilities.updateDefaultStatus();
 
-            logger.info("New Server {} has added the bot!", guild);
+        logger.info("New Server {} has added the bot!", guild);
+
+        if (defaultChannel == null) {
+            return;
         }
 
-        Utilities.updateDefaultStatus();
+        defaultChannel.asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            .setColor(new Color(155, 0, 155))
+            .setTitle("Hello!")
+            .setFooter("Use " + keithServer.getPrefix() + "feedback if you have any issues!- Succ")
+            .setDescription("Use " + keithServer.getPrefix() + "help to see available commands")
+            .setThumbnail(event.getJDA().getSelfUser().getAvatarUrl())
+            .build()).queue();
+
     }
 
     @Override

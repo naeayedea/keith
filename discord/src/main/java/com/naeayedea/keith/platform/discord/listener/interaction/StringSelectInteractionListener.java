@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.interaction;
 
 import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
@@ -7,6 +7,7 @@ import com.naeayedea.keith.platform.discord.lib.command.StringSelectInteractionH
 import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.managers.ServerManager;
 import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.slf4j.Logger;
@@ -55,9 +56,7 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
     public void onPermitted(StringSelectInteractionEvent event) throws Exception {
         StringSelectInteractionHandler handler = handlers.get(event.getComponentId());
 
-        if (handler != null) {
-            handler.handleStringSelectEvent(event);
-        } else {
+        if (handler == null) {
             logger.warn("No handler found for action: {}", event.getComponentId());
 
             Guild guild = event.getGuild();
@@ -65,7 +64,11 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
             String prefix = guild == null ? DEFAULT_PREFIX : serverManager.getServer(guild.getId()).getPrefix();
 
             event.reply("No handler found for this choice. Please try another or use " + prefix + "feedback <message> to get in contact.").queue();
+
+            return;
         }
+
+        handler.handleStringSelectEvent(event);
     }
 
     @Override

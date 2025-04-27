@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.discord;
 
 import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.core.managers.ServerManager;

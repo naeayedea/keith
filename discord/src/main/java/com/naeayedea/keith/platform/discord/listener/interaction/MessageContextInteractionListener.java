@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.interaction;
 
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
@@ -107,16 +107,16 @@ public class MessageContextInteractionListener extends AbstractSlashCommandEvent
 
         MessageContextCommand command = commands.get(baseEventName);
 
-        if (command != null) {
-            if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
-                throw new KeithPermissionException("You do not have permission to use this command");
-            }
-
-            command.run(event);
-        } else {
+        if (command == null) {
             logger.error("No handler configured for event {}", event.getName());
 
             throw new KeithGracefulErrorException("This command has not been configured properly. Please contact the owner using /feedback");
         }
+
+        if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+            throw new KeithPermissionException("You do not have permission to use this command");
+        }
+
+        command.run(event);
     }
 }

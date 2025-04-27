@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.message;
 
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
@@ -10,6 +10,7 @@ import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import com.naeayedea.keith.core.model.server.BasicKeithServer;
 import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,7 +19,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,27 +130,29 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
         }
 
         //make sure that rate limit has not been reached
-        if (rateLimiter.userPermitted(keithUser.getId())) {
-            List<MessageReaction> reactions = message.getReactions();
-
-            //check if any of our aliases have been fired before
-            for (MessageReaction reaction : reactions) {
-                if (reaction.isSelf() && command.triggeredBy(reaction.getEmoji())) {
-                    return;
-                }
-            }
-
-            rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
-
-            message.addReaction(emote).queue(success -> {
-                try {
-                    command.run(event, member.getUser());
-                } catch (KeithException e) {
-                    logger.error(e.getMessage(), e);
-
-                    message.removeReaction(emote).queue();
-                }
-            });
+        if (!rateLimiter.userPermitted(keithUser.getId())) {
+            return;
         }
+
+        List<MessageReaction> reactions = message.getReactions();
+
+        //check if any of our aliases have been fired before
+        for (MessageReaction reaction : reactions) {
+            if (reaction.isSelf() && command.triggeredBy(reaction.getEmoji())) {
+                return;
+            }
+        }
+
+        rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
+
+        message.addReaction(emote).queue(success -> {
+            try {
+                command.run(event, member.getUser());
+            } catch (KeithException e) {
+                logger.error(e.getMessage(), e);
+
+                message.removeReaction(emote).queue();
+            }
+        });
     }
 }

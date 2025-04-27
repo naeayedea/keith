@@ -1,7 +1,8 @@
-package com.naeayedea.keith.platform.discord.listener;
+package com.naeayedea.keith.platform.discord.listener.interaction;
 
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
