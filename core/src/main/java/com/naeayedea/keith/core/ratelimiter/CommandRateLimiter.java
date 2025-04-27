@@ -7,7 +7,7 @@ public class CommandRateLimiter {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandRateLimiter.class);
 
-    private final int DEFAULT_RATE_LIMIT;
+    public final int DEFAULT_RATE_LIMIT;
 
     private final RateLimitCache rateLimitCache;
 

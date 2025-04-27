@@ -102,14 +102,6 @@ public class Utilities {
         return response;
     }
 
-    public static String getPrefix(ServerManager serverManager, MessageReceivedEvent event) {
-        if (event.getChannel() instanceof PrivateChannel) {
-            return "?";
-        }
-
-        return serverManager.getServer(event.getGuild().getId()).prefix();
-    }
-
     public static Color getBotColor() {
         return new Color(155, 0, 155);
     }

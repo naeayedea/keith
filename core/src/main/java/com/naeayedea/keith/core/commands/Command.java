@@ -24,7 +24,7 @@ public interface Command {
     int getTimeOut();
 
     /**
-     * Determine if this command should send a typing message to discord when the command is run
+     * Determine if this command should send a typing status when run
      *
      * @return true if the command should send a typing signal, false otherwise
      */

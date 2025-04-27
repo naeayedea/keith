@@ -1,13 +1,15 @@
 package com.naeayedea.keith.platform.discord.listener;
 
-import com.naeayedea.keith.platform.discord.lib.command.interactions.MessageContextCommand;
-import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
 import com.naeayedea.keith.core.i18n.TranslationProvider;
 import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
+import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.core.model.user.KeithUser;
 import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.platform.discord.lib.command.interactions.MessageContextCommand;
+import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -15,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,7 @@ import java.util.Map;
 import static com.naeayedea.keith.core.i18n.TranslationProvider.MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX;
 
 @Component
-public class MessageContextInteractionListener {
+public class MessageContextInteractionListener extends AbstractSlashCommandEventListener<MessageContextInteractionEvent> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(MessageContextInteractionListener.class);
@@ -38,7 +40,7 @@ public class MessageContextInteractionListener {
 
     public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommand> messageContextCommands, KeithUserManager keithUserManager, TranslationProvider translationProvider) {
         this.keithUserManager = keithUserManager;
-        this. translationMappings = new HashMap<>();
+        this.translationMappings = new HashMap<>();
 
         Map<String, MessageContextCommand> commandHandlers = new HashMap<>();
 
@@ -76,8 +78,27 @@ public class MessageContextInteractionListener {
         this.commands = commandMultiMap;
     }
 
-    @EventListener(MessageContextInteractionEvent.class)
-    public void onMessageContextInteractionEvent(MessageContextInteractionEvent event) {
+    @EventListener
+    @Async
+    @Override
+    public void onEvent(KeithEvent<MessageContextInteractionEvent> event) {
+        super.onEvent(event);
+    }
+
+    @Override
+    protected KeithUser getUser(MessageContextInteractionEvent event) {
+        return keithUserManager.getUser(event.getUser().getId());
+    }
+
+    @Override
+    protected boolean isBot(MessageContextInteractionEvent event) {
+        User user = event.getUser();
+
+        return user.isBot() || user.isSystem();
+    }
+
+    @Override
+    public void onPermitted(MessageContextInteractionEvent event) throws Exception {
         logger.info("event name {}", event.getName());
 
         String baseEventName = translationMappings.get(event.getName());
@@ -87,40 +108,15 @@ public class MessageContextInteractionListener {
         MessageContextCommand command = commands.get(baseEventName);
 
         if (command != null) {
-            try {
-                try {
-                    if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
-                        throw new KeithPermissionException("You do not have permission to use this command");
-                    }
-
-                    command.run(event);
-                } catch (KeithGracefulErrorException e) {
-                    event
-                        .reply(e.getMessage())
-                        .setEphemeral(true)
-                        .queue();
-                } catch (KeithPermissionException e) {
-                    event.reply("You do not have permission to do that!")
-                        .setEphemeral(true)
-                        .queue();
-                } catch (KeithExecutionException e) {
-                    logger.error("Error encountered whilst running command {}, {}", event.getName(), e.getMessage(), e);
-                    throw new IOException(e);
-                }
-            } catch (Throwable e) {
-                event.reply("Something went wrong :(")
-                    .setEphemeral(true)
-                    .queue();
-
-                logger.warn("Encountered problem running command {}", command.getDefaultName(), e);
+            if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+                throw new KeithPermissionException("You do not have permission to use this command");
             }
 
+            command.run(event);
         } else {
             logger.error("No handler configured for event {}", event.getName());
 
-            event.reply("This command has not been configured properly. Please contact the owner using /feedback")
-                .setEphemeral(true)
-                .queue();
+            throw new KeithGracefulErrorException("This command has not been configured properly. Please contact the owner using /feedback");
         }
     }
 }

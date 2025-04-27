@@ -1,7 +1,8 @@
 package com.naeayedea.keith.platform.discord.listener;
 
+import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.core.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.lib.command.interactions.SlashCommand;
-import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
 import com.naeayedea.keith.core.managers.KeithUserManager;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SlashCommandListener {
+public class SlashCommandListener extends AbstractSlashCommandEventListener<SlashCommandInteractionEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(SlashCommandListener.class);
 
@@ -58,43 +60,37 @@ public class SlashCommandListener {
         this.commands = commandMultiMap;
     }
 
-    @EventListener(SlashCommandInteractionEvent.class)
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+    @EventListener
+    @Async
+    @Override
+    public void onEvent(KeithEvent<SlashCommandInteractionEvent> eventSource) {
+        super.onEvent(eventSource);
+    }
+
+    @Override
+    public void onPermitted(SlashCommandInteractionEvent event) throws Exception {
         SlashCommand command = commands.get(event.getName());
 
         if (command != null) {
-            try {
-                try {
-                    if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
-                        throw new KeithPermissionException("You do not have permission to use this command");
-                    }
-
-                    command.run(event);
-                } catch (KeithGracefulErrorException e) {
-                    event
-                        .reply(e.getMessage())
-                        .setEphemeral(true)
-                        .queue();
-                } catch (KeithPermissionException e) {
-                    event.reply("You do not have permission to do that!")
-                        .setEphemeral(true)
-                        .queue();
-                } catch (KeithExecutionException e) {
-                    logger.error("Error encountered whilst running command {}, {}", event.getName(), e.getMessage(), e);
-                    throw new IOException(e);
-                }
-            } catch (Throwable e) {
-                event.reply("Something went wrong :(")
-                    .setEphemeral(true)
-                    .queue();
+            if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+                throw new KeithPermissionException("You do not have permission to use this command");
             }
 
+            command.run(event);
         } else {
             logger.error("No handler configured for event {}", event.getName());
 
-            event.reply("This command has not been configured properly. Please contact the owner using /feedback")
-                .setEphemeral(true)
-                .queue();
+            throw new KeithGracefulErrorException("This command has not been configured properly. Please contact the owner using /feedback");
         }
+    }
+
+    @Override
+    protected KeithUser getUser(SlashCommandInteractionEvent event) {
+        return keithUserManager.getUser(event.getUser().getId());
+    }
+
+    @Override
+    protected boolean isBot(SlashCommandInteractionEvent event) {
+        return event.getUser().isBot() || event.getUser().isSystem();
     }
 }

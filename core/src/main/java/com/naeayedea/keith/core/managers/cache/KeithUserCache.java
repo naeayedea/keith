@@ -1,7 +1,7 @@
 package com.naeayedea.keith.core.managers.cache;
 
 import com.naeayedea.keith.core.commands.AccessLevel;
-import com.naeayedea.keith.core.model.KeithUser;
+import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import com.naeayedea.keith.core.util.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -42,56 +43,56 @@ public class KeithUserCache {
 
     @NonNull
     @Cacheable(CACHE_NAME)
-    public KeithUser getUser(String discordID) {
-        return reloadUser(discordID);
+    public BasicKeithUser getUser(String userId) {
+        return reloadUser(userId);
     }
 
     @NonNull
     @CachePut(cacheNames = CACHE_NAME)
-    public KeithUser incrementCommandCount(String discordID) {
-        if (!database.executeUpdate(INCREMENT_COMMAND_COUNT_STATEMENT, discordID)) {
-            logger.error("Could not increment command count for user {} in database.", discordID);
+    public BasicKeithUser incrementCommandCount(String userId) {
+        if (!database.executeUpdate(INCREMENT_COMMAND_COUNT_STATEMENT, userId)) {
+            logger.error("Could not increment command count for user {} in database.", userId);
         }
 
-        return reloadUser(discordID);
+        return reloadUser(userId);
 
     }
 
     @NonNull
-    @CachePut(cacheNames = CACHE_NAME, key = "#discordID")
-    public KeithUser setAccessLevel(String discordID, AccessLevel accessLevel) {
-        if (!database.executeUpdate(SET_ACCESS_LEVEL_STATEMENT, accessLevel.num, discordID)) {
-            logger.error("Could not update access level for user {} in database.", discordID);
+    @CachePut(cacheNames = CACHE_NAME, key = "#userId")
+    public BasicKeithUser setAccessLevel(String userId, AccessLevel accessLevel) {
+        if (!database.executeUpdate(SET_ACCESS_LEVEL_STATEMENT, accessLevel.num, userId)) {
+            logger.error("Could not update access level for user {} in database.", userId);
         }
 
         //reload from db
-        return reloadUser(discordID);
+        return reloadUser(userId);
     }
 
     @NonNull
     @CachePut(cacheNames = CACHE_NAME)
-    public KeithUser reloadUser(String discordID) {
-        logger.debug("Reloading user {} from database", discordID);
+    public BasicKeithUser reloadUser(String userId) {
+        logger.debug("Reloading user {} from database", userId);
 
-        List<String> results = database.getStringResult(GET_CANDIDATE_STATEMENT, discordID);
+        List<String> results = database.getStringResult(GET_CANDIDATE_STATEMENT, userId);
 
         if (results.size() > 1) {
-            String[] result = results.get(1).split("\\s+");
+            String[] result = results.get(1).split("\\t");
 
-            logger.trace("User {} already exists", discordID);
+            logger.trace("User {} already exists", userId);
 
-            return new KeithUser(discordID, AccessLevel.getLevel(result[2]), result[1], Long.parseLong(result[3]));
+            return new BasicKeithUser(userId, AccessLevel.getLevel(result[1]), Timestamp.valueOf(result[0]).toInstant(), Long.parseLong(result[2]));
         } else {
-            logger.trace("User {} doesn't exist, creating.", discordID);
+            logger.trace("User {} doesn't exist, creating.", userId);
 
             //user doesn't exist, need to create
-            if (!database.executeUpdate(CREATE_CANDIDATE_STATEMENT, discordID)) {
+            if (!database.executeUpdate(CREATE_CANDIDATE_STATEMENT, userId)) {
                 logger.error("Could not create user in database.");
             }
 
-            logger.debug("User {} created", discordID);
+            logger.debug("User {} created", userId);
 
-            return new KeithUser(discordID, AccessLevel.USER, Instant.now().toString(), 0);
+            return new BasicKeithUser(userId, AccessLevel.USER, Instant.now(), 0);
         }
     }
 

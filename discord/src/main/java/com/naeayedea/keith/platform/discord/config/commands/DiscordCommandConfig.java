@@ -6,6 +6,7 @@ import com.naeayedea.keith.core.i18n.LocalizationRetriever;
 import com.naeayedea.keith.core.i18n.TranslationProvider;
 import com.naeayedea.keith.platform.discord.model.discordCommand.*;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
@@ -53,7 +54,7 @@ public class DiscordCommandConfig {
 
     private CommandData processCommandInformation(CommandInformation commandInformation) throws IOException {
         return unpackCommandInformation(commandInformation)
-            .setGuildOnly(commandInformation.isGuildOnly())
+            .setContexts(commandInformation.isGuildOnly() ? EnumSet.of(InteractionContextType.GUILD) : EnumSet.of(InteractionContextType.GUILD, InteractionContextType.BOT_DM))
             .setNSFW(commandInformation.isNSFW())
             .setDefaultPermissions(processDefaultPermission(commandInformation.getDefaultPermission()))
             .setLocalizationFunction(getLocalizationFunction(commandInformation));

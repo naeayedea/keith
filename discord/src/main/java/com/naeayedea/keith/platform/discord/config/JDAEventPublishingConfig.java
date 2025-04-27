@@ -1,5 +1,6 @@
 package com.naeayedea.keith.platform.discord.config;
 
+import com.naeayedea.keith.core.model.event.KeithEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -21,9 +22,7 @@ public class JDAEventPublishingConfig {
         jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onGenericEvent(@NotNull GenericEvent event) {
-                logger.trace(event.toString());
-
-                publisher.publishEvent(new PayloadApplicationEvent<>(jda, event)); // will get auto converted to PayloadApplicationEvent
+                publisher.publishEvent(new PayloadApplicationEvent<>(jda, new KeithEvent<>(event))); // will get auto converted to PayloadApplicationEvent
             }
         });
     }
