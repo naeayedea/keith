@@ -1,6 +1,6 @@
 package com.naeayedea.keith.platform.discord.listener.guild;
 
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.server.KeithServer;
 import com.naeayedea.keith.platform.discord.listener.AbstractDiscordEventListener;
@@ -22,9 +22,9 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
 
     private final Logger logger = LoggerFactory.getLogger(GuildJoinEventEventListener.class);
 
-    private final ServerManager serverManager;
+    private final KeithServerManager serverManager;
 
-    public GuildJoinEventEventListener(ServerManager serverManager) {
+    public GuildJoinEventEventListener(KeithServerManager serverManager) {
         this.serverManager = serverManager;
     }
 
@@ -32,6 +32,8 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
     @Async
     @Override
     public void onEvent(KeithEvent<GuildJoinEvent> eventSource) {
+        logger.info("event received: {}", eventSource.source());
+
         super.onEvent(eventSource);
     }
 

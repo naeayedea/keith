@@ -7,7 +7,7 @@ import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
 import com.naeayedea.keith.core.util.MultiMap;
-import com.naeayedea.keith.platform.discord.lib.command.interactions.MessageContextCommand;
+import com.naeayedea.keith.platform.discord.command.lib.interactions.MessageContextCommandHandler;
 import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
@@ -29,31 +29,30 @@ import static com.naeayedea.keith.core.i18n.TranslationProvider.MESSAGE_COMMAND_
 @Component
 public class MessageContextInteractionListener extends AbstractSlashCommandEventListener<MessageContextInteractionEvent> {
 
-
     private static final Logger logger = LoggerFactory.getLogger(MessageContextInteractionListener.class);
 
     private final KeithUserManager keithUserManager;
 
-    private final Map<String, MessageContextCommand> commands;
+    private final Map<String, MessageContextCommandHandler> commands;
 
     private final Map<String, String> translationMappings;
 
-    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommand> messageContextCommands, KeithUserManager keithUserManager, TranslationProvider translationProvider) {
+    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommandHandler> messageContextCommandHandlers, KeithUserManager keithUserManager, TranslationProvider translationProvider) {
         this.keithUserManager = keithUserManager;
         this.translationMappings = new HashMap<>();
 
-        Map<String, MessageContextCommand> commandHandlers = new HashMap<>();
+        Map<String, MessageContextCommandHandler> commandHandlers = new HashMap<>();
 
-        logger.info("Loaded {} message context command handlers", messageContextCommands.size());
+        logger.info("Loaded {} message context command handlers", messageContextCommandHandlers.size());
 
-        for (MessageContextCommand command : messageContextCommands) {
-            commandHandlers.put(command.getDefaultName(), command);
+        for (MessageContextCommandHandler command : messageContextCommandHandlers) {
+            commandHandlers.put(command.getInternalName(), command);
         }
 
-        MultiMap<String, MessageContextCommand> commandMultiMap = new MultiMap<>();
+        MultiMap<String, MessageContextCommandHandler> commandMultiMap = new MultiMap<>();
         for (CommandInformation command : commandInformation) {
             if (command.getType().equals(Command.Type.MESSAGE)) {
-                MessageContextCommand handler = commandHandlers.get(command.getName());
+                MessageContextCommandHandler handler = commandHandlers.get(command.getName());
 
                 if (handler != null) {
                     commandMultiMap.put(command.getName(), handler);
@@ -105,7 +104,7 @@ public class MessageContextInteractionListener extends AbstractSlashCommandEvent
 
         logger.info("event name translated to {}", baseEventName);
 
-        MessageContextCommand command = commands.get(baseEventName);
+        MessageContextCommandHandler command = commands.get(baseEventName);
 
         if (command == null) {
             logger.error("No handler configured for event {}", event.getName());

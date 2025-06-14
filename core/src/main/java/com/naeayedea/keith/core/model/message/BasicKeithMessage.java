@@ -1,6 +1,6 @@
 package com.naeayedea.keith.core.model.message;
 
-import com.naeayedea.keith.core.model.server.KeithServer;
+import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
 import com.naeayedea.keith.core.model.user.KeithUser;
 import org.springframework.lang.NonNull;
 
@@ -12,7 +12,7 @@ public class BasicKeithMessage implements KeithMessage {
 
     private final KeithUser author;
 
-    private final KeithServer server;
+    private final KeithMessageChannel channel;
 
     private final String messageContent;
 
@@ -24,18 +24,18 @@ public class BasicKeithMessage implements KeithMessage {
 
     private final KeithMessage repliedTo;
 
-    public BasicKeithMessage(@NonNull KeithUser author, @NonNull KeithServer server, @NonNull String messageContent, @NonNull List<KeithUser> mentionedUsers, @NonNull Instant timestamp) {
+    public BasicKeithMessage(@NonNull KeithUser author, @NonNull KeithMessageChannel channel, @NonNull String messageContent, @NonNull List<KeithUser> mentionedUsers, @NonNull Instant timestamp) {
         this.author = author;
-        this.server = server;
+        this.channel = channel;
         this.messageContent = messageContent;
         this.mentionedUsers = mentionedUsers;
         this.timestamp = timestamp;
         this.repliedTo = null;
     }
 
-    public BasicKeithMessage(@NonNull KeithUser author, @NonNull KeithServer server, @NonNull String messageContent, @NonNull List<KeithUser> mentionedUsers, @NonNull Instant timestamp, KeithMessage repliedTo) {
+    public BasicKeithMessage(@NonNull KeithUser author, @NonNull KeithMessageChannel channel, @NonNull String messageContent, @NonNull List<KeithUser> mentionedUsers, @NonNull Instant timestamp, KeithMessage repliedTo) {
         this.author = author;
-        this.server = server;
+        this.channel = channel;
         this.messageContent = messageContent;
         this.mentionedUsers = mentionedUsers;
         this.timestamp = timestamp;
@@ -49,9 +49,8 @@ public class BasicKeithMessage implements KeithMessage {
     }
 
     @Override
-    @NonNull
-    public KeithServer getServer() {
-        return server;
+    public Optional<KeithMessageChannel> getChannel() {
+        return Optional.of(channel);
     }
 
     @Override

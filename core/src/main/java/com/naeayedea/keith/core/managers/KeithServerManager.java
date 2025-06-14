@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-public class ServerManager {
+public class KeithServerManager {
 
     @Value("${keith.manager.server.statements.getServer}")
     private String GET_SERVER_STATEMENT;
@@ -39,7 +39,7 @@ public class ServerManager {
 
     private final Database database;
 
-    public ServerManager(Database database) {
+    public KeithServerManager(Database database) {
         this.database = database;
     }
 

@@ -1,6 +1,6 @@
-package com.naeayedea.keith.platform.discord.lib.command;
+package com.naeayedea.keith.platform.discord.command.lib;
 
-import com.naeayedea.keith.core.commands.Command;
+import com.naeayedea.keith.core.commands.lib.Command;
 import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Defines an interface for running commands through the MessageReactionAddEvent listener
  */
-public interface ReactionCommand extends Command {
+public interface ReactionCommandHandler extends Command {
 
     /**
      * Returns all reactions that will trigger the given command

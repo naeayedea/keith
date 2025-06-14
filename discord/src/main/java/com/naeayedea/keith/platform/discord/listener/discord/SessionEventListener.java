@@ -1,7 +1,7 @@
 package com.naeayedea.keith.platform.discord.listener.discord;
 
 import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
@@ -17,11 +17,11 @@ public class SessionEventListener {
 
     private final KeithUserManager keithUserManager;
 
-    private final ServerManager serverManager;
+    private final KeithServerManager serverManager;
 
     private final Logger logger = LoggerFactory.getLogger(SessionEventListener.class);
 
-    public SessionEventListener(KeithUserManager keithUserManager, ServerManager serverManager) {
+    public SessionEventListener(KeithUserManager keithUserManager, KeithServerManager serverManager) {
         this.keithUserManager = keithUserManager;
         this.serverManager = serverManager;
     }

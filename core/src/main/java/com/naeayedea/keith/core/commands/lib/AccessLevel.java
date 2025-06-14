@@ -1,4 +1,4 @@
-package com.naeayedea.keith.core.commands;
+package com.naeayedea.keith.core.commands.lib;
 
 public enum AccessLevel {
 
@@ -9,9 +9,11 @@ public enum AccessLevel {
     //Users that haven't been banned
     USER(1),
     //Commands with ALL access level can be used by anyone, even banned users
-    ALL(0);
+    BANNED(0);
 
     public final int num;
+
+    public static final AccessLevel MAX_LEVEL = OWNER;
 
     AccessLevel(int num) {
         this.num = num;
@@ -19,7 +21,7 @@ public enum AccessLevel {
 
     public static AccessLevel getLevel(String num) {
         return switch (num) {
-            case "0" -> ALL;
+            case "0" -> BANNED;
             case "2" -> ADMIN;
             case "3" -> OWNER;
             default -> USER;
@@ -34,4 +36,9 @@ public enum AccessLevel {
             default -> "User";
         };
     }
+
+    public boolean isSameOrLowerPermissionLevel(AccessLevel level) {
+        return this.num <= level.num;
+    }
+
 }

@@ -3,9 +3,9 @@ package com.naeayedea.keith.platform.discord.listener.interaction;
 import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
-import com.naeayedea.keith.platform.discord.lib.command.StringSelectInteractionHandler;
+import com.naeayedea.keith.platform.discord.command.lib.StringSelectInteractionHandler;
 import com.naeayedea.keith.core.exception.KeithExecutionException;
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.core.util.MultiMap;
 import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,9 +31,9 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
     @Value("${keith.default-prefix}")
     private String DEFAULT_PREFIX;
 
-    private final ServerManager serverManager;
+    private final KeithServerManager serverManager;
 
-    public StringSelectInteractionListener(List<? extends StringSelectInteractionHandler> handlers, ServerManager serverManager, KeithUserManager keithUserManager) {
+    public StringSelectInteractionListener(List<? extends StringSelectInteractionHandler> handlers, KeithServerManager serverManager, KeithUserManager keithUserManager) {
         MultiMap<String, StringSelectInteractionHandler> handlerMap = new MultiMap<>();
 
         for (StringSelectInteractionHandler handler : handlers) {

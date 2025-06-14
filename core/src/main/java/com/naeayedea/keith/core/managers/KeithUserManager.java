@@ -1,6 +1,6 @@
 package com.naeayedea.keith.core.managers;
 
-import com.naeayedea.keith.core.commands.AccessLevel;
+import com.naeayedea.keith.core.commands.lib.AccessLevel;
 import com.naeayedea.keith.core.managers.cache.KeithUserCache;
 import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import org.slf4j.Logger;

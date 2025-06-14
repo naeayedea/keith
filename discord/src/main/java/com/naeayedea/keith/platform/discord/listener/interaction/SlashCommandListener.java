@@ -2,7 +2,7 @@ package com.naeayedea.keith.platform.discord.listener.interaction;
 
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
-import com.naeayedea.keith.platform.discord.lib.command.interactions.SlashCommand;
+import com.naeayedea.keith.platform.discord.command.lib.interactions.SlashCommandHandler;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
 import com.naeayedea.keith.core.managers.KeithUserManager;
@@ -28,23 +28,23 @@ public class SlashCommandListener extends AbstractSlashCommandEventListener<Slas
 
     private final KeithUserManager keithUserManager;
 
-    private final Map<String, SlashCommand> commands;
+    private final Map<String, SlashCommandHandler> commands;
 
-    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommand> slashCommands, KeithUserManager keithUserManager) {
+    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommandHandler> slashCommandHandlers, KeithUserManager keithUserManager) {
         this.keithUserManager = keithUserManager;
-        Map<String, SlashCommand> commandHandlers = new HashMap<>();
+        Map<String, SlashCommandHandler> commandHandlers = new HashMap<>();
 
-        logger.info("Loaded {} slash commands handlers", slashCommands.size());
+        logger.info("Loaded {} slash commands handlers", slashCommandHandlers.size());
 
-        for (SlashCommand command : slashCommands) {
-            commandHandlers.put(command.getDefaultName(), command);
+        for (SlashCommandHandler command : slashCommandHandlers) {
+            commandHandlers.put(command.getInternalName(), command);
         }
 
-        MultiMap<String, SlashCommand> commandMultiMap = new MultiMap<>();
+        MultiMap<String, SlashCommandHandler> commandMultiMap = new MultiMap<>();
 
         for (CommandInformation command : commandInformation) {
             if (command.getType().equals(Command.Type.SLASH)) {
-                SlashCommand handler = commandHandlers.get(command.getName());
+                SlashCommandHandler handler = commandHandlers.get(command.getName());
 
                 if (handler != null) {
                     commandMultiMap.put(command.getName(), handler);
@@ -68,7 +68,7 @@ public class SlashCommandListener extends AbstractSlashCommandEventListener<Slas
 
     @Override
     public void onPermitted(SlashCommandInteractionEvent event) throws Exception {
-        SlashCommand command = commands.get(event.getName());
+        SlashCommandHandler command = commands.get(event.getName());
 
         if (command != null) {
             if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {

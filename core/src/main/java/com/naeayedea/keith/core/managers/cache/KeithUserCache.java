@@ -1,8 +1,9 @@
 package com.naeayedea.keith.core.managers.cache;
 
-import com.naeayedea.keith.core.commands.AccessLevel;
+import com.naeayedea.keith.core.commands.lib.AccessLevel;
 import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import com.naeayedea.keith.core.util.Database;
+import com.naeayedea.keith.core.util.KeithConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class KeithUserCache {
@@ -55,7 +57,6 @@ public class KeithUserCache {
         }
 
         return reloadUser(userId);
-
     }
 
     @NonNull
@@ -81,7 +82,7 @@ public class KeithUserCache {
 
             logger.trace("User {} already exists", userId);
 
-            return new BasicKeithUser(userId, AccessLevel.getLevel(result[1]), Timestamp.valueOf(result[0]).toInstant(), Long.parseLong(result[2]));
+            return new BasicKeithUser(userId, AccessLevel.getLevel(result[1]), Timestamp.valueOf(result[0]).toInstant(), Long.parseLong(result[2]), Locale.of(result[3]));
         } else {
             logger.trace("User {} doesn't exist, creating.", userId);
 
@@ -92,7 +93,7 @@ public class KeithUserCache {
 
             logger.debug("User {} created", userId);
 
-            return new BasicKeithUser(userId, AccessLevel.USER, Instant.now(), 0);
+            return new BasicKeithUser(userId, AccessLevel.USER, Instant.now(), 0, KeithConstants.DEFAULT_LOCALE);
         }
     }
 

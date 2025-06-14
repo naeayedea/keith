@@ -2,8 +2,10 @@ package com.naeayedea.keith.platform.discord.config.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naeayedea.keith.core.commands.lib.AccessLevel;
 import com.naeayedea.keith.core.i18n.LocalizationRetriever;
 import com.naeayedea.keith.core.i18n.TranslationProvider;
+import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import com.naeayedea.keith.platform.discord.model.discordCommand.*;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
@@ -30,6 +32,11 @@ public class DiscordCommandConfig {
     
     public DiscordCommandConfig(TranslationProvider translationProvider) {
         this.translationProvider = translationProvider;
+    }
+
+    @Bean
+    public List<TextCommandHandler> userTextCommandHandlers(List<TextCommandHandler> textCommandHandlers) {
+        return textCommandHandlers.stream().filter(handler -> handler.getAccessLevel().isSameOrLowerPermissionLevel(AccessLevel.USER)).toList();
     }
 
     @Bean("slash-command-data-list")

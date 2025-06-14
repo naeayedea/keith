@@ -1,8 +1,9 @@
 package com.naeayedea.keith.core.model.user;
 
-import com.naeayedea.keith.core.commands.AccessLevel;
+import com.naeayedea.keith.core.commands.lib.AccessLevel;
 
 import java.time.Instant;
+import java.util.Locale;
 
 public class BasicKeithUser implements KeithUser {
 
@@ -14,11 +15,14 @@ public class BasicKeithUser implements KeithUser {
 
     private final long commandCount;
 
-    public BasicKeithUser(String userId, AccessLevel accessLevel, Instant firstSeen, long commandCount) {
+    private final Locale locale;
+
+    public BasicKeithUser(String userId, AccessLevel accessLevel, Instant firstSeen, long commandCount, Locale locale) {
         this.userId = userId;
         this.accessLevel = accessLevel;
         this.firstSeen = firstSeen;
         this.commandCount = commandCount;
+        this.locale = locale;
     }
 
     public Instant getFirstSeen() {
@@ -34,11 +38,16 @@ public class BasicKeithUser implements KeithUser {
     }
 
     public boolean isBanned() {
-        return accessLevel == AccessLevel.ALL;
+        return accessLevel == AccessLevel.BANNED;
     }
 
     public long getCommandCount() {
         return commandCount;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return locale;
     }
 
     public boolean hasPermission(AccessLevel commandLevel) {

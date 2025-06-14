@@ -1,7 +1,6 @@
 package com.naeayedea.keith.core.model.message;
 
-
-import com.naeayedea.keith.core.model.server.KeithServer;
+import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
 import com.naeayedea.keith.core.model.user.KeithUser;
 
 import java.time.Instant;
@@ -12,7 +11,7 @@ public interface KeithMessage {
 
     KeithUser getAuthor();
 
-    KeithServer getServer();
+    Optional<KeithMessageChannel> getChannel();
 
     String getMessageAsContent();
 

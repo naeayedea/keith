@@ -1,15 +1,14 @@
 package com.naeayedea.keith.platform.discord.utils;
 
-import com.naeayedea.keith.platform.discord.lib.command.TextCommand;
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.i18n.TranslationProvider;
 import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.GuildMessageChannelUnion;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -18,7 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -171,11 +170,26 @@ public class Utilities {
         return "";
     }
 
-    public static void populateCommandMap(MultiMap<String, TextCommand> commandMap, List<? extends TextCommand> commands, List<String> exclusions) {
-        for (TextCommand command : commands) {
-            if (!exclusions.contains(command.getDefaultName())) {
-                commandMap.putAll(command.getAliases(), command);
+    public static void populateCommandMap(Map<Locale, MultiMap<String, TextCommandHandler>> localeToAliasMap, List<? extends TextCommandHandler> commands, List<String> exclusions, TranslationProvider translationProvider) {
+        for (DiscordLocale discordLocale : DiscordLocale.values()) {
+            //for every locale in discord
+            Locale locale = discordLocale.toLocale();
+
+            MultiMap<String, TextCommandHandler> commandMap = new MultiMap<>();
+
+            //for every command we know of
+            for (TextCommandHandler command : commands) {
+                if (!exclusions.contains(command.getInternalName())) {
+                    //add the aliases
+                    commandMap.putAll(Arrays.stream(translationProvider.getTranslation(command.getAliasTranslationKey(), locale).toLowerCase(locale).split(",")).toList(), command);
+
+                    //then add the base name
+                    commandMap.put(translationProvider.getTranslation(command.getNameTranslationKey(), locale).toLowerCase(locale), command);
+                }
             }
+
+            //add the aliases to the locale
+            localeToAliasMap.put(locale, commandMap);
         }
     }
 

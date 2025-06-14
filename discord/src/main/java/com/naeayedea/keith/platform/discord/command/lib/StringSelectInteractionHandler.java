@@ -1,4 +1,4 @@
-package com.naeayedea.keith.platform.discord.lib.command;
+package com.naeayedea.keith.platform.discord.command.lib;
 
 import com.naeayedea.keith.core.exception.KeithExecutionException;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;

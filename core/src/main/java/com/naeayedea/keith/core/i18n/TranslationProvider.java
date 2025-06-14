@@ -31,6 +31,6 @@ public class TranslationProvider {
     }
 
     public String getTranslationKey(String prefix, String name, String target) {
-        return "translation.i18n." + (prefix.isEmpty() ? "" : prefix + ".") + name + "." + target;
+        return "translation.i18n.commands." + (prefix.isEmpty() ? "" : prefix + ".") + name + "." + target;
     }
 }

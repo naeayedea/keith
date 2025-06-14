@@ -35,8 +35,7 @@ public class JDAConfig {
 
         return new DiscordConfiguration(
             token,
-            dataSource
-            ,
+            dataSource,
             args.length > 2 ? args[0] : "",
             args.length > 2 ? args[1] : ""
         );
@@ -47,7 +46,7 @@ public class JDAConfig {
         logger.info("Initialising JPA");
 
         JDABuilder builder = JDABuilder.create(discordConfiguration.getToken(),
-            GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+            GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_EXPRESSIONS,
             GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES,
             GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
             GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS,

@@ -3,16 +3,19 @@ package com.naeayedea.keith.platform.discord.listener.message;
 import com.naeayedea.keith.core.exception.KeithExecutionException;
 import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.core.i18n.TranslationProvider;
 import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.server.KeithServer;
 import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import com.naeayedea.keith.core.model.user.KeithUser;
 import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.core.util.KeithConstants;
 import com.naeayedea.keith.core.util.MultiMap;
-import com.naeayedea.keith.platform.discord.lib.command.TextCommand;
+import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
+import com.naeayedea.keith.platform.discord.utils.Utilities;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -29,10 +32,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -44,34 +46,42 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
     @Value("${keith.default-prefix}")
     private String DEFAULT_PREFIX;
 
-    private MultiMap<String, TextCommand> commands;
+    private Map<Locale, MultiMap<String, TextCommandHandler>> localeToAliasMap;
 
     private final ExecutorService commandService;
 
     private final KeithUserManager keithUserManager;
 
-    private final ServerManager serverManager;
+    private final KeithServerManager serverManager;
 
     private final CommandRateLimiter rateLimiter;
 
-    private final List<TextCommand> textCommands;
+    private final List<TextCommandHandler> textCommandHandlers;
 
-    public MessageReceivedEventListener(@Qualifier("messageService") ExecutorService messageService, @Qualifier("commandService") ExecutorService commandService, KeithUserManager keithUserManager, ServerManager serverManager, CommandRateLimiter rateLimiter) {
+    private final TranslationProvider translationProvider;
+
+    public MessageReceivedEventListener(@Qualifier("commandService") ExecutorService commandService, KeithUserManager keithUserManager, KeithServerManager serverManager, CommandRateLimiter rateLimiter, @Qualifier("userTextCommandHandlers") List<TextCommandHandler> textCommandHandlers, TranslationProvider translationProvider) {
         this.keithUserManager = keithUserManager;
         this.serverManager = serverManager;
         this.commandService = commandService;
         this.rateLimiter = rateLimiter;
 
-        this.textCommands = new ArrayList<>();
+        this.textCommandHandlers = textCommandHandlers;
+
+        this.translationProvider = translationProvider;
     }
 
     @PostConstruct
     private void initialiseCommands() {
         logger.info("Initializing base command map.");
 
-        commands = new MultiMap<>();
+        localeToAliasMap = new HashMap<>();
 
-        logger.info("Loaded {} base message command aliases", commands.size());
+        Utilities.populateCommandMap(localeToAliasMap, textCommandHandlers, List.of(), translationProvider);
+
+        System.out.println(localeToAliasMap);
+
+        logger.info("Loaded {} base message command aliases", localeToAliasMap.get(KeithConstants.DEFAULT_LOCALE).size());
     }
 
     private String getPrefix(MessageReceivedEvent event) {
@@ -87,9 +97,19 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         return message.length() > prefix.length() && message.toLowerCase().startsWith(prefix);
     }
 
-    private TextCommand findCommand(List<String> list) {
+    private TextCommandHandler findCommand(List<String> list, Locale locale) {
         String commandString = list.removeFirst().toLowerCase();
-        return commands.get(commandString);
+
+        System.out.println(locale.getLanguage());
+        System.out.println("Available locals: "+ localeToAliasMap.keySet());
+
+        //if locale in map, return the translations
+        if (localeToAliasMap.containsKey(locale)) {
+            return localeToAliasMap.get(locale).get(commandString);
+        }
+
+        //otherwise use default
+        return localeToAliasMap.get(KeithConstants.DEFAULT_LOCALE).get(commandString);
     }
 
     @EventListener
@@ -131,7 +151,11 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
         List<String> tokens = new ArrayList<>(Arrays.asList(event.getMessage().getContentRaw().substring(prefix.length()).trim().split("\\s+")));
 
-        TextCommand command = findCommand(tokens);
+        TextCommandHandler command = findCommand(tokens, keithUser.getLocale());
+
+        if (command == null) {
+            return false;
+        }
 
         if (permissionsNotMet(event, keithUser, command)) {
             return false;
@@ -163,16 +187,12 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         //Need to wrap the stringList in an arrayList as stringList does not support removal of indices
         List<String> tokens = new ArrayList<>(Arrays.asList(event.getMessage().getContentRaw().substring(prefix.length()).trim().split("\\s+")));
 
-        TextCommand command = findCommand(tokens);
+        TextCommandHandler command = findCommand(tokens, keithUser.getLocale());
 
-        logger.trace("Found command: {}", command.getDefaultName());
+        logger.trace("Found command: {}", command.getInternalName());
 
         //all checks passed, execute command
         Runnable execution = () -> {
-            if (command.sendTyping()) {
-                channel.sendTyping().complete();
-            }
-
             try {
                 command.run(event, tokens);
             } catch (KeithPermissionException e) {
@@ -199,16 +219,26 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         //increment the rate limit before proceeding, if the command fails we don't want the user to be able to spam
         rateLimiter.incrementOrInsertRecord(keithUser.getId(), command.getCost());
 
-        commandService.submit(execution).get(command.getTimeOut(), TimeUnit.SECONDS);
+        Future<?> commandFuture =  commandService.submit(execution);
+
+        try {
+            commandFuture.get(2, TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException e) {
+            //interrupt the task
+            commandFuture.cancel(true);
+
+            //rethrow so we can handle higher up
+            throw new TimeoutException();
+        }
     }
 
-    private boolean privateMessageCompatible(MessageReceivedEvent event, TextCommand command, MessageChannel channel, BasicKeithUser keithUser) {
+    private boolean privateMessageCompatible(MessageReceivedEvent event, TextCommandHandler command, MessageChannel channel, BasicKeithUser keithUser) {
         if (!command.isPrivateMessageCompatible()) {
             //consider this a command, albeit a small penalty
             rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
 
             event.getMessage()
-                .reply(command.getDefaultName() + " cannot be used in private message!")
+                .reply(command.getInternalName() + " cannot be used in private message!")
                 .queue();
 
             return false;
@@ -217,9 +247,9 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         return true;
     }
 
-    private boolean permissionsNotMet(MessageReceivedEvent event, BasicKeithUser keithUser, TextCommand command) {
+    private boolean permissionsNotMet(MessageReceivedEvent event, BasicKeithUser keithUser, TextCommandHandler command) {
         if (!keithUser.hasPermission(command.getAccessLevel())) {
-            logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getDefaultName());
+            logger.trace("User {} does not have permission to use command {}", keithUser.getId(), command.getInternalName());
 
             //consider this a command, albeit a small penalty
             rateLimiter.incrementOrInsertRecord(keithUser.getId(), 1);
@@ -275,7 +305,7 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
                 .reply("Invalid Arguments")
                 .queue();
             case TimeoutException timeoutException -> event.getMessage()
-                .reply("\"Execution of command took too long.")
+                .reply("Execution of command took too long.")
                 .queue();
             case KeithPermissionException keithPermissionException -> event.getMessage()
                 .reply("You do not have access to this command.")

@@ -2,10 +2,10 @@ package com.naeayedea.keith.platform.discord.listener.message;
 
 import com.naeayedea.keith.core.model.event.KeithEvent;
 import com.naeayedea.keith.core.model.user.KeithUser;
-import com.naeayedea.keith.platform.discord.lib.command.ReactionCommand;
+import com.naeayedea.keith.platform.discord.command.lib.ReactionCommandHandler;
 import com.naeayedea.keith.core.exception.KeithException;
 import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.ServerManager;
+import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.core.model.user.BasicKeithUser;
 import com.naeayedea.keith.core.model.server.BasicKeithServer;
 import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
@@ -35,17 +35,17 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
 
     private final Logger logger = LoggerFactory.getLogger(MessageReactionAddEventListener.class);
 
-    private MultiMap<String, ReactionCommand> reactionCommands;
+    private MultiMap<String, ReactionCommandHandler> reactionCommands;
 
-    private final ServerManager serverManager;
+    private final KeithServerManager serverManager;
 
     private final KeithUserManager keithUserManager;
 
     private final CommandRateLimiter rateLimiter;
 
-    private final List<ReactionCommand> reactionCommandHandlers;
+    private final List<ReactionCommandHandler> reactionCommandHandlers;
 
-    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, ServerManager serverManager, KeithUserManager keithUserManager, CommandRateLimiter rateLimiter, List<ReactionCommand> reactionCommandHandlers) {
+    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, KeithServerManager serverManager, KeithUserManager keithUserManager, CommandRateLimiter rateLimiter, List<ReactionCommandHandler> reactionCommandHandlers) {
         this.serverManager = serverManager;
         this.keithUserManager = keithUserManager;
         this.rateLimiter = rateLimiter;
@@ -56,7 +56,7 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
     private void init() {
         this.reactionCommands = new MultiMap<>();
 
-        for (ReactionCommand command : reactionCommandHandlers) {
+        for (ReactionCommandHandler command : reactionCommandHandlers) {
             reactionCommands.putAll(command.getReactionTriggers().stream().map(Emoji::getAsReactionCode).toList(), command);
         }
 
@@ -82,7 +82,7 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
     }
 
     @Override
-    public void onPermitted(MessageReactionAddEvent event) throws Exception {
+    public void onPermitted(MessageReactionAddEvent event) {
         Emoji emote = event.getReaction().getEmoji();
 
         Member member = event.getMember();
@@ -97,7 +97,7 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
         //retrieve the message which is being reacted to and the reaction itself
         Message message = channel.retrieveMessageById(event.getMessageId()).complete();
 
-        ReactionCommand command = reactionCommands.get(emote.getAsReactionCode());
+        ReactionCommandHandler command = reactionCommands.get(emote.getAsReactionCode());
 
         //ensure that this emoji has a corresponding command
         if (command == null) {

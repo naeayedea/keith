@@ -1,9 +1,13 @@
 package com.naeayedea.keith.core.model.server;
 
 
+import com.naeayedea.keith.core.model.channel.KeithChannel;
+import com.naeayedea.keith.core.model.message.KeithMessage;
+import com.naeayedea.keith.core.model.user.KeithUser;
 import org.springframework.lang.NonNull;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public class BasicKeithServer implements KeithServer {
@@ -59,5 +63,17 @@ public class BasicKeithServer implements KeithServer {
     @NonNull
     public Optional<String> getPinChannelId() {
         return pinChannelId != null ? Optional.of(pinChannelId) : Optional.empty();
+    }
+
+    @Override
+    @NonNull
+    public List<KeithChannel> getChannels() {
+        return List.of();
+    }
+
+    @Override
+    @NonNull
+    public List<KeithUser> getUsers() {
+        return List.of();
     }
 }

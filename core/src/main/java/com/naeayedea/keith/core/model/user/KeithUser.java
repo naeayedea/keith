@@ -1,8 +1,9 @@
 package com.naeayedea.keith.core.model.user;
 
-import com.naeayedea.keith.core.commands.AccessLevel;
+import com.naeayedea.keith.core.commands.lib.AccessLevel;
 
 import java.time.Instant;
+import java.util.Locale;
 
 public interface KeithUser {
 
@@ -15,6 +16,8 @@ public interface KeithUser {
     boolean isBanned();
 
     long getCommandCount();
+
+    Locale getLocale();
 
     boolean hasPermission(AccessLevel commandLevel);
 
