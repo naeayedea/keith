@@ -1,9 +1,9 @@
 package com.naeayedea.keith.core.managers.cache;
 
-import com.naeayedea.keith.core.commands.lib.AccessLevel;
-import com.naeayedea.keith.core.model.user.BasicKeithUser;
-import com.naeayedea.keith.core.util.Database;
-import com.naeayedea.keith.core.util.KeithConstants;
+import com.naeayedea.keith.common.model.user.AccessLevel;
+import com.naeayedea.keith.common.model.user.BasicKeithUser;
+import com.naeayedea.keith.common.util.Database;
+import com.naeayedea.keith.common.util.KeithConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

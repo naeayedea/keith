@@ -1,12 +1,12 @@
 package com.naeayedea.keith.platform.discord.command.general.ping;
 
 import com.naeayedea.keith.core.commands.drivers.general.ping.PingCommand;
-import com.naeayedea.keith.core.commands.lib.input.TextCommandInput;
-import com.naeayedea.keith.core.commands.lib.output.basic.TextCommandOutput;
-import com.naeayedea.keith.core.exception.KeithExecutionException;
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
-import com.naeayedea.keith.core.i18n.TranslationProvider;
+import com.naeayedea.keith.common.model.command.input.TextCommandInput;
+import com.naeayedea.keith.common.model.command.output.basic.TextCommandOutput;
+import com.naeayedea.keith.common.exception.KeithExecutionException;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
+import com.naeayedea.keith.common.i18n.TranslationProvider;
 import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import com.naeayedea.keith.platform.discord.command.lib.input.transformer.DiscordTextInputTransformer;
 import com.naeayedea.keith.platform.discord.command.lib.interactions.SlashCommandHandler;

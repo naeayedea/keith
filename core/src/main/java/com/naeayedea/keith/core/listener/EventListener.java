@@ -1,6 +1,6 @@
 package com.naeayedea.keith.core.listener;
 
-import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.event.KeithEvent;
 
 /**
  * Used to implement event listeners in Spring, it is expected that the implementing class

@@ -1,11 +1,14 @@
-
 plugins {
+    id 'application'
+}
 
+application {
+    mainClassName = 'com.naeayedea.keith.core.Launcher'
 }
 
 group = 'com.naeayedea.keith.core'
 version = '4.0.0-alpha'
 
 dependencies {
-
+    implementation project(':common')
 }

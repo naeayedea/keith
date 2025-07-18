@@ -2,9 +2,9 @@ package com.naeayedea.keith.platform.discord.config.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naeayedea.keith.core.commands.lib.AccessLevel;
-import com.naeayedea.keith.core.i18n.LocalizationRetriever;
-import com.naeayedea.keith.core.i18n.TranslationProvider;
+import com.naeayedea.keith.common.model.user.AccessLevel;
+import com.naeayedea.keith.common.i18n.LocalizationRetriever;
+import com.naeayedea.keith.common.i18n.TranslationProvider;
 import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import com.naeayedea.keith.platform.discord.model.discordCommand.*;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
@@ -22,12 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.naeayedea.keith.core.i18n.TranslationProvider.*;
+import static com.naeayedea.keith.common.i18n.TranslationProvider.*;
 
 @Configuration
 public class DiscordCommandConfig {
-
-
+    
     private final TranslationProvider translationProvider;
     
     public DiscordCommandConfig(TranslationProvider translationProvider) {

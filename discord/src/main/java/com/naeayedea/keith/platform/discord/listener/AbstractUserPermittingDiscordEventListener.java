@@ -1,6 +1,6 @@
 package com.naeayedea.keith.platform.discord.listener;
 
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.user.KeithUser;
 import net.dv8tion.jda.api.events.Event;
 
 public abstract class AbstractUserPermittingDiscordEventListener<T extends Event> extends AbstractDiscordEventListener<T> {

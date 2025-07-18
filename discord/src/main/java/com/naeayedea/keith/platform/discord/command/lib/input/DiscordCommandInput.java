@@ -1,9 +1,8 @@
 package com.naeayedea.keith.platform.discord.command.lib.input;
 
-import com.naeayedea.keith.core.commands.lib.input.CommandInput;
-import com.naeayedea.keith.core.model.channel.KeithChannel;
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.command.input.CommandInput;
+import com.naeayedea.keith.common.model.channel.KeithChannel;
+import com.naeayedea.keith.common.model.user.KeithUser;
 
 import java.time.Instant;
 import java.util.Locale;

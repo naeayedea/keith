@@ -1,6 +1,6 @@
 package com.naeayedea.keith.platform.discord.listener.guild;
 
-import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.event.KeithEvent;
 import com.naeayedea.keith.platform.discord.listener.AbstractDiscordEventListener;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;

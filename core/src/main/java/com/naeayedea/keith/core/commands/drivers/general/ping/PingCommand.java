@@ -1,14 +1,14 @@
 package com.naeayedea.keith.core.commands.drivers.general.ping;
 
+import com.naeayedea.keith.common.i18n.TranslationProvider;
 import com.naeayedea.keith.core.commands.lib.AbstractChannelCommand;
-import com.naeayedea.keith.core.commands.lib.AccessLevel;
-import com.naeayedea.keith.core.commands.lib.input.TextCommandInput;
-import com.naeayedea.keith.core.commands.lib.output.basic.SimpleTextCommandOutput;
-import com.naeayedea.keith.core.commands.lib.output.basic.TextCommandOutput;
-import com.naeayedea.keith.core.exception.KeithExecutionException;
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
-import com.naeayedea.keith.core.i18n.TranslationProvider;
+import com.naeayedea.keith.common.model.user.AccessLevel;
+import com.naeayedea.keith.common.model.command.input.TextCommandInput;
+import com.naeayedea.keith.common.model.command.output.basic.SimpleTextCommandOutput;
+import com.naeayedea.keith.common.model.command.output.basic.TextCommandOutput;
+import com.naeayedea.keith.common.exception.KeithExecutionException;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
 import org.springframework.lang.NonNull;
 
 import java.time.Duration;

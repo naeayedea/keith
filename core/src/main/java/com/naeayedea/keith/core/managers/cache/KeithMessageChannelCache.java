@@ -1,9 +1,7 @@
 package com.naeayedea.keith.core.managers.cache;
 
-import com.naeayedea.keith.core.model.channel.KeithChannel;
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.message.KeithMessage;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.channel.KeithChannel;
+import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

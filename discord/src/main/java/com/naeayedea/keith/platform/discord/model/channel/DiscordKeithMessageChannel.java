@@ -1,8 +1,8 @@
 package com.naeayedea.keith.platform.discord.model.channel;
 
 
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.message.KeithMessage;
+import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
+import com.naeayedea.keith.common.model.message.KeithMessage;
 import com.naeayedea.keith.platform.discord.utils.KeithDiscordConstants;
 import com.naeayedea.keith.platform.discord.model.DiscordModelConverter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;

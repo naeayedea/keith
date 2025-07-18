@@ -1,8 +1,8 @@
 package com.naeayedea.keith.platform.discord.model.message;
 
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.message.KeithMessage;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
+import com.naeayedea.keith.common.model.message.KeithMessage;
+import com.naeayedea.keith.common.model.user.KeithUser;
 import net.dv8tion.jda.api.entities.Message;
 import org.springframework.lang.NonNull;
 

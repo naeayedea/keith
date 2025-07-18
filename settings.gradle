@@ -1,4 +1,5 @@
 rootProject.name = 'keith'
 
+include 'common'
 include 'core'
 include 'discord'

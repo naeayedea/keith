@@ -1,7 +1,7 @@
 package com.naeayedea.keith.core.managers;
 
-import com.naeayedea.keith.core.model.server.BasicKeithServer;
-import com.naeayedea.keith.core.util.Database;
+import com.naeayedea.keith.common.model.server.BasicKeithServer;
+import com.naeayedea.keith.common.util.Database;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;

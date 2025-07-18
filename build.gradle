@@ -25,11 +25,11 @@ subprojects {
 
     dependencies {
         //spring
-        implementation ("org.springframework.boot:spring-boot-starter")
+        implementation "org.springframework.boot:spring-boot-starter"
         //spring cache support
-        implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.2'
+        implementation "org.springframework.boot:spring-boot-starter-cache:3.3.2"
         //additional cache support such as caffeine cache
-        implementation 'org.springframework:spring-context-support:6.1.14'
+        implementation "org.springframework:spring-context-support:6.1.14"
 
         //replace logback with log4j2
         implementation "org.springframework.boot:spring-boot-starter-log4j2"
@@ -40,7 +40,7 @@ subprojects {
         //database
         implementation "org.mariadb.jdbc:mariadb-java-client:3.4.1"
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.2'
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:5.11.2"
     }
 
     test {

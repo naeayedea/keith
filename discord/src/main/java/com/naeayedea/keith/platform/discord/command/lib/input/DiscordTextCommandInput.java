@@ -1,10 +1,10 @@
 package com.naeayedea.keith.platform.discord.command.lib.input;
 
-import com.naeayedea.keith.core.commands.lib.input.TextCommandInput;
-import com.naeayedea.keith.core.model.channel.KeithChannel;
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.message.KeithMessage;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.command.input.TextCommandInput;
+import com.naeayedea.keith.common.model.channel.KeithChannel;
+import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
+import com.naeayedea.keith.common.model.message.KeithMessage;
+import com.naeayedea.keith.common.model.user.KeithUser;
 import org.springframework.lang.NonNull;
 
 import java.time.Instant;

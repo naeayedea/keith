@@ -1,12 +1,12 @@
 package com.naeayedea.keith.platform.discord.listener.interaction;
 
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
-import com.naeayedea.keith.core.i18n.TranslationProvider;
+import com.naeayedea.keith.common.i18n.TranslationProvider;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
 import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.model.event.KeithEvent;
-import com.naeayedea.keith.core.model.user.KeithUser;
-import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.common.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.user.KeithUser;
+import com.naeayedea.keith.common.util.MultiMap;
 import com.naeayedea.keith.platform.discord.command.lib.interactions.MessageContextCommandHandler;
 import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
 import net.dv8tion.jda.api.entities.User;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.naeayedea.keith.core.i18n.TranslationProvider.MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX;
+import static com.naeayedea.keith.common.i18n.TranslationProvider.MESSAGE_COMMAND_DESCRIPTION_TRANSLATION_SUFFIX;
 
 @Component
 public class MessageContextInteractionListener extends AbstractSlashCommandEventListener<MessageContextInteractionEvent> {

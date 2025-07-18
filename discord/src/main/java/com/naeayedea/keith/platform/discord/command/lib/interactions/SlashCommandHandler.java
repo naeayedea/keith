@@ -1,8 +1,8 @@
 package com.naeayedea.keith.platform.discord.command.lib.interactions;
 
-import com.naeayedea.keith.core.exception.KeithExecutionException;
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.common.exception.KeithExecutionException;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
 import com.naeayedea.keith.platform.discord.command.lib.CommandHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.springframework.lang.NonNull;

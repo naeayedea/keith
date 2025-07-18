@@ -1,6 +1,6 @@
 package com.naeayedea.keith.platform.discord.command.lib;
 
-import com.naeayedea.keith.core.exception.KeithExecutionException;
+import com.naeayedea.keith.common.exception.KeithExecutionException;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 

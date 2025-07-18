@@ -1,9 +1,9 @@
 package com.naeayedea.keith.platform.discord.command.lib;
 
 import com.naeayedea.keith.core.commands.lib.Command;
-import com.naeayedea.keith.core.exception.KeithExecutionException;
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.common.exception.KeithExecutionException;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;

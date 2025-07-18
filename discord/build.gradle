@@ -28,6 +28,7 @@ processResources {
 
 dependencies {
     //keith core
+    implementation project(':common')
     implementation project(':core')
 
     //discord related

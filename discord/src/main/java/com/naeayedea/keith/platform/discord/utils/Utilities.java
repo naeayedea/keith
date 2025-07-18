@@ -1,7 +1,7 @@
 package com.naeayedea.keith.platform.discord.utils;
 
-import com.naeayedea.keith.core.i18n.TranslationProvider;
-import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.common.i18n.TranslationProvider;
+import com.naeayedea.keith.common.util.MultiMap;
 import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;

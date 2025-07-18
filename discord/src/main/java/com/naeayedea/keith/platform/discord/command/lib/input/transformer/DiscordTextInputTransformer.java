@@ -1,12 +1,13 @@
 package com.naeayedea.keith.platform.discord.command.lib.input.transformer;
 
+import com.naeayedea.keith.common.model.command.input.TextOptionsCommandInput;
 import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.core.managers.cache.KeithMessageChannelCache;
-import com.naeayedea.keith.core.model.channel.KeithMessageChannel;
-import com.naeayedea.keith.core.model.message.BasicKeithMessage;
-import com.naeayedea.keith.core.model.message.KeithMessage;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
+import com.naeayedea.keith.common.model.message.BasicKeithMessage;
+import com.naeayedea.keith.common.model.message.KeithMessage;
+import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.utils.KeithDiscordConstants;
 import com.naeayedea.keith.platform.discord.command.lib.input.DiscordTextCommandInput;
 import com.naeayedea.keith.platform.discord.model.DiscordModelConverter;
@@ -50,7 +51,7 @@ public class DiscordTextInputTransformer {
      * Converts a slash command interaction event into a text input by flattening the options into a single string.
      * Only recommended for use when you only have a single option as there's no guarantee of the ordering of inputs.
      * <br/><br/>
-     * See {@link com.naeayedea.keith.core.commands.lib.input.TextOptionsCommandInput TextOptionsCommandInput} for a map of options
+     * See {@link TextOptionsCommandInput TextOptionsCommandInput} for a map of options
      * @param event the {@link SlashCommandInteractionEvent} to unpack
      *
      * @return a flattened representation of the command inputs, ignoring the keys

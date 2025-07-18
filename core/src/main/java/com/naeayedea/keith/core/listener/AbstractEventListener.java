@@ -1,6 +1,6 @@
 package com.naeayedea.keith.core.listener;
 
-import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.event.KeithEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

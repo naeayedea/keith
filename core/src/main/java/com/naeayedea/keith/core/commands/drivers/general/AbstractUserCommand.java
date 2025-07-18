@@ -1,9 +1,9 @@
 package com.naeayedea.keith.core.commands.drivers.general;
 
 import com.naeayedea.keith.core.commands.lib.AbstractChannelCommand;
-import com.naeayedea.keith.core.commands.lib.AccessLevel;
-import com.naeayedea.keith.core.commands.lib.input.CommandInput;
-import com.naeayedea.keith.core.commands.lib.output.CommandOutput;
+import com.naeayedea.keith.common.model.user.AccessLevel;
+import com.naeayedea.keith.common.model.command.input.CommandInput;
+import com.naeayedea.keith.common.model.command.output.CommandOutput;
 import com.naeayedea.keith.core.commands.lib.strategy.CommandStrategy;
 import org.springframework.lang.NonNull;
 

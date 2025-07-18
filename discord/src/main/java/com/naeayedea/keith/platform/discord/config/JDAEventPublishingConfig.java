@@ -1,6 +1,6 @@
 package com.naeayedea.keith.platform.discord.config;
 
-import com.naeayedea.keith.core.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.event.KeithEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

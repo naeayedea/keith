@@ -1,13 +1,13 @@
 package com.naeayedea.keith.platform.discord.listener.interaction;
 
-import com.naeayedea.keith.core.model.event.KeithEvent;
-import com.naeayedea.keith.core.model.user.KeithUser;
+import com.naeayedea.keith.common.model.event.KeithEvent;
+import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.command.lib.interactions.SlashCommandHandler;
-import com.naeayedea.keith.core.exception.KeithGracefulErrorException;
-import com.naeayedea.keith.core.exception.KeithPermissionException;
+import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
+import com.naeayedea.keith.common.exception.KeithPermissionException;
 import com.naeayedea.keith.core.managers.KeithUserManager;
 import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
-import com.naeayedea.keith.core.util.MultiMap;
+import com.naeayedea.keith.common.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import org.slf4j.Logger;

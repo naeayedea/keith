@@ -1,0 +1,9 @@
+plugins {
+}
+
+group = 'com.naeayedea.keith.common'
+version = '4.0.0-alpha'
+
+dependencies {
+
+}

@@ -1,5 +1,6 @@
 package com.naeayedea.keith.core.commands.lib;
 
+import com.naeayedea.keith.common.model.user.AccessLevel;
 import org.springframework.lang.NonNull;
 
 
