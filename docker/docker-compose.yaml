@@ -1,0 +1,49 @@
+name: "keith"
+
+networks:
+  keith-network:
+
+services:
+  keith-core:
+    container_name: "keith-core"
+    build:
+      context: ..
+      dockerfile: core/Dockerfile
+    ports:
+      - "8443:8443"
+    networks:
+      - keith-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8443
+    secrets:
+      - db_password
+    depends_on:
+      - database
+
+  database:
+    container_name: "mysql"
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_USER=keith
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_DATABASE=keith
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "3306"
+    networks:
+      - keith-network
+    secrets:
+      - db_password
+      - db_root_password
+
+secrets:
+  db_password:
+    file: secrets/db_password.txt
+  db_root_password:
+    file: secrets/db_root_password.txt
