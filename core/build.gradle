@@ -11,4 +11,12 @@ version = '4.0.0-alpha'
 
 dependencies {
     implementation project(':common')
+
+    implementation "org.springframework.boot:spring-boot-starter-web"
+}
+
+
+bootJar {
+    archiveBaseName = 'keith-core'
+    archiveVersion = ''
 }
