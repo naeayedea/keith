@@ -4,7 +4,7 @@ plugins {
 }
 
 ext {
-    keithVersion = '4.0.0'
+    keithVersion = '4.0.0-alpha'
     jacksonVersion = '2.17.2'
     springCloudVersion = '2025.0.0'
 }
