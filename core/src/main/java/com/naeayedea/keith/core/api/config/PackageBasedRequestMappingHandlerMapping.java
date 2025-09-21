@@ -2,13 +2,15 @@
  * Copyright (C) Steven Muirhead 2025. All Rights Reserved.
  *
  * Unauthorized copying, or use of the contents of this file via any medium is
- * strictly prohibited unless previous permission has been given by the copyright
- * holder(s) in writing.
+ * strictly prohibited unless previous permission has been given by the
+ * copyright holder(s) in writing.
+ *
  */
 
 package com.naeayedea.keith.core.api.config;
 
-import com.naeayedea.keith.core.api.annotation.PackageMappedRestController;
+import com.naeayedea.keith.core.api.annotation.http.PackageMappedRestController;
+import com.naeayedea.keith.core.util.AnnotationUtilities;
 import org.jspecify.annotations.NonNull;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -24,6 +26,7 @@ import java.util.Set;
  * trailing slash/no trailing slash endpoints for every endpoint it processes.
  */
 public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
+
 
 
     @Override
@@ -42,7 +45,7 @@ public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHand
         info = info.mutate().paths(paths.toArray(new String[0])).build();
 
         //if the class doesn't have a package mapped controller ignore, or if the mapping is overridden with an explicit @RequestMapping annotation
-        if (!handlerType.isAnnotationPresent(PackageMappedRestController.class) || handlerType.isAnnotationPresent(RequestMapping.class)) {
+        if (handlerType.isAnnotationPresent(RequestMapping.class) || !isClassValid(handlerType)) {
             return info;
         }
 
@@ -56,6 +59,10 @@ public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHand
             .build();
 
         return prefixInfo.combine(info);
+    }
+
+    private static boolean isClassValid(Class<?> clazz) {
+        return AnnotationUtilities.findAnnotationOnClass(clazz, PackageMappedRestController.class) != null;
     }
 
     /**

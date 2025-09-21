@@ -14,7 +14,11 @@ public class KeithPermissionException extends KeithException {
         super(cause);
     }
 
-    public KeithPermissionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public KeithPermissionException(String template, Object... arguments) {
+        super(template, arguments);
+    }
+
+    public KeithPermissionException(String template, Object[] arguments, Throwable cause) {
+        super(template, arguments, cause);
     }
 }

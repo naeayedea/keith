@@ -14,8 +14,12 @@ public class KeithExecutionException extends KeithException {
         super(cause);
     }
 
-    public KeithExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public KeithExecutionException(String template, Object... arguments) {
+        super(template, arguments);
+    }
+
+    public KeithExecutionException(String template, Object[] arguments, Throwable cause) {
+        super(template, arguments, cause);
     }
 }
 

@@ -49,6 +49,7 @@ subprojects {
 
         //database
         implementation "org.mariadb.jdbc:mariadb-java-client:3.4.1"
+        implementation "org.springframework:spring-jdbc"
 
         testImplementation "org.junit.jupiter:junit-jupiter-engine:5.11.2"
     }

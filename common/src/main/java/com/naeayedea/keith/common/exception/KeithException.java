@@ -1,5 +1,7 @@
 package com.naeayedea.keith.common.exception;
 
+import org.slf4j.helpers.MessageFormatter;
+
 public class KeithException extends Exception {
 
     public KeithException(String message) {
@@ -14,7 +16,11 @@ public class KeithException extends Exception {
         super(cause);
     }
 
-    public KeithException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public KeithException(String template, Object ...arguments) {
+        super(MessageFormatter.arrayFormat(template, arguments).getMessage());
+    }
+
+    public KeithException(String template, Object[] arguments, Throwable cause) {
+        super(MessageFormatter.arrayFormat(template, arguments).getMessage(), cause);
     }
 }

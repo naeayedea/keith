@@ -14,7 +14,7 @@ public class KeithGracefulErrorException extends KeithException {
         super(cause);
     }
 
-    public KeithGracefulErrorException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public KeithGracefulErrorException(String template, Object[] arguments) {
+        super(template, arguments);
     }
 }

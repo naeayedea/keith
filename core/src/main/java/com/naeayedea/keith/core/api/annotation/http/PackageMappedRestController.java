@@ -2,11 +2,12 @@
  * Copyright (C) Steven Muirhead 2025. All Rights Reserved.
  *
  * Unauthorized copying, or use of the contents of this file via any medium is
- * strictly prohibited unless previous permission has been given by the copyright
- * holder(s) in writing.
+ * strictly prohibited unless previous permission has been given by the
+ * copyright holder(s) in writing.
+ *
  */
 
-package com.naeayedea.keith.core.api.annotation;
+package com.naeayedea.keith.core.api.annotation.http;
 
 import org.springframework.web.bind.annotation.RestController;
 
