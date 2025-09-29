@@ -56,7 +56,6 @@ public class KeithUserManager {
         return loadUserFromPersistenceLayer(userId, false);
     }
 
-
     @NonNull
     @CachePut(cacheNames = CACHE_NAME)
     @Transactional(rollbackFor = KeithInternalException.class)
@@ -78,26 +77,26 @@ public class KeithUserManager {
 
     @NonNull
     @CachePut(cacheNames = CACHE_NAME, key = "#userId")
-public BasicKeithUser setAccessLevel(@NonNull String userId, AccessLevel accessLevel) throws KeithInternalException {
-int numRowsAffected = jdbcClient.sql(SET_ACCESS_LEVEL_STATEMENT)
-    .param("user_id", userId)
-    .param("access_level", accessLevel)
-    .update();
+    public BasicKeithUser setAccessLevel(@NonNull String userId, AccessLevel accessLevel) throws KeithInternalException {
+        int numRowsAffected = jdbcClient.sql(SET_ACCESS_LEVEL_STATEMENT)
+            .param("user_id", userId)
+            .param("access_level", accessLevel)
+            .update();
 
-if (numRowsAffected > 1) {
-    logger.error("Attempted to update more than one users access level with query: {}, rows affected: {}. Rolling back.", SET_ACCESS_LEVEL_STATEMENT, numRowsAffected);
+        if (numRowsAffected > 1) {
+            logger.error("Attempted to update more than one users access level with query: {}, rows affected: {}. Rolling back.", SET_ACCESS_LEVEL_STATEMENT, numRowsAffected);
 
-    throw new KeithInternalException("SET_ACCESS_LEVEL_STATEMENT updated more than one row. Critical error avoided.");
-} else if (numRowsAffected < 1) {
-    logger.error("Could not update access level for user {} in database.", userId);
-    throw new KeithInternalException("Could not update access level for user {} to {}", userId, accessLevel);
-}
+            throw new KeithInternalException("SET_ACCESS_LEVEL_STATEMENT updated more than one row. Critical error avoided.");
+        } else if (numRowsAffected < 1) {
+            logger.error("Could not update access level for user {} in database.", userId);
+            throw new KeithInternalException("Could not update access level for user {} to {}", userId, accessLevel);
+        }
 
-return loadUserFromPersistenceLayer(userId, false);
-}
+        return loadUserFromPersistenceLayer(userId, false);
+    }
 
-@NonNull
-private BasicKeithUser loadUserFromPersistenceLayer(@NonNull String userId, boolean createIfMissing) throws KeithInternalException {
+    @NonNull
+    private BasicKeithUser loadUserFromPersistenceLayer(@NonNull String userId, boolean createIfMissing) throws KeithInternalException {
         logger.debug("Reloading user {} from database", userId);
 
         Map<String, Object> result = jdbcClient.sql(GET_USER_STATEMENT)
