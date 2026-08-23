@@ -23,9 +23,6 @@ public class CacheConfig {
     @Value("${keith.manager.cache.refresh}")
     private long DEFAULT_CACHE_EXPIRY_SECONDS;
 
-    @Value("${keith.rate-limit.timeout}")
-    private long RATE_LIMIT_CACHE_SECONDS;
-
     @Bean
     @Primary
     public CacheManager cacheManager() {
@@ -47,32 +44,6 @@ public class CacheConfig {
             public long expireAfterRead(Object key, Object value, long currentTime, long currentDuration) {
                 //reset on read
                 return expireAfterCreate(key, value, currentTime);
-            }
-        }));
-
-        return cacheManager;
-    }
-
-    @Bean
-    public CacheManager rateLimitCacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-
-        cacheManager.setCaffeine(Caffeine.newBuilder().expireAfter(new Expiry<>() {
-            @Override
-            public long expireAfterCreate(Object key, Object value, long currentTime) {
-                return TimeUnit.SECONDS.toNanos(RATE_LIMIT_CACHE_SECONDS);
-            }
-
-            @Override
-            public long expireAfterUpdate(Object key, Object value, long currentTime, long currentDuration) {
-                //reset on update
-                return expireAfterCreate(key, value, currentTime);
-            }
-
-            @Override
-            public long expireAfterRead(Object key, Object value, long currentTime, long currentDuration) {
-                //don't reset the rate limit cache on read
-                return TimeUnit.SECONDS.toNanos(RATE_LIMIT_CACHE_SECONDS) - currentDuration;
             }
         }));
 

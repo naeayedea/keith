@@ -1,9 +1,8 @@
 package com.naeayedea.keith.platform.discord.command.lib.input.transformer;
 
 import com.naeayedea.keith.common.model.command.input.TextOptionsCommandInput;
-import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.KeithServerManager;
-import com.naeayedea.keith.core.managers.cache.KeithMessageChannelCache;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
+import com.naeayedea.keith.platform.discord.cache.KeithMessageChannelCache;
 import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
 import com.naeayedea.keith.common.model.message.BasicKeithMessage;
 import com.naeayedea.keith.common.model.message.KeithMessage;
@@ -24,16 +23,13 @@ import java.util.List;
 @Component
 public class DiscordTextInputTransformer {
 
-    private final KeithUserManager keithUserManager;
-
-    private final KeithServerManager serverManager;
+    private final CoreUserClient userClient;
 
     private final DiscordModelConverter modelConverter;
     private final KeithMessageChannelCache keithMessageChannelCache;
 
-    public DiscordTextInputTransformer(KeithUserManager keithUserManager, KeithServerManager serverManager, DiscordModelConverter modelConverter, KeithMessageChannelCache keithMessageChannelCache) {
-        this.keithUserManager = keithUserManager;
-        this.serverManager = serverManager;
+    public DiscordTextInputTransformer(CoreUserClient userClient, DiscordModelConverter modelConverter, KeithMessageChannelCache keithMessageChannelCache) {
+        this.userClient = userClient;
         this.modelConverter = modelConverter;
         this.keithMessageChannelCache = keithMessageChannelCache;
     }
@@ -41,7 +37,7 @@ public class DiscordTextInputTransformer {
     @NonNull
     public DiscordTextCommandInput fromMessageReceivedEvent(@NonNull MessageReceivedEvent event) {
         return DiscordTextCommandInput.builder()
-            .user(keithUserManager.getUser(event.getAuthor().getId()))
+            .user(userClient.getOrCreateUser(event.getAuthor().getId()))
             .timestamp(event.getMessage().getTimeCreated().toInstant())
             .message(modelConverter.getKeithMessageFromDiscordMessage(event.getMessage()))
             .build();
@@ -58,7 +54,7 @@ public class DiscordTextInputTransformer {
      */
     @NonNull
     public DiscordTextCommandInput fromSlashCommandInteractionEvent(SlashCommandInteractionEvent event) {
-        KeithUser user = keithUserManager.getUser(event.getUser().getId());
+        KeithUser user = userClient.getOrCreateUser(event.getUser().getId());
 
         KeithMessageChannel channel = keithMessageChannelCache.getChannel(event.getChannel().getId(), KeithDiscordConstants.PLATFORM_NAME);
 
@@ -78,7 +74,7 @@ public class DiscordTextInputTransformer {
 
         for (OptionMapping option : options) {
             //add any mentioned users
-            mentionedUsers.addAll(option.getMentions().getUsers().stream().map(mentionedUser -> keithUserManager.getUser(mentionedUser.getId())).toList());
+            mentionedUsers.addAll(option.getMentions().getUsers().stream().map(mentionedUser -> userClient.getOrCreateUser(mentionedUser.getId())).toList());
 
             //add the content to the list
             values.add(option.getAsString());

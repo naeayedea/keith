@@ -4,18 +4,22 @@ import com.naeayedea.keith.common.exception.KeithExecutionException;
 import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.common.exception.KeithPermissionException;
 import com.naeayedea.keith.common.i18n.TranslationProvider;
-import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.KeithServerManager;
+import com.naeayedea.keith.common.model.api.v1.response.basic.TextResponse;
+import com.naeayedea.keith.platform.discord.client.CoreApiClient;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
+import com.naeayedea.keith.platform.discord.event.ActiveSessionRegistry;
+import com.naeayedea.keith.platform.discord.server.LocalServerSettingsProvider;
 import com.naeayedea.keith.common.model.event.KeithEvent;
-import com.naeayedea.keith.common.model.server.KeithServer;
 import com.naeayedea.keith.common.model.user.BasicKeithUser;
 import com.naeayedea.keith.common.model.user.KeithUser;
-import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.platform.discord.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.common.util.KeithConstants;
 import com.naeayedea.keith.common.util.MultiMap;
 import com.naeayedea.keith.platform.discord.command.lib.TextCommandHandler;
 import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -50,9 +54,9 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
     private final ExecutorService commandService;
 
-    private final KeithUserManager keithUserManager;
+    private final CoreUserClient userClient;
 
-    private final KeithServerManager serverManager;
+    private final LocalServerSettingsProvider serverSettings;
 
     private final CommandRateLimiter rateLimiter;
 
@@ -60,15 +64,30 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
     private final TranslationProvider translationProvider;
 
-    public MessageReceivedEventListener(@Qualifier("commandService") ExecutorService commandService, KeithUserManager keithUserManager, KeithServerManager serverManager, CommandRateLimiter rateLimiter, @Qualifier("userTextCommandHandlers") List<TextCommandHandler> textCommandHandlers, TranslationProvider translationProvider) {
-        this.keithUserManager = keithUserManager;
-        this.serverManager = serverManager;
+    private final ActiveSessionRegistry activeSessionRegistry;
+
+    private final CoreApiClient coreApiClient;
+
+    public MessageReceivedEventListener(
+        @Qualifier("commandService") ExecutorService commandService,
+        CoreUserClient userClient,
+        LocalServerSettingsProvider serverSettings,
+        CommandRateLimiter rateLimiter,
+        @Qualifier("userTextCommandHandlers") List<TextCommandHandler> textCommandHandlers,
+        TranslationProvider translationProvider,
+        ActiveSessionRegistry activeSessionRegistry,
+        CoreApiClient coreApiClient
+    ) {
+        this.userClient = userClient;
+        this.serverSettings = serverSettings;
         this.commandService = commandService;
         this.rateLimiter = rateLimiter;
 
         this.textCommandHandlers = textCommandHandlers;
 
         this.translationProvider = translationProvider;
+        this.activeSessionRegistry = activeSessionRegistry;
+        this.coreApiClient = coreApiClient;
     }
 
     @PostConstruct
@@ -88,7 +107,7 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
         if (event.getChannel() instanceof PrivateChannel) {
             return DEFAULT_PREFIX;
         } else {
-            return serverManager.getServer(event.getGuild().getId()).getPrefix();
+            return serverSettings.getPrefix(event.getGuild().getId());
         }
     }
 
@@ -125,18 +144,24 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
             return true;
         }
 
-        KeithServer server = serverManager.getServer(event.getGuild().getId());
-
-        return !server.isBanned();
+        return !serverSettings.isBanned(event.getGuild().getId());
     }
 
     @Override
     public boolean eventIsCompatible(MessageReceivedEvent event) {
         if (!findPrefix(event.getMessage().getContentRaw(), getPrefix(event))) {
-            return false;
+            //no prefix - only still interesting if this channel has an active channel-scoped
+            //session (a game, a chat relay). Unlike prefixed commands, these bypass rate limiting
+            //entirely, same as the old monolith did - you don't want to rate-limit someone
+            //spamming guesses in a number game or having an ordinary chat-relay conversation.
+            if (!activeSessionRegistry.isActive(event.getChannel().getId())) {
+                return false;
+            }
+
+            return !userClient.getOrCreateUser(event.getAuthor().getId()).isBanned();
         }
 
-        BasicKeithUser keithUser = keithUserManager.getUser(event.getAuthor().getId());
+        BasicKeithUser keithUser = userClient.getOrCreateUser(event.getAuthor().getId());
 
         //Check user isn't rate limited
         if (rateLimitReached(event, keithUser)) {
@@ -180,7 +205,13 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
             thread.join().queue();
         }
 
-        BasicKeithUser keithUser = keithUserManager.getUser(event.getAuthor().getId());
+        if (!findPrefix(event.getMessage().getContentRaw(), getPrefix(event))) {
+            evaluateChannelSession(event);
+
+            return;
+        }
+
+        BasicKeithUser keithUser = userClient.getOrCreateUser(event.getAuthor().getId());
 
         String prefix = getPrefix(event);
 
@@ -209,11 +240,8 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
                     .queue();
             }
 
-            try {
-                keithUserManager.incrementCommandCount(keithUser.getId());
-            } catch (Exception e) {
-                logger.error("Could not increment command count for user {}", keithUser.getId(), e);
-            }
+            //TODO: core doesn't expose a way to increment a user's command count over HTTP yet
+            //(KeithUserManager.incrementCommandCount is in-process only) - re-add once it does.
         };
 
         //increment the rate limit before proceeding, if the command fails we don't want the user to be able to spam
@@ -229,6 +257,42 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
             //rethrow so we can handle higher up
             throw new TimeoutException();
+        }
+    }
+
+    /**
+     * Forwards a plain (non-prefixed) message in a channel {@link ActiveSessionRegistry} believes
+     * has an active session to core for evaluation - a guess, a chat-relay message, anything a
+     * channel-scoped session cares about. Most channels never reach this since the registry check
+     * in {@link #eventIsCompatible(MessageReceivedEvent)} already filtered them out.
+     */
+    private void evaluateChannelSession(MessageReceivedEvent event) {
+        Member member = event.getMember();
+        String authorName = member != null ? member.getEffectiveName() : event.getAuthor().getName();
+
+        Map<String, String> params = new LinkedHashMap<>();
+
+        params.put("channelId", event.getChannel().getId());
+        params.put("authorName", authorName);
+        params.put("content", event.getMessage().getContentRaw());
+
+        TextResponse response = coreApiClient.getAsUser(
+            "/api/v1/command/channel/evaluate",
+            event.getAuthor().getId(),
+            params,
+            TextResponse.class
+        );
+
+        if (response == null) {
+            return;
+        }
+
+        if (!response.getText().isBlank()) {
+            event.getMessage().reply(response.getText()).queue();
+        }
+
+        for (String reaction : response.getReactions()) {
+            event.getMessage().addReaction(Emoji.fromUnicode(reaction)).queue();
         }
     }
 
@@ -322,7 +386,7 @@ public class MessageReceivedEventListener extends AbstractUserPermittingDiscordE
 
     @Override
     protected KeithUser getUser(MessageReceivedEvent event) {
-        return keithUserManager.getUser(event.getAuthor().getId());
+        return userClient.getOrCreateUser(event.getAuthor().getId());
     }
 
     @Override

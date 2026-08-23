@@ -39,18 +39,14 @@ public class RequestContextArgumentResolver implements HandlerMethodArgumentReso
             return null;
         }
 
-        String userId = request.getParameter("userId");
-
-        if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id parameter is missing");
-        }
-
-        KeithCommandContext commandContext = KeithCommandContext.builder()
-            .userId(userId)
-            .build();
+        String platform = request.getParameter("platform");
+        String platformUserId = request.getParameter("platformUserId");
 
         try {
-            return commandContext;
+            return KeithCommandContext.builder()
+                .platform(platform)
+                .platformUserId(platformUserId)
+                .build();
         } catch (IllegalStateException e) {
             throw new KeithUserFacingException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (Throwable t) {

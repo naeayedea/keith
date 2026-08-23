@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -99,10 +100,12 @@ public class KeithUserManager {
     private BasicKeithUser loadUserFromPersistenceLayer(@NonNull String userId, boolean createIfMissing) throws KeithInternalException {
         logger.debug("Reloading user {} from database", userId);
 
-        Map<String, Object> result = jdbcClient.sql(GET_USER_STATEMENT)
+        List<Map<String, Object>> rows = jdbcClient.sql(GET_USER_STATEMENT)
             .param("user_id", userId)
             .query()
-            .singleRow();
+            .listOfRows();
+
+        Map<String, Object> result = rows.isEmpty() ? Map.of() : rows.getFirst();
 
         if (result.size() >= 4) {
             logger.trace("User {} already exists", userId);

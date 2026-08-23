@@ -18,7 +18,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@PackageMappedRestController
+@PackageMappedRestController(packagesToExclude = {"http", "controller"})
 @RequireAccessLevel(baseAccessLevel = AccessLevel.OWNER)
 public @interface KeithHttpCommandController {
 

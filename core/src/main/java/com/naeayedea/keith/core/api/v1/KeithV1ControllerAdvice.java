@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ControllerAdvice(basePackages = "com.naeayedea.keith.core.api.v1.http")
+@ControllerAdvice(basePackages = "com.naeayedea.keith.core.api.v1.http.controller")
 public class KeithV1ControllerAdvice {
 
     @ExceptionHandler(KeithUserFacingException.class)

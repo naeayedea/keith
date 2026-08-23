@@ -1,11 +1,11 @@
 package com.naeayedea.keith.platform.discord.listener.interaction;
 
-import com.naeayedea.keith.core.managers.KeithUserManager;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
 import com.naeayedea.keith.common.model.event.KeithEvent;
 import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.command.lib.StringSelectInteractionHandler;
 import com.naeayedea.keith.common.exception.KeithExecutionException;
-import com.naeayedea.keith.core.managers.KeithServerManager;
+import com.naeayedea.keith.platform.discord.server.LocalServerSettingsProvider;
 import com.naeayedea.keith.common.util.MultiMap;
 import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import net.dv8tion.jda.api.entities.Guild;
@@ -26,14 +26,14 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
     private static final Logger logger = LoggerFactory.getLogger(StringSelectInteractionListener.class);
 
     private final Map<String, ? extends StringSelectInteractionHandler> handlers;
-    private final KeithUserManager keithUserManager;
+    private final CoreUserClient userClient;
 
     @Value("${keith.default-prefix}")
     private String DEFAULT_PREFIX;
 
-    private final KeithServerManager serverManager;
+    private final LocalServerSettingsProvider serverSettings;
 
-    public StringSelectInteractionListener(List<? extends StringSelectInteractionHandler> handlers, KeithServerManager serverManager, KeithUserManager keithUserManager) {
+    public StringSelectInteractionListener(List<? extends StringSelectInteractionHandler> handlers, LocalServerSettingsProvider serverSettings, CoreUserClient userClient) {
         MultiMap<String, StringSelectInteractionHandler> handlerMap = new MultiMap<>();
 
         for (StringSelectInteractionHandler handler : handlers) {
@@ -41,8 +41,8 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
         }
 
         this.handlers = handlerMap;
-        this.serverManager = serverManager;
-        this.keithUserManager = keithUserManager;
+        this.serverSettings = serverSettings;
+        this.userClient = userClient;
     }
 
     @EventListener
@@ -61,7 +61,7 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
 
             Guild guild = event.getGuild();
 
-            String prefix = guild == null ? DEFAULT_PREFIX : serverManager.getServer(guild.getId()).getPrefix();
+            String prefix = guild == null ? DEFAULT_PREFIX : serverSettings.getPrefix(guild.getId());
 
             event.reply("No handler found for this choice. Please try another or use " + prefix + "feedback <message> to get in contact.").queue();
 
@@ -82,7 +82,7 @@ public class StringSelectInteractionListener extends AbstractUserPermittingDisco
 
     @Override
     protected KeithUser getUser(StringSelectInteractionEvent event) {
-        return keithUserManager.getUser(event.getUser().getId());
+        return userClient.getOrCreateUser(event.getUser().getId());
     }
 
     @Override

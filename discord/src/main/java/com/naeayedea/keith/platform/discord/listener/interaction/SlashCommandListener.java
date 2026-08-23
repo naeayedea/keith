@@ -5,7 +5,7 @@ import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.command.lib.interactions.SlashCommandHandler;
 import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.common.exception.KeithPermissionException;
-import com.naeayedea.keith.core.managers.KeithUserManager;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
 import com.naeayedea.keith.platform.discord.model.discordCommand.CommandInformation;
 import com.naeayedea.keith.common.util.MultiMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -26,12 +26,12 @@ public class SlashCommandListener extends AbstractSlashCommandEventListener<Slas
 
     private static final Logger logger = LoggerFactory.getLogger(SlashCommandListener.class);
 
-    private final KeithUserManager keithUserManager;
+    private final CoreUserClient userClient;
 
     private final Map<String, SlashCommandHandler> commands;
 
-    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommandHandler> slashCommandHandlers, KeithUserManager keithUserManager) {
-        this.keithUserManager = keithUserManager;
+    public SlashCommandListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<SlashCommandHandler> slashCommandHandlers, CoreUserClient userClient) {
+        this.userClient = userClient;
         Map<String, SlashCommandHandler> commandHandlers = new HashMap<>();
 
         logger.info("Loaded {} slash commands handlers", slashCommandHandlers.size());
@@ -71,7 +71,7 @@ public class SlashCommandListener extends AbstractSlashCommandEventListener<Slas
         SlashCommandHandler command = commands.get(event.getName());
 
         if (command != null) {
-            if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+            if (!userClient.getOrCreateUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
                 throw new KeithPermissionException("You do not have permission to use this command");
             }
 
@@ -85,7 +85,7 @@ public class SlashCommandListener extends AbstractSlashCommandEventListener<Slas
 
     @Override
     protected KeithUser getUser(SlashCommandInteractionEvent event) {
-        return keithUserManager.getUser(event.getUser().getId());
+        return userClient.getOrCreateUser(event.getUser().getId());
     }
 
     @Override

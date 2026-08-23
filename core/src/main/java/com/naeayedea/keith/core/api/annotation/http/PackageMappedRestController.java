@@ -21,4 +21,7 @@ import java.lang.annotation.*;
 @Documented
 @RestController
 public @interface PackageMappedRestController {
+
+    String[] packagesToExclude() default {"http", "controller"};
 }
+

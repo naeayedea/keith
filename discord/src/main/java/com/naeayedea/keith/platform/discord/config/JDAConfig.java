@@ -16,7 +16,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
@@ -28,14 +27,13 @@ public class JDAConfig {
     private final Logger logger = LoggerFactory.getLogger(JDAConfig.class);
 
     @Bean
-    public DiscordConfiguration keith(DataSource dataSource, ApplicationArguments arguments) {
+    public DiscordConfiguration keith(ApplicationArguments arguments) {
         String[] args = arguments.getSourceArgs();
 
         logger.info("Loading bot configuration...");
 
         return new DiscordConfiguration(
             token,
-            dataSource,
             args.length > 2 ? args[0] : "",
             args.length > 2 ? args[1] : ""
         );

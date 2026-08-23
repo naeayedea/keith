@@ -1,8 +1,7 @@
 package com.naeayedea.keith.platform.discord.model;
 
-import com.naeayedea.keith.core.managers.cache.KeithMessageChannelCache;
-import com.naeayedea.keith.core.managers.KeithServerManager;
-import com.naeayedea.keith.core.managers.KeithUserManager;
+import com.naeayedea.keith.platform.discord.cache.KeithMessageChannelCache;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
 import com.naeayedea.keith.common.model.channel.KeithMessageChannel;
 import com.naeayedea.keith.common.model.message.KeithMessage;
 import com.naeayedea.keith.common.model.user.KeithUser;
@@ -17,17 +16,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscordModelConverter {
 
-    private final KeithUserManager userManager;
-
-    private final KeithServerManager serverManager;
+    private final CoreUserClient userClient;
 
     private final KeithMessageChannelCache messageChannelCache;
 
     private static final int MAX_REPLIED_TO_DEPTH = 5;
 
-    public DiscordModelConverter(KeithUserManager userManager, KeithServerManager serverManager, KeithMessageChannelCache messageChannelCache) {
-        this.userManager = userManager;
-        this.serverManager = serverManager;
+    public DiscordModelConverter(CoreUserClient userClient, KeithMessageChannelCache messageChannelCache) {
+        this.userClient = userClient;
         this.messageChannelCache = messageChannelCache;
     }
 
@@ -68,6 +64,6 @@ public class DiscordModelConverter {
 
     @NonNull
     private KeithUser getKeithUser(@NonNull String userId) {
-        return userManager.getUser(userId);
+        return userClient.getOrCreateUser(userId);
     }
 }

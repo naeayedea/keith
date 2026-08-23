@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClassName = 'com.naeayedea.keith.discord.KeithLauncher'
+    mainClassName = 'com.naeayedea.keith.platform.discord.KeithLauncher'
 }
 
 group = 'com.naeayedea.keith.discord'
@@ -27,12 +27,25 @@ processResources {
 }
 
 dependencies {
-    //keith core
+    //keith common - the shared, platform-agnostic model. discord talks to core over HTTP, not
+    //via a direct module dependency - see CoreApiClient.
     implementation project(':common')
-    implementation project(':core')
+
+    //HTTP client (RestClient) for calling core's API - not the full spring-boot-starter-web,
+    //since this app doesn't need to host its own web server.
+    implementation "org.springframework:spring-web"
+
+    //consumes LeafEvents (session state, outbound message delivery) pushed by core over RabbitMQ
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
 
     //discord related
-    implementation "net.dv8tion:JDA:5.6.1"
+    implementation "net.dv8tion:JDA:6.5.0"
 
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+}
+
+bootJar {
+    archiveBaseName = 'keith-discord'
+    archiveVersion = ''
 }

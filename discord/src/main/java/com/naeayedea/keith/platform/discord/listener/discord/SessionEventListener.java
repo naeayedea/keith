@@ -1,7 +1,5 @@
 package com.naeayedea.keith.platform.discord.listener.discord;
 
-import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
@@ -15,16 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionEventListener {
 
-    private final KeithUserManager keithUserManager;
-
-    private final KeithServerManager serverManager;
-
     private final Logger logger = LoggerFactory.getLogger(SessionEventListener.class);
-
-    public SessionEventListener(KeithUserManager keithUserManager, KeithServerManager serverManager) {
-        this.keithUserManager = keithUserManager;
-        this.serverManager = serverManager;
-    }
 
     private void onSessionReconnected(JDA jda) {
         logger.info("Session recreated, invalidating caches and updating status.");
@@ -32,8 +21,8 @@ public class SessionEventListener {
         Utilities.updateUptime();
         Utilities.setJDA(jda);
 
-        keithUserManager.clear();
-        serverManager.clear();
+        //user/server data now lives behind core's HTTP API rather than a local cache this app
+        //owns, so there's nothing here left to invalidate on reconnect.
 
         Utilities.updateDefaultStatus();
     }

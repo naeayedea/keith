@@ -4,11 +4,10 @@ import com.naeayedea.keith.common.model.event.KeithEvent;
 import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.platform.discord.command.lib.ReactionCommandHandler;
 import com.naeayedea.keith.common.exception.KeithException;
-import com.naeayedea.keith.core.managers.KeithUserManager;
-import com.naeayedea.keith.core.managers.KeithServerManager;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
+import com.naeayedea.keith.platform.discord.server.LocalServerSettingsProvider;
 import com.naeayedea.keith.common.model.user.BasicKeithUser;
-import com.naeayedea.keith.common.model.server.BasicKeithServer;
-import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.platform.discord.ratelimiter.CommandRateLimiter;
 import com.naeayedea.keith.common.util.MultiMap;
 import com.naeayedea.keith.platform.discord.listener.AbstractUserPermittingDiscordEventListener;
 import jakarta.annotation.PostConstruct;
@@ -37,17 +36,17 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
 
     private MultiMap<String, ReactionCommandHandler> reactionCommands;
 
-    private final KeithServerManager serverManager;
+    private final LocalServerSettingsProvider serverSettings;
 
-    private final KeithUserManager keithUserManager;
+    private final CoreUserClient userClient;
 
     private final CommandRateLimiter rateLimiter;
 
     private final List<ReactionCommandHandler> reactionCommandHandlers;
 
-    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, KeithServerManager serverManager, KeithUserManager keithUserManager, CommandRateLimiter rateLimiter, List<ReactionCommandHandler> reactionCommandHandlers) {
-        this.serverManager = serverManager;
-        this.keithUserManager = keithUserManager;
+    public MessageReactionAddEventListener(@Qualifier("reactionService") ExecutorService reactionHandlingService, LocalServerSettingsProvider serverSettings, CoreUserClient userClient, CommandRateLimiter rateLimiter, List<ReactionCommandHandler> reactionCommandHandlers) {
+        this.serverSettings = serverSettings;
+        this.userClient = userClient;
         this.rateLimiter = rateLimiter;
         this.reactionCommandHandlers = reactionCommandHandlers;
     }
@@ -73,7 +72,7 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
 
     @Override
     protected KeithUser getUser(MessageReactionAddEvent event) {
-        return keithUserManager.getUser(event.getUserId());
+        return userClient.getOrCreateUser(event.getUserId());
     }
 
     @Override
@@ -116,16 +115,14 @@ public class MessageReactionAddEventListener extends AbstractUserPermittingDisco
             thread.join().complete();
         }
 
-        BasicKeithUser keithUser = keithUserManager.getUser(member.getUser().getId());
+        BasicKeithUser keithUser = userClient.getOrCreateUser(member.getUser().getId());
 
         if (keithUser.isBanned()) {
             return;
         }
 
-        BasicKeithServer keithServer = isPrivateMessage ? null : serverManager.getServer(event.getGuild().getId());
-
         //if not private message, ensure server has permission to use the bot
-        if (!isPrivateMessage && keithServer.isBanned()) {
+        if (!isPrivateMessage && serverSettings.isBanned(event.getGuild().getId())) {
             return;
         }
 

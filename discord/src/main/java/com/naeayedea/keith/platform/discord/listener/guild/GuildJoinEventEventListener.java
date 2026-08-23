@@ -1,9 +1,8 @@
 package com.naeayedea.keith.platform.discord.listener.guild;
 
-import com.naeayedea.keith.core.managers.KeithServerManager;
 import com.naeayedea.keith.common.model.event.KeithEvent;
-import com.naeayedea.keith.common.model.server.KeithServer;
 import com.naeayedea.keith.platform.discord.listener.AbstractDiscordEventListener;
+import com.naeayedea.keith.platform.discord.server.LocalServerSettingsProvider;
 import com.naeayedea.keith.platform.discord.utils.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,10 +21,10 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
 
     private final Logger logger = LoggerFactory.getLogger(GuildJoinEventEventListener.class);
 
-    private final KeithServerManager serverManager;
+    private final LocalServerSettingsProvider serverSettings;
 
-    public GuildJoinEventEventListener(KeithServerManager serverManager) {
-        this.serverManager = serverManager;
+    public GuildJoinEventEventListener(LocalServerSettingsProvider serverSettings) {
+        this.serverSettings = serverSettings;
     }
 
     @EventListener
@@ -39,16 +38,14 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
 
     @Override
     public boolean serverPermitted(GuildJoinEvent event) {
-        KeithServer server = serverManager.getServer(event.getGuild().getId());
-
-        return !server.isBanned();
+        return !serverSettings.isBanned(event.getGuild().getId());
     }
 
     @Override
     public void onPermitted(GuildJoinEvent event) {
         Guild guild = event.getGuild();
 
-        KeithServer keithServer = serverManager.getServer(event.getGuild().getId());
+        String prefix = serverSettings.getPrefix(event.getGuild().getId());
 
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
 
@@ -63,8 +60,8 @@ public class GuildJoinEventEventListener extends AbstractDiscordEventListener<Gu
         defaultChannel.asTextChannel().sendMessageEmbeds(new EmbedBuilder()
             .setColor(new Color(155, 0, 155))
             .setTitle("Hello!")
-            .setFooter("Use " + keithServer.getPrefix() + "feedback if you have any issues!- Succ")
-            .setDescription("Use " + keithServer.getPrefix() + "help to see available commands")
+            .setFooter("Use " + prefix + "feedback if you have any issues!- Succ")
+            .setDescription("Use " + prefix + "help to see available commands")
             .setThumbnail(event.getJDA().getSelfUser().getAvatarUrl())
             .build()).queue();
 

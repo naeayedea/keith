@@ -2,9 +2,11 @@
 #pre-build stage
 FROM gradle:8.10.2-jdk-21-and-22 AS pre-build
 WORKDIR /opt/naeayedea/keith/
+COPY settings.gradle .
 COPY build.gradle .
 COPY common ./common
 COPY core/build.gradle ./core/
+COPY discord/build.gradle ./discord/
 RUN gradle dependencies --refresh-dependencies
 
 #build stage

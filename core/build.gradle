@@ -3,16 +3,36 @@ plugins {
 }
 
 application {
-    mainClassName = 'com.naeayedea.keith.core.Launcher'
+    mainClassName = 'com.naeayedea.keith.core.KeithCoreService'
 }
 
 group = 'com.naeayedea.keith.core'
 version = '4.0.0-alpha'
 
+tasks.register('addProjectInformation') {
+    group = "other"
+    description = "Adds project information to JAR"
+
+    //override some config so the local deployment runs better
+    doFirst {
+        ant.propertyfile(file: "./build/resources/main/application.properties") {
+            entry( key: "keith.version", value: "$keithVersion")
+            entry( key: "keith.project.name", value: rootProject.name)
+        }
+    }
+}
+
+processResources {
+    finalizedBy addProjectInformation
+}
+
 dependencies {
     implementation project(':common')
 
     implementation "org.springframework.boot:spring-boot-starter-web"
+
+    //publishes LeafEvents (session state, outbound message delivery) to leaf apps over RabbitMQ
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
 }
 
 

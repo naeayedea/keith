@@ -50,13 +50,21 @@ public class AccessControlRequestInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String userId = request.getParameter("userId");
+        String platform = request.getParameter("platform");
+        String platformUserId = request.getParameter("platformUserId");
 
-        if (userId == null) {
-            throw new KeithUserFacingException(HttpStatus.BAD_REQUEST, "Missing required parameter 'userId'");
+        if (platform == null || platform.isBlank()) {
+            throw new KeithUserFacingException(HttpStatus.BAD_REQUEST, "Missing required parameter 'platform'");
         }
 
-        KeithUser user = userService.getUser(userId);
+        if (platformUserId == null || platformUserId.isBlank()) {
+            throw new KeithUserFacingException(HttpStatus.BAD_REQUEST, "Missing required parameter 'platformUserId'");
+        }
+
+        //TODO: resolution is currently by platformUserId alone (single-platform per user). Once
+        //cross-platform account linking exists, resolve the canonical user via `platform` +
+        //`platformUserId` through user_platform_presence instead.
+        KeithUser user = userService.getUser(platformUserId);
 
         if (user == null) {
             throw new KeithUserFacingException(HttpStatus.UNAUTHORIZED, "User in command does not exist");

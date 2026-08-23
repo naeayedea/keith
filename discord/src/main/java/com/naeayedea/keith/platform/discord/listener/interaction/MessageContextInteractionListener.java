@@ -3,7 +3,7 @@ package com.naeayedea.keith.platform.discord.listener.interaction;
 import com.naeayedea.keith.common.i18n.TranslationProvider;
 import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.common.exception.KeithPermissionException;
-import com.naeayedea.keith.core.managers.KeithUserManager;
+import com.naeayedea.keith.platform.discord.client.CoreUserClient;
 import com.naeayedea.keith.common.model.event.KeithEvent;
 import com.naeayedea.keith.common.model.user.KeithUser;
 import com.naeayedea.keith.common.util.MultiMap;
@@ -31,14 +31,14 @@ public class MessageContextInteractionListener extends AbstractSlashCommandEvent
 
     private static final Logger logger = LoggerFactory.getLogger(MessageContextInteractionListener.class);
 
-    private final KeithUserManager keithUserManager;
+    private final CoreUserClient userClient;
 
     private final Map<String, MessageContextCommandHandler> commands;
 
     private final Map<String, String> translationMappings;
 
-    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommandHandler> messageContextCommandHandlers, KeithUserManager keithUserManager, TranslationProvider translationProvider) {
-        this.keithUserManager = keithUserManager;
+    public MessageContextInteractionListener(@Qualifier("slash-command-data-list") List<CommandInformation> commandInformation, List<MessageContextCommandHandler> messageContextCommandHandlers, CoreUserClient userClient, TranslationProvider translationProvider) {
+        this.userClient = userClient;
         this.translationMappings = new HashMap<>();
 
         Map<String, MessageContextCommandHandler> commandHandlers = new HashMap<>();
@@ -86,7 +86,7 @@ public class MessageContextInteractionListener extends AbstractSlashCommandEvent
 
     @Override
     protected KeithUser getUser(MessageContextInteractionEvent event) {
-        return keithUserManager.getUser(event.getUser().getId());
+        return userClient.getOrCreateUser(event.getUser().getId());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class MessageContextInteractionListener extends AbstractSlashCommandEvent
             throw new KeithGracefulErrorException("This command has not been configured properly. Please contact the owner using /feedback");
         }
 
-        if (!keithUserManager.getUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
+        if (!userClient.getOrCreateUser(event.getUser().getId()).hasPermission(command.getAccessLevel())) {
             throw new KeithPermissionException("You do not have permission to use this command");
         }
 

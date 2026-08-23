@@ -1,7 +1,5 @@
 package com.naeayedea.keith.platform.discord.config;
 
-import javax.sql.DataSource;
-
 public class DiscordConfiguration {
 
     private String token;
@@ -10,11 +8,8 @@ public class DiscordConfiguration {
 
     private String restartChannel;
 
-    private DataSource dataSource;
-
-    public DiscordConfiguration(String token, DataSource dataSource, String restartMessage, String restartChannel) {
+    public DiscordConfiguration(String token, String restartMessage, String restartChannel) {
         this.token = token;
-        this.dataSource = dataSource;
         this.restartMessage = restartMessage;
         this.restartChannel = restartChannel;
     }
@@ -41,13 +36,5 @@ public class DiscordConfiguration {
 
     public void setRestartChannel(String restartChannel) {
         this.restartChannel = restartChannel;
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
     }
 }

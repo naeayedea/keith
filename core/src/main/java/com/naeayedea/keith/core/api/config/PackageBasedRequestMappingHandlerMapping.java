@@ -1,24 +1,19 @@
-/*
- * Copyright (C) Steven Muirhead 2025. All Rights Reserved.
- *
- * Unauthorized copying, or use of the contents of this file via any medium is
- * strictly prohibited unless previous permission has been given by the
- * copyright holder(s) in writing.
- *
- */
-
 package com.naeayedea.keith.core.api.config;
 
 import com.naeayedea.keith.core.api.annotation.http.PackageMappedRestController;
 import com.naeayedea.keith.core.util.AnnotationUtilities;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Converts controller + method signatures into valid http request mappings, will expand package structures into
@@ -27,10 +22,13 @@ import java.util.Set;
  */
 public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(PackageBasedRequestMappingHandlerMapping.class);
 
     @Override
-    protected RequestMappingInfo getMappingForMethod(@NonNull Method method, @NonNull Class<?> handlerType) {
+    protected RequestMappingInfo getMappingForMethod(
+        @NonNull Method method,
+        @NonNull Class<?> handlerType
+    ) {
         RequestMappingInfo info = super.getMappingForMethod(method, handlerType);
 
         //if info is null, indicates method does not have a <METHOD>Mapping annotation so we should ignore
@@ -39,7 +37,7 @@ public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHand
         }
 
         //get a set of valid paths from the method, typically we build this into a trailing slash vs no trailing slash path
-        Set<String> paths = buildPathsWithTrailingAndNonTrailingSlashes(info);
+        Set<String> paths = buildPathsWithTrailingAndNonTrailingSlashes(info.getPatternValues());
 
         //rebuild with the new paths
         info = info.mutate().paths(paths.toArray(new String[0])).build();
@@ -49,32 +47,55 @@ public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHand
             return info;
         }
 
+        PackageMappedRestController annotationInstance = AnnotationUtilities.findAnnotationOnClass(handlerType, PackageMappedRestController.class);
+
+        List<String> packagesToExclude = new ArrayList<>();
+
+        if (annotationInstance != null) {
+            packagesToExclude = Arrays.asList(annotationInstance.packagesToExclude());
+        }
+
         //get the base path from the package structure
-        String fullBasePath = getFullBasePathFromPackage(handlerType);
+        String fullBasePath = getFullBasePathFromPackage(handlerType, packagesToExclude);
+
+        paths = buildPathsWithTrailingAndNonTrailingSlashes(List.of(fullBasePath));
 
         //combine
         RequestMappingInfo prefixInfo = RequestMappingInfo
             //add both the slash and trailing slash version
-            .paths(fullBasePath)
+            .paths(paths.toArray(new String[0]))
             .build();
 
-        return prefixInfo.combine(info);
+        info = prefixInfo.combine(info);
+
+        Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
+        String methodLabel = methods.isEmpty() ? "ANY" : methods.toString();
+
+        for (String path : info.getDirectPaths()) {
+            logger.debug("Dynamically registering controller endpoint for {}: {} {}",
+                handlerType.getSimpleName(),
+                methodLabel,
+                (Stream.of(fullBasePath, path).filter(string -> !string.isBlank()).collect(Collectors.joining("/"))).replaceAll("/{2,}", "/"));
+        }
+
+        return info;
     }
 
-    private static boolean isClassValid(Class<?> clazz) {
+    private static boolean isClassValid(@NonNull Class<?> clazz) {
         return AnnotationUtilities.findAnnotationOnClass(clazz, PackageMappedRestController.class) != null;
     }
 
     /**
      * For every current path in the request mapping, create a version with and without a trailing slash
      *
-     * @param info the {@link RequestMappingInfo} object with the current state of the mapping
+     * @param inputPaths the paths to build from
      * @return a {@code Set<String>} containing the original paths + an equivalent with/without a trailing slash
      */
-    private static Set<String> buildPathsWithTrailingAndNonTrailingSlashes(RequestMappingInfo info) {
+    @NonNull
+    private static Set<String> buildPathsWithTrailingAndNonTrailingSlashes(@NonNull Collection<String> inputPaths) {
         Set<String> paths = new HashSet<>();
 
-        for (String path : info.getPatternValues()) {
+        for (String path : inputPaths) {
             String pathWithSlash;
             String pathWithoutSlash;
             if (path.endsWith("/")) {
@@ -93,36 +114,46 @@ public class PackageBasedRequestMappingHandlerMapping extends RequestMappingHand
     }
 
     /**
-     * Retrieve a valid HTTP path based on the base path of the method. Will trim "http" from the path. For example,
-     * if the package is any.amount.of.packages.<b>api</b>.v1.command.general.GeneralCommandController, the HTTP base path for that
-     * controller would automatically be set to /api/v1/command/general/
+     * Retrieve a valid HTTP path based on the base path of the method. Will trim everything up to and
+     * including the "api" package segment. For example, if the package is
+     * any.amount.of.packages.<b>api</b>.v1.command.general.GeneralCommandController, the HTTP base path for
+     * that controller would automatically be set to /api/v1/command/general/
      *
-     * @param handlerType the class of the controller being updated
+     * @param handlerType       the class of the controller being updated
+     * @param packagesToExclude package segments that should be stripped out of the resulting path
      * @return a String path built from the package of the class.
      */
-    private static String getFullBasePathFromPackage(Class<?> handlerType) {
-        String packageName = handlerType.getPackage().getName();
+    @NonNull
+    private static String getFullBasePathFromPackage(
+        @NonNull Class<?> handlerType,
+        @NonNull List<String> packagesToExclude
+    ) {
+        Package pkg = handlerType.getPackage();
+        String packageName = pkg == null ? "" : pkg.getName();
 
-        String stringToFind = "api";
-        int idx = packageName.lastIndexOf(stringToFind);
+        List<String> segments = new ArrayList<>(Arrays.asList(packageName.split("\\.")));
 
-        String basePath = "";
-        if (idx != -1) {
-            basePath = packageName.substring(idx + stringToFind.length()).replaceAll("\\.", "/");
+        // find the LAST segment that is exactly "api" (whole-segment match, not substring)
+        int apiIndex = -1;
+        for (int i = segments.size() - 1; i >= 0; i--) {
+            if (segments.get(i).equals("api")) {
+                apiIndex = i;
+                break;
+            }
         }
 
-        if (basePath.startsWith("/")) {
-            basePath = basePath.substring(1);
+        List<String> pathSegments = apiIndex == -1 ? List.of() : segments.subList(apiIndex + 1, segments.size());
+
+        // drop any segment that matches an excluded package name (whole-segment match)
+        List<String> filteredSegments = new ArrayList<>();
+        for (String segment : pathSegments) {
+            if (!packagesToExclude.contains(segment)) {
+                filteredSegments.add(segment);
+            }
         }
 
-        if (!basePath.endsWith("/") && !basePath.isBlank()) {
-            basePath += "/";
-        }
+        String basePath = String.join("/", filteredSegments);
 
-        if (basePath.contains("/http")) {
-            basePath = basePath.replaceAll("/http", "");
-        }
-
-        return "/api/" + basePath;
+        return ("/api/" + basePath + "/").replaceAll("/{2,}", "/");
     }
 }

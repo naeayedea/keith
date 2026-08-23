@@ -33,7 +33,7 @@ public class UserService {
         try {
             return userManager.getOrCreateUser(userId);
         } catch (Throwable t) {
-            throw new KeithInternalException("Could not create or retrieve user with id {}", userId);
+            throw new KeithInternalException("Could not create or retrieve user with id " + userId, t);
         }
     }
 

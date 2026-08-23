@@ -3,6 +3,10 @@ name: "keith"
 networks:
   keith-network:
 
+volumes:
+  keith-mysql-data:
+  keith-rabbitmq-data:
+
 services:
   keith-core:
     container_name: "keith-core"
@@ -16,10 +20,41 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=8443
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=keith
     secrets:
-      - db_password
+      - source: db_password
+        target: keith.database.password
+      - source: rabbitmq_password
+        target: spring.rabbitmq.password
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  keith-discord:
+    container_name: "keith-discord"
+    build:
+      context: ..
+      dockerfile: discord/Dockerfile
+    networks:
+      - keith-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KEITH_CORE_BASE_URL=http://keith-core:8443
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=keith
+    secrets:
+      - source: discord_token
+        target: keith.configuration.token
+      - source: rabbitmq_password
+        target: spring.rabbitmq.password
+    depends_on:
+      keith-core:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   database:
     container_name: "mysql"
@@ -34,16 +69,49 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    expose:
-      - "3306"
+    ports:
+      - "13280:3306"
     networks:
       - keith-network
+    volumes:
+      - keith-mysql-data:/var/lib/mysql
+      #applied in filename order on first init only (empty data dir) - keep schema files named so
+      #that matters, e.g. the numeric-ish prefixes already on core/database/schemas/keith-core/*.sql
+      - ../core/database/schemas/keith-core:/docker-entrypoint-initdb.d:ro
     secrets:
       - db_password
       - db_root_password
+
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:4-management-alpine
+    #the default "guest" user only accepts connections from localhost - a custom user is needed
+    #for core/discord to connect to it from their own containers. The rabbitmq:4 image dropped
+    #support for the _FILE-suffixed secret env vars other images (mysql) still support, so this
+    #goes through env_file instead of the "secrets:" block - still gitignored, just not the same
+    #Docker-secrets mechanism as the other services here.
+    env_file:
+      - secrets/rabbitmq.env
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5672:5672"
+      #management UI, useful for debugging - not required for core/discord to talk to each other
+      - "15672:15672"
+    networks:
+      - keith-network
+    volumes:
+      - keith-rabbitmq-data:/var/lib/rabbitmq
 
 secrets:
   db_password:
     file: secrets/db_password.txt
   db_root_password:
     file: secrets/db_root_password.txt
+  discord_token:
+    file: secrets/discord_token.txt
+  rabbitmq_password:
+    file: secrets/rabbitmq_password.txt

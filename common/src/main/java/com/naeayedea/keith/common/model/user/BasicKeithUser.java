@@ -1,5 +1,8 @@
 package com.naeayedea.keith.common.model.user;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
 import java.util.Locale;
 
@@ -15,7 +18,8 @@ public class BasicKeithUser implements KeithUser {
 
     private final Locale locale;
 
-    public BasicKeithUser(String userId, AccessLevel accessLevel, Instant firstSeen, long commandCount, Locale locale) {
+    @JsonCreator
+    public BasicKeithUser(@JsonProperty("id") String userId, @JsonProperty("accessLevel") AccessLevel accessLevel, @JsonProperty("firstSeen") Instant firstSeen, @JsonProperty("commandCount") long commandCount, @JsonProperty("locale") Locale locale) {
         this.userId = userId;
         this.accessLevel = accessLevel;
         this.firstSeen = firstSeen;

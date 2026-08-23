@@ -1,13 +1,13 @@
 package com.naeayedea.keith.platform.discord.command.lib.interactions;
 
-import com.naeayedea.keith.core.commands.lib.Command;
+import com.naeayedea.keith.common.model.command.CommandInformationProvider;
 import com.naeayedea.keith.common.exception.KeithExecutionException;
 import com.naeayedea.keith.common.exception.KeithGracefulErrorException;
 import com.naeayedea.keith.common.exception.KeithPermissionException;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import org.springframework.lang.NonNull;
 
-public interface MessageContextCommandHandler extends Command {
+public interface MessageContextCommandHandler extends CommandInformationProvider {
 
     /**
      * Runs the given command

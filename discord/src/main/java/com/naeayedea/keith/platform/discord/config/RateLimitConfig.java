@@ -1,7 +1,7 @@
 package com.naeayedea.keith.platform.discord.config;
 
-import com.naeayedea.keith.core.ratelimiter.CommandRateLimiter;
-import com.naeayedea.keith.core.ratelimiter.RateLimitCache;
+import com.naeayedea.keith.platform.discord.ratelimiter.CommandRateLimiter;
+import com.naeayedea.keith.platform.discord.ratelimiter.RateLimitCache;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
